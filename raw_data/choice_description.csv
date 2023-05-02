@@ -1,0 +1,37 @@
+Choice situation,Scenario,Paysage,Acces,Biodiversite,Biome,Temps
+QCE1_SQ001,Scénario 1,75,0,0,2,4
+QCE2_SQ001,Scénario 1,25,0,2,0,8
+QCE3_SQ001,Scénario 1,75,1,0,0,8
+QCE4_SQ001,Scénario 1,75,1,0,0,6
+QCE5_SQ001,Scénario 1,75,1,1,1,2
+QCE6_SQ001,Scénario 1,25,1,2,2,4
+QCE7_SQ001,Scénario 1,25,0,1,1,6
+QCE8_SQ001,Scénario 1,25,0,2,1,6
+QCE9_SQ001,Scénario 1,25,1,1,2,4
+QCE10_SQ001,Scénario 1,25,1,0,1,2
+QCE11_SQ001,Scénario 1,75,0,1,0,8
+QCE12_SQ001,Scénario 1,75,0,1,2,2
+QCE1_SQ001,Scénario 2,25,1,2,0,6
+QCE2_SQ001,Scénario 2,75,1,0,2,2
+QCE3_SQ001,Scénario 2,25,0,1,1,8
+QCE4_SQ001,Scénario 2,25,0,2,2,8
+QCE5_SQ001,Scénario 2,25,0,1,2,6
+QCE6_SQ001,Scénario 2,75,0,0,1,4
+QCE7_SQ001,Scénario 2,75,1,1,0,2
+QCE8_SQ001,Scénario 2,75,1,0,0,6
+QCE9_SQ001,Scénario 2,75,0,1,1,2
+QCE10_SQ001,Scénario 2,75,0,2,0,4
+QCE11_SQ001,Scénario 2,25,1,0,2,8
+QCE12_SQ001,Scénario 2,25,1,1,1,4
+QCE1_SQ001,Scénario de référence,0,0,-1,-1,0
+QCE2_SQ001,Scénario de référence,0,0,-1,-1,0
+QCE3_SQ001,Scénario de référence,0,0,-1,-1,0
+QCE4_SQ001,Scénario de référence,0,0,-1,-1,0
+QCE5_SQ001,Scénario de référence,0,0,-1,-1,0
+QCE6_SQ001,Scénario de référence,0,0,-1,-1,0
+QCE7_SQ001,Scénario de référence,0,0,-1,-1,0
+QCE8_SQ001,Scénario de référence,0,0,-1,-1,0
+QCE9_SQ001,Scénario de référence,0,0,-1,-1,0
+QCE10_SQ001,Scénario de référence,0,0,-1,-1,0
+QCE11_SQ001,Scénario de référence,0,0,-1,-1,0
+QCE12_SQ001,Scénario de référence,0,0,-1,-1,0

@@ -1077,3 +1077,263 @@ data_clean$time_video_short[which(data_clean$Durée.pour.le.groupe...Cartes.de.c
 ## remove when exercise not understood at all
 data_clean <- droplevels(data_clean[which(!(data_clean$QCEex2 == "Non, je n'ai pas du tout compris l'exercice")),])
 
+## clean "other" postal codes
+data_clean$post_code_home <- as.character(data_clean$Q01)
+data_clean$post_code_home[which(data_clean$post_code_home=="Autre")] <- NA
+
+commune_liste_poste <- read.csv("raw_data/laposte_hexasmal.csv",header=TRUE, sep = ";", colClasses = rep("character",6))
+commune_liste_poste$com_code <- paste0(commune_liste_poste$nom_de_la_commune,spe=" - ",commune_liste_poste$code_postal)
+
+table(data_clean$Q01_other)
+
+data_clean$post_code_home[which(data_clean$Q01_other %in% c("01300","31160","33290","33640","34270",
+                                                            "34660","38150","44130","49290 ","59220","59600",
+                                                            "59660 ","68190","69250","99","Bouches du Rhône ","Monts",
+                                                            "Petit Caux ", "Lyo ","marseille","Marseille","MARSEILLE","Marseille ","MARSEILLE "))] <- NA
+data_clean$post_code_home[which(data_clean$Q01_other=="01480 Savigneux")] <- commune_liste_poste$com_code[which(commune_liste_poste$code_postal=="01480" & commune_liste_poste$nom_de_la_commune=="SAVIGNEUX")]
+data_clean$post_code_home[which(data_clean$Q01_other %in% c("13007","13007 Marseille"))] <- commune_liste_poste$com_code[which(commune_liste_poste$code_postal=="13007" & commune_liste_poste$libelle_d_acheminement =="MARSEILLE")]
+data_clean$post_code_home[which(data_clean$Q01_other %in% c("13013","13013 marseille","13013 MARSEILLE","13013 Marseille"))] <- commune_liste_poste$com_code[which(commune_liste_poste$code_postal=="13013" & commune_liste_poste$libelle_d_acheminement=="MARSEILLE")][1]
+data_clean$post_code_home[which(data_clean$Q01_other=="13014")] <- commune_liste_poste$com_code[which(commune_liste_poste$code_postal=="13014" & commune_liste_poste$libelle_d_acheminement=="MARSEILLE")]
+data_clean$post_code_home[which(data_clean$Q01_other%in% c("13015","13015 marseille"))] <- commune_liste_poste$com_code[which(commune_liste_poste$code_postal=="13015" & commune_liste_poste$libelle_d_acheminement=="MARSEILLE")]
+data_clean$post_code_home[which(data_clean$Q01_other=="13016 estaque")] <- commune_liste_poste$com_code[which(commune_liste_poste$code_postal=="13016" & commune_liste_poste$libelle_d_acheminement=="MARSEILLE")][1]
+data_clean$post_code_home[which(data_clean$Q01_other=="13820")] <- commune_liste_poste$com_code[which(commune_liste_poste$code_postal=="13820" & commune_liste_poste$nom_de_la_commune=="ENSUES LA REDONNE")][1]
+data_clean$post_code_home[which(data_clean$Q01_other=="14200")] <- commune_liste_poste$com_code[which(commune_liste_poste$code_postal=="14200" & commune_liste_poste$nom_de_la_commune=="HEROUVILLE ST CLAIR")]
+data_clean$post_code_home[which(data_clean$Q01_other=="20000 ajaccio")] <- commune_liste_poste$com_code[which(commune_liste_poste$code_postal=="20000" & commune_liste_poste$nom_de_la_commune=="AJACCIO")]
+data_clean$post_code_home[which(data_clean$Q01_other=="27320 saint Germain sur avre")] <- commune_liste_poste$com_code[which(commune_liste_poste$code_postal=="27320" & commune_liste_poste$nom_de_la_commune=="ST GERMAIN SUR AVRE")]
+data_clean$post_code_home[which(data_clean$Q01_other=="30720 RIBAUTE LES TAVERNES")] <- commune_liste_poste$com_code[which(commune_liste_poste$code_postal=="30720" & commune_liste_poste$nom_de_la_commune=="RIBAUTE LES TAVERNES")]
+data_clean$post_code_home[which(data_clean$Q01_other=="33230 coutras")] <- commune_liste_poste$com_code[which(commune_liste_poste$code_postal=="33230" & commune_liste_poste$nom_de_la_commune=="COUTRAS")]
+data_clean$post_code_home[which(data_clean$Q01_other=="33700 - Mérignac")] <- commune_liste_poste$com_code[which(commune_liste_poste$code_postal=="33700" & commune_liste_poste$nom_de_la_commune=="MERIGNAC")]
+data_clean$post_code_home[which(data_clean$Q01_other=="34230 pouzols ")] <- commune_liste_poste$com_code[which(commune_liste_poste$code_postal=="34230" & commune_liste_poste$nom_de_la_commune=="POUZOLS")]
+data_clean$post_code_home[which(data_clean$Q01_other %in% c("34270 Saint-Mathieu-de-Tréviers "))] <- commune_liste_poste$com_code[which(commune_liste_poste$code_postal=="34270" & commune_liste_poste$nom_de_la_commune=="ST MATHIEU DE TREVIERS")]
+data_clean$post_code_home[which(data_clean$Q01_other=="34290 Alignan du vent ")] <- commune_liste_poste$com_code[which(commune_liste_poste$code_postal=="34290" & commune_liste_poste$nom_de_la_commune=="ALIGNAN DU VENT")]
+data_clean$post_code_home[which(data_clean$Q01_other=="34970")] <- commune_liste_poste$com_code[which(commune_liste_poste$code_postal=="34970" & commune_liste_poste$nom_de_la_commune=="LATTES")]
+data_clean$post_code_home[which(data_clean$Q01_other=="38000 Grenoble")] <- commune_liste_poste$com_code[which(commune_liste_poste$code_postal=="38000" & commune_liste_poste$nom_de_la_commune=="GRENOBLE")]
+data_clean$post_code_home[which(data_clean$Q01_other=="44000")] <- commune_liste_poste$com_code[which(commune_liste_poste$code_postal=="44000" & commune_liste_poste$nom_de_la_commune=="NANTES")]
+data_clean$post_code_home[which(data_clean$Q01_other=="44130 Blain")] <- commune_liste_poste$com_code[which(commune_liste_poste$code_postal=="44130" & commune_liste_poste$nom_de_la_commune=="BLAIN")][1]
+data_clean$post_code_home[which(data_clean$Q01_other=="44130 Fay de bretagne")] <- commune_liste_poste$com_code[which(commune_liste_poste$code_postal=="44130" & commune_liste_poste$nom_de_la_commune=="FAY DE BRETAGNE")]
+data_clean$post_code_home[which(data_clean$Q01_other=="44150 Ancenis ")] <- commune_liste_poste$com_code[which(commune_liste_poste$code_postal=="44150" & commune_liste_poste$nom_de_la_commune=="ANCENIS ST GEREON")][1]
+data_clean$post_code_home[which(data_clean$Q01_other=="44150 Vair sur Loire ")] <- commune_liste_poste$com_code[which(commune_liste_poste$code_postal=="44150" & commune_liste_poste$nom_de_la_commune=="VAIR SUR LOIRE")][1]
+data_clean$post_code_home[which(data_clean$Q01_other=="44190 GETIGNE ")] <- commune_liste_poste$com_code[which(commune_liste_poste$code_postal=="44190" & commune_liste_poste$nom_de_la_commune=="GETIGNE")]
+data_clean$post_code_home[which(data_clean$Q01_other %in% c("44880","44880 sautron"))] <- commune_liste_poste$com_code[which(commune_liste_poste$code_postal=="44880" & commune_liste_poste$nom_de_la_commune=="SAUTRON")]
+data_clean$post_code_home[which(data_clean$Q01_other %in% c("49000 ANGERS","49000","49000 Angers "))] <- commune_liste_poste$com_code[which(commune_liste_poste$code_postal=="49000" & commune_liste_poste$nom_de_la_commune=="ANGERS")]
+data_clean$post_code_home[which(data_clean$Q01_other=="49110 Saint-Rémy-en-Mauges")] <- commune_liste_poste$com_code[which(commune_liste_poste$code_postal=="49110" & commune_liste_poste$nom_de_la_commune=="MONTREVAULT SUR EVRE")][1]
+data_clean$post_code_home[which(data_clean$Q01_other=="49140 cornillé les caves ")] <- commune_liste_poste$com_code[which(commune_liste_poste$code_postal=="49140" & commune_liste_poste$nom_de_la_commune=="CORNILLE LES CAVES")]
+data_clean$post_code_home[which(data_clean$Q01_other=="59140 DUNKERQUE")] <- commune_liste_poste$com_code[which(commune_liste_poste$code_postal=="59140" & commune_liste_poste$nom_de_la_commune=="DUNKERQUE")]
+data_clean$post_code_home[which(data_clean$Q01_other=="59278")] <- commune_liste_poste$com_code[which(commune_liste_poste$code_postal=="59278" & commune_liste_poste$nom_de_la_commune=="ESCAUTPONT")]
+data_clean$post_code_home[which(data_clean$Q01_other=="59400 CAMBRAI")] <- commune_liste_poste$com_code[which(commune_liste_poste$code_postal=="59400" & commune_liste_poste$nom_de_la_commune=="CAMBRAI")][1]
+data_clean$post_code_home[which(data_clean$Q01_other=="59410")] <- commune_liste_poste$com_code[which(commune_liste_poste$code_postal=="59410" & commune_liste_poste$nom_de_la_commune=="ANZIN")]
+data_clean$post_code_home[which(data_clean$Q01_other=="59660 Merville")] <- commune_liste_poste$com_code[which(commune_liste_poste$code_postal=="59660" & commune_liste_poste$nom_de_la_commune=="MERVILLE")]
+data_clean$post_code_home[which(data_clean$Q01_other=="67350 ETTENDORF ")] <- commune_liste_poste$com_code[which(commune_liste_poste$code_postal=="67350" & commune_liste_poste$nom_de_la_commune=="ETTENDORF")]
+data_clean$post_code_home[which(data_clean$Q01_other=="67350 UHRWILLER")] <- commune_liste_poste$com_code[which(commune_liste_poste$code_postal=="67350" & commune_liste_poste$nom_de_la_commune=="UHRWILLER")]
+data_clean$post_code_home[which(data_clean$Q01_other=="69007")] <- commune_liste_poste$com_code[which(commune_liste_poste$code_postal=="69007" & commune_liste_poste$libelle_d_acheminement=="LYON")]
+data_clean$post_code_home[which(data_clean$Q01_other=="69100")] <- commune_liste_poste$com_code[which(commune_liste_poste$code_postal=="69100" & commune_liste_poste$nom_de_la_commune=="VILLEURBANNE")]
+data_clean$post_code_home[which(data_clean$Q01_other=="69190 Saint fons ")] <- commune_liste_poste$com_code[which(commune_liste_poste$code_postal=="69190" & commune_liste_poste$nom_de_la_commune=="ST FONS")]
+data_clean$post_code_home[which(data_clean$Q01_other=="73370 Le Bourget-du-Lac")] <- commune_liste_poste$com_code[which(commune_liste_poste$code_postal=="73370" & commune_liste_poste$nom_de_la_commune=="LE BOURGET DU LAC")]
+data_clean$post_code_home[which(data_clean$Q01_other=="76270 Bouelles")] <- commune_liste_poste$com_code[which(commune_liste_poste$code_postal=="76270" & commune_liste_poste$nom_de_la_commune=="BOUELLES")]
+data_clean$post_code_home[which(data_clean$Q01_other=="76370 Petit-Caux")] <- commune_liste_poste$com_code[which(commune_liste_poste$code_postal=="76370" & commune_liste_poste$nom_de_la_commune=="PETIT CAUX")][1]
+data_clean$post_code_home[which(data_clean$Q01_other=="Agnin ")] <- commune_liste_poste$com_code[which(commune_liste_poste$code_postal=="38150" & commune_liste_poste$nom_de_la_commune=="AGNIN")]
+data_clean$post_code_home[which(data_clean$Q01_other %in% c("Angers ","ANGERS ","angers 49000"))] <- commune_liste_poste$com_code[which(commune_liste_poste$code_postal=="49000" & commune_liste_poste$nom_de_la_commune=="ANGERS")]
+data_clean$post_code_home[which(data_clean$Q01_other=="anzin 59410")] <- commune_liste_poste$com_code[which(commune_liste_poste$code_postal=="59410" & commune_liste_poste$nom_de_la_commune=="ANZIN")]
+data_clean$post_code_home[which(data_clean$Q01_other=="BASSAN")] <- commune_liste_poste$com_code[which(commune_liste_poste$code_postal=="34290" & commune_liste_poste$nom_de_la_commune=="BASSAN")]
+data_clean$post_code_home[which(data_clean$Q01_other=="Blain")] <- commune_liste_poste$com_code[which(commune_liste_poste$code_postal=="44130" & commune_liste_poste$nom_de_la_commune=="BLAIN")][1]
+data_clean$post_code_home[which(data_clean$Q01_other=="Caen ")] <- commune_liste_poste$com_code[which(commune_liste_poste$code_postal=="14000" & commune_liste_poste$nom_de_la_commune=="CAEN")]
+data_clean$post_code_home[which(data_clean$Q01_other=="CAGNOTTE")] <- commune_liste_poste$com_code[which(commune_liste_poste$code_postal=="40300" & commune_liste_poste$nom_de_la_commune=="CAGNOTTE")]
+data_clean$post_code_home[which(data_clean$Q01_other=="Denain ")] <- commune_liste_poste$com_code[which(commune_liste_poste$code_postal=="59220" & commune_liste_poste$nom_de_la_commune=="DENAIN")]
+data_clean$post_code_home[which(data_clean$Q01_other=="Ettendorf 67350")] <- commune_liste_poste$com_code[which(commune_liste_poste$code_postal=="67350" & commune_liste_poste$nom_de_la_commune=="ETTENDORF")]
+data_clean$post_code_home[which(data_clean$Q01_other=="Gratentour 31150")] <- commune_liste_poste$com_code[which(commune_liste_poste$code_postal=="31150" & commune_liste_poste$nom_de_la_commune=="GRATENTOUR")]
+data_clean$post_code_home[which(data_clean$Q01_other=="illats")] <- commune_liste_poste$com_code[which(commune_liste_poste$code_postal=="33720" & commune_liste_poste$nom_de_la_commune=="ILLATS")]
+data_clean$post_code_home[which(data_clean$Q01_other=="Manosque ")] <- commune_liste_poste$com_code[which(commune_liste_poste$code_postal=="04100" & commune_liste_poste$nom_de_la_commune=="MANOSQUE")]
+data_clean$post_code_home[which(data_clean$Q01_other=="Marcilly la Campagne 27320")] <- commune_liste_poste$com_code[which(commune_liste_poste$code_postal=="27320" & commune_liste_poste$nom_de_la_commune=="MARCILLY LA CAMPAGNE")]
+data_clean$post_code_home[which(data_clean$Q01_other=="Marseille 13007")] <- commune_liste_poste$com_code[which(commune_liste_poste$code_postal=="13007" & commune_liste_poste$libelle_d_acheminement=="MARSEILLE")]
+data_clean$post_code_home[which(data_clean$Q01_other=="Marseille 13013")] <- commune_liste_poste$com_code[which(commune_liste_poste$code_postal=="13013" & commune_liste_poste$libelle_d_acheminement=="MARSEILLE")][1]
+data_clean$post_code_home[which(data_clean$Q01_other %in% c("marseille 13016","MARSEILLE 13016","Marseille 13016 "))] <- commune_liste_poste$com_code[which(commune_liste_poste$code_postal=="13016" & commune_liste_poste$libelle_d_acheminement=="MARSEILLE")][1]
+data_clean$post_code_home[which(data_clean$Q01_other %in% c("maubeuge","Maubeuge","Maubeuge ","maubeuge 59600","Maubeuge 59600"))] <- commune_liste_poste$com_code[which(commune_liste_poste$code_postal=="59600" & commune_liste_poste$nom_de_la_commune=="MAUBEUGE")][1]
+data_clean$post_code_home[which(data_clean$Q01_other %in% c("Montpellier","Montpellier "))] <- commune_liste_poste$com_code[which(commune_liste_poste$code_postal=="34000" & commune_liste_poste$nom_de_la_commune=="MONTPELLIER")]
+data_clean$post_code_home[which(data_clean$Q01_other=="Montpellier 34090")] <- commune_liste_poste$com_code[which(commune_liste_poste$code_postal=="34090" & commune_liste_poste$nom_de_la_commune=="MONTPELLIER")]
+data_clean$post_code_home[which(data_clean$Q01_other=="Montrevault sur evre ")] <- commune_liste_poste$com_code[which(commune_liste_poste$code_postal=="49110" & commune_liste_poste$nom_de_la_commune=="MONTREVAULT SUR EVRE")][1]
+data_clean$post_code_home[which(data_clean$Q01_other=="Nantes")] <- commune_liste_poste$com_code[which(commune_liste_poste$code_postal=="44000" & commune_liste_poste$nom_de_la_commune=="NANTES")]
+data_clean$post_code_home[which(data_clean$Q01_other=="Nantes 44300")] <- commune_liste_poste$com_code[which(commune_liste_poste$code_postal=="44300" & commune_liste_poste$nom_de_la_commune=="NANTES")]
+data_clean$post_code_home[which(data_clean$Q01_other=="NEUVILLE SUR SAONE")] <- commune_liste_poste$com_code[which(commune_liste_poste$code_postal=="69250" & commune_liste_poste$nom_de_la_commune=="NEUVILLE SUR SAONE")]
+data_clean$post_code_home[which(data_clean$Q01_other=="Pont d’Ain ")] <- commune_liste_poste$com_code[which(commune_liste_poste$code_postal=="01160" & commune_liste_poste$nom_de_la_commune=="PONT D AIN")]
+data_clean$post_code_home[which(data_clean$Q01_other=="Roussillon 38150")] <- commune_liste_poste$com_code[which(commune_liste_poste$code_postal=="38150" & commune_liste_poste$nom_de_la_commune=="ROUSSILLON")]
+data_clean$post_code_home[which(data_clean$Q01_other=="Saint Mathieu de Tréviers ")] <- commune_liste_poste$com_code[which(commune_liste_poste$code_postal=="34270" & commune_liste_poste$nom_de_la_commune=="ST MATHIEU DE TREVIERS")]
+data_clean$post_code_home[which(data_clean$Q01_other=="saint saire")] <- commune_liste_poste$com_code[which(commune_liste_poste$code_postal=="76270" & commune_liste_poste$nom_de_la_commune=="ST SAIRE")]
+data_clean$post_code_home[which(data_clean$Q01_other=="Salaise sur sanne 38150")] <- commune_liste_poste$com_code[which(commune_liste_poste$code_postal=="38150" & commune_liste_poste$nom_de_la_commune=="SALAISE SUR SANNE")]
+data_clean$post_code_home[which(data_clean$Q01_other %in% c("Servian","Servian 34290"))] <- commune_liste_poste$com_code[which(commune_liste_poste$code_postal=="34290" & commune_liste_poste$nom_de_la_commune=="SERVIAN")]
+data_clean$post_code_home[which(data_clean$Q01_other=="St fons")] <- commune_liste_poste$com_code[which(commune_liste_poste$code_postal=="69190" & commune_liste_poste$nom_de_la_commune=="ST FONS")]
+data_clean$post_code_home[which(data_clean$Q01_other=="ST PIERRE MONTLIMART 49110")] <- commune_liste_poste$com_code[which(commune_liste_poste$code_postal=="49110" & commune_liste_poste$nom_de_la_commune=="MONTREVAULT SUR EVRE")][1]
+data_clean$post_code_home[which(data_clean$Q01_other=="Villemur-sur-Tarn 31340")] <- commune_liste_poste$com_code[which(commune_liste_poste$code_postal=="31340" & commune_liste_poste$nom_de_la_commune=="VILLEMUR SUR TARN")]
+data_clean$post_code_home[which(data_clean$Q01_other=="Villeneuve loubet ")] <- commune_liste_poste$com_code[which(commune_liste_poste$code_postal=="06270" & commune_liste_poste$nom_de_la_commune=="VILLENEUVE LOUBET")]
+data_clean$post_code_home[which(data_clean$Q01_other=="Wavrechain-sous-Denain ")] <- commune_liste_poste$com_code[which(commune_liste_poste$code_postal=="59220" & commune_liste_poste$nom_de_la_commune=="WAVRECHAIN SOUS DENAIN")]
+
+data_clean$post_code_home[which(!(data_clean$post_code_home %in% levels(data_clean$Q01)))] <- NA
+
+
+data_clean$post_code_work <- as.character(data_clean$QIV28)
+data_clean$post_code_work[which(data_clean$post_code_work=="Autre")] <- NA
+
+table(data_clean$QIV28_other)
+
+data_clean$post_code_work[which(data_clean$QIV28_other %in% c("je ne travaille pas","sur le terroire Français et à l'étranger","38150","44150","68190","69250","Sophia Antipolis","Zwevegem Belgique","Namur 5000 (Belgique)"))] <- NA
+data_clean$post_code_work[which(data_clean$QIV28_other %in% c("13002 marseille"))] <- commune_liste_poste$com_code[which(commune_liste_poste$code_postal=="13002" & commune_liste_poste$libelle_d_acheminement =="MARSEILLE")]
+data_clean$post_code_work[which(data_clean$QIV28_other %in% c("13005"))] <- commune_liste_poste$com_code[which(commune_liste_poste$code_postal=="13005" & commune_liste_poste$libelle_d_acheminement =="MARSEILLE")]
+data_clean$post_code_work[which(data_clean$QIV28_other %in% c("13007","13007 Marseille ","13007 MARSEILLE "))] <- commune_liste_poste$com_code[which(commune_liste_poste$code_postal=="13007" & commune_liste_poste$libelle_d_acheminement =="MARSEILLE")]
+data_clean$post_code_work[which(data_clean$QIV28_other %in% c("13011"))] <- commune_liste_poste$com_code[which(commune_liste_poste$code_postal=="13011" & commune_liste_poste$libelle_d_acheminement =="MARSEILLE")][1]
+data_clean$post_code_work[which(data_clean$QIV28_other %in% c("13013","13013 Marseille","13013 MARSEILLE","Marseille 13013","Marseille13013"))] <- commune_liste_poste$com_code[which(commune_liste_poste$code_postal=="13013" & commune_liste_poste$libelle_d_acheminement =="MARSEILLE")][1]
+data_clean$post_code_work[which(data_clean$QIV28_other %in% c("13014 marseille"))] <- commune_liste_poste$com_code[which(commune_liste_poste$code_postal=="13014" & commune_liste_poste$libelle_d_acheminement =="MARSEILLE")]
+data_clean$post_code_work[which(data_clean$QIV28_other %in% c("13015","Marseille 13015"))] <- commune_liste_poste$com_code[which(commune_liste_poste$code_postal=="13015" & commune_liste_poste$libelle_d_acheminement =="MARSEILLE")]
+data_clean$post_code_work[which(data_clean$QIV28_other %in% c("13016 lestaque ", "marseille 13016", "L'ESTAQUE 13016"))] <- commune_liste_poste$com_code[which(commune_liste_poste$code_postal=="13016" & commune_liste_poste$libelle_d_acheminement =="MARSEILLE")][1]
+data_clean$post_code_work[which(data_clean$QIV28_other=="13820")] <- commune_liste_poste$com_code[which(commune_liste_poste$code_postal=="13820" & commune_liste_poste$nom_de_la_commune=="ENSUES LA REDONNE")][1]
+data_clean$post_code_work[which(data_clean$QIV28_other=="14000")] <- commune_liste_poste$com_code[which(commune_liste_poste$code_postal=="14000" & commune_liste_poste$nom_de_la_commune=="CAEN")]
+data_clean$post_code_work[which(data_clean$QIV28_other=="14200")] <- commune_liste_poste$com_code[which(commune_liste_poste$code_postal=="14200" & commune_liste_poste$nom_de_la_commune=="HEROUVILLE ST CLAIR")]
+data_clean$post_code_work[which(data_clean$QIV28_other=="20000 ajaccio ")] <- commune_liste_poste$com_code[which(commune_liste_poste$code_postal=="20000" & commune_liste_poste$nom_de_la_commune=="AJACCIO")]
+data_clean$post_code_work[which(data_clean$QIV28_other=="27100")] <- commune_liste_poste$com_code[which(commune_liste_poste$code_postal=="27100" & commune_liste_poste$nom_de_la_commune=="VAL DE REUIL")]
+data_clean$post_code_work[which(data_clean$QIV28_other=="27320 saint Germain sur avre ")] <- commune_liste_poste$com_code[which(commune_liste_poste$code_postal=="27320" & commune_liste_poste$nom_de_la_commune=="ST GERMAIN SUR AVRE")]
+data_clean$post_code_work[which(data_clean$QIV28_other %in% c("30100","30100 ALES"))] <- commune_liste_poste$com_code[which(commune_liste_poste$code_postal=="30100" & commune_liste_poste$nom_de_la_commune=="ALES")]
+data_clean$post_code_work[which(data_clean$QIV28_other=="33127 - Martignas-sur-Jalle ")] <- commune_liste_poste$com_code[which(commune_liste_poste$code_postal=="33127" & commune_liste_poste$nom_de_la_commune=="MARTIGNAS SUR JALLE")]
+data_clean$post_code_work[which(data_clean$QIV28_other=="33600 Pessac")] <- commune_liste_poste$com_code[which(commune_liste_poste$code_postal=="33600" & commune_liste_poste$nom_de_la_commune=="PESSAC")]
+data_clean$post_code_work[which(data_clean$QIV28_other %in% c("34270 Saint-Mathieu-de-Tréviers ","Saint Mathieu de Tréviers "))] <- commune_liste_poste$com_code[which(commune_liste_poste$code_postal=="34270" & commune_liste_poste$nom_de_la_commune=="ST MATHIEU DE TREVIERS")]
+data_clean$post_code_work[which(data_clean$QIV28_other=="34290 BASSAN")] <- commune_liste_poste$com_code[which(commune_liste_poste$code_postal=="34290" & commune_liste_poste$nom_de_la_commune=="BASSAN")]
+data_clean$post_code_work[which(data_clean$QIV28_other %in% c("34500 beziers","34500 Béziers"))] <- commune_liste_poste$com_code[which(commune_liste_poste$code_postal=="34500" & commune_liste_poste$nom_de_la_commune=="BEZIERS")]
+data_clean$post_code_work[which(data_clean$QIV28_other=="34660")] <- commune_liste_poste$com_code[which(commune_liste_poste$code_postal=="34660" & commune_liste_poste$nom_de_la_commune=="COURNONTERRAL")]
+data_clean$post_code_work[which(data_clean$QIV28_other %in% c("38150 agnin"))] <- commune_liste_poste$com_code[which(commune_liste_poste$code_postal=="38150" & commune_liste_poste$nom_de_la_commune=="AGNIN")]
+data_clean$post_code_work[which(data_clean$QIV28_other=="38150 Roussillon")] <- commune_liste_poste$com_code[which(commune_liste_poste$code_postal=="38150" & commune_liste_poste$nom_de_la_commune=="ROUSSILLON")]
+data_clean$post_code_work[which(data_clean$QIV28_other=="38150 salaise sur sanne ")] <- commune_liste_poste$com_code[which(commune_liste_poste$code_postal=="38150" & commune_liste_poste$nom_de_la_commune=="SALAISE SUR SANNE")]
+data_clean$post_code_work[which(data_clean$QIV28_other=="44000")] <- commune_liste_poste$com_code[which(commune_liste_poste$code_postal=="44000" & commune_liste_poste$nom_de_la_commune=="NANTES")]
+data_clean$post_code_work[which(data_clean$QIV28_other=="44120 VERTOU ")] <- commune_liste_poste$com_code[which(commune_liste_poste$code_postal=="44120" & commune_liste_poste$nom_de_la_commune=="VERTOU")][1]
+data_clean$post_code_work[which(data_clean$QIV28_other %in% c("44130 BLAIN","blain 44130"))] <- commune_liste_poste$com_code[which(commune_liste_poste$code_postal=="44130" & commune_liste_poste$nom_de_la_commune=="BLAIN")][1]
+data_clean$post_code_work[which(data_clean$QIV28_other=="44150 Ancenis ")] <- commune_liste_poste$com_code[which(commune_liste_poste$code_postal=="44150" & commune_liste_poste$nom_de_la_commune=="ANCENIS ST GEREON")][1]
+data_clean$post_code_work[which(data_clean$QIV28_other=="44150 Vair sur Loire ")] <- commune_liste_poste$com_code[which(commune_liste_poste$code_postal=="44150" & commune_liste_poste$nom_de_la_commune=="VAIR SUR LOIRE")][1]
+data_clean$post_code_work[which(data_clean$QIV28_other=="44800")] <- commune_liste_poste$com_code[which(commune_liste_poste$code_postal=="44800" & commune_liste_poste$nom_de_la_commune=="ST HERBLAIN")]
+data_clean$post_code_work[which(data_clean$QIV28_other %in% c("44880 sautron"))] <- commune_liste_poste$com_code[which(commune_liste_poste$code_postal=="44880" & commune_liste_poste$nom_de_la_commune=="SAUTRON")]
+data_clean$post_code_work[which(data_clean$QIV28_other=="49000")] <- commune_liste_poste$com_code[which(commune_liste_poste$code_postal=="49000" & commune_liste_poste$nom_de_la_commune=="ANGERS")]
+data_clean$post_code_work[which(data_clean$QIV28_other=="49124 st Barthélemy d'anjou ")] <- commune_liste_poste$com_code[which(commune_liste_poste$code_postal=="49124" & commune_liste_poste$nom_de_la_commune=="ST BARTHELEMY D ANJOU")]
+data_clean$post_code_work[which(data_clean$QIV28_other=="49140 jarze")] <- commune_liste_poste$com_code[which(commune_liste_poste$code_postal=="49140" & commune_liste_poste$nom_de_la_commune=="JARZE VILLAGES")][1]
+data_clean$post_code_work[which(data_clean$QIV28_other=="49240")] <- commune_liste_poste$com_code[which(commune_liste_poste$code_postal=="49240" & commune_liste_poste$nom_de_la_commune=="AVRILLE")]
+data_clean$post_code_work[which(data_clean$QIV28_other=="49290 Chalonnes sur loire ")] <- commune_liste_poste$com_code[which(commune_liste_poste$code_postal=="49290" & commune_liste_poste$nom_de_la_commune=="CHALONNES SUR LOIRE")]
+data_clean$post_code_work[which(data_clean$QIV28_other=="59140 Dunkerque")] <- commune_liste_poste$com_code[which(commune_liste_poste$code_postal=="59140" & commune_liste_poste$nom_de_la_commune=="DUNKERQUE")]
+data_clean$post_code_work[which(data_clean$QIV28_other=="59220 Denain")] <- commune_liste_poste$com_code[which(commune_liste_poste$code_postal=="59220" & commune_liste_poste$nom_de_la_commune=="DENAIN")]
+data_clean$post_code_work[which(data_clean$QIV28_other=="59278 Escautpont ")] <- commune_liste_poste$com_code[which(commune_liste_poste$code_postal=="59278" & commune_liste_poste$nom_de_la_commune=="ESCAUTPONT")]
+data_clean$post_code_work[which(data_clean$QIV28_other=="59400 CAMBRAI")] <- commune_liste_poste$com_code[which(commune_liste_poste$code_postal=="59400" & commune_liste_poste$nom_de_la_commune=="CAMBRAI")][1]
+data_clean$post_code_work[which(data_clean$QIV28_other %in% c("59410","59410 Anzin"))] <- commune_liste_poste$com_code[which(commune_liste_poste$code_postal=="59410" & commune_liste_poste$nom_de_la_commune=="ANZIN")]
+data_clean$post_code_work[which(data_clean$QIV28_other %in% c("59600","59600 Maubeuge "))] <- commune_liste_poste$com_code[which(commune_liste_poste$code_postal=="59600" & commune_liste_poste$nom_de_la_commune=="MAUBEUGE")]
+data_clean$post_code_work[which(data_clean$QIV28_other %in% c("59660","59660 Merville"))] <- commune_liste_poste$com_code[which(commune_liste_poste$code_postal=="59660" & commune_liste_poste$nom_de_la_commune=="MERVILLE")]
+data_clean$post_code_work[which(data_clean$QIV28_other %in% c("67350 ETTENDORF ","Ettendorf 67350"))] <- commune_liste_poste$com_code[which(commune_liste_poste$code_postal=="67350" & commune_liste_poste$nom_de_la_commune=="ETTENDORF")]
+data_clean$post_code_work[which(data_clean$QIV28_other=="67930 BEINHEIM")] <- commune_liste_poste$com_code[which(commune_liste_poste$code_postal=="67930" & commune_liste_poste$nom_de_la_commune=="BEINHEIM")]
+data_clean$post_code_work[which(data_clean$QIV28_other=="69003 LYON")] <- commune_liste_poste$com_code[which(commune_liste_poste$code_postal=="69003" & commune_liste_poste$libelle_d_acheminement=="LYON")]
+data_clean$post_code_work[which(data_clean$QIV28_other=="69007")] <- commune_liste_poste$com_code[which(commune_liste_poste$code_postal=="69007" & commune_liste_poste$libelle_d_acheminement=="LYON")]
+data_clean$post_code_work[which(data_clean$QIV28_other=="69100")] <- commune_liste_poste$com_code[which(commune_liste_poste$code_postal=="69100" & commune_liste_poste$nom_de_la_commune=="VILLEURBANNE")]
+data_clean$post_code_work[which(data_clean$QIV28_other %in% c("69190 Saint fons ","St fons"))] <- commune_liste_poste$com_code[which(commune_liste_poste$code_postal=="69190" & commune_liste_poste$nom_de_la_commune=="ST FONS")]
+data_clean$post_code_work[which(data_clean$QIV28_other=="73000 Chambéry")] <- commune_liste_poste$com_code[which(commune_liste_poste$code_postal=="73000" & commune_liste_poste$nom_de_la_commune=="CHAMBERY")]
+data_clean$post_code_work[which(data_clean$QIV28_other=="76270 Bouelles")] <- commune_liste_poste$com_code[which(commune_liste_poste$code_postal=="76270" & commune_liste_poste$nom_de_la_commune=="BOUELLES")]
+data_clean$post_code_work[which(data_clean$QIV28_other=="76370 Petit-Caux")] <- commune_liste_poste$com_code[which(commune_liste_poste$code_postal=="76370" & commune_liste_poste$nom_de_la_commune=="PETIT CAUX")][1]
+data_clean$post_code_work[which(data_clean$QIV28_other=="Amboise 37400")] <- commune_liste_poste$com_code[which(commune_liste_poste$code_postal=="37400" & commune_liste_poste$nom_de_la_commune=="AMBOISE")]
+data_clean$post_code_work[which(data_clean$QIV28_other %in% c("Angers ","ANGERS "))] <- commune_liste_poste$com_code[which(commune_liste_poste$code_postal=="49000" & commune_liste_poste$nom_de_la_commune=="ANGERS")]
+data_clean$post_code_work[which(data_clean$QIV28_other=="Assas 34820")] <- commune_liste_poste$com_code[which(commune_liste_poste$code_postal=="34820" & commune_liste_poste$nom_de_la_commune=="ASSAS")]
+data_clean$post_code_work[which(data_clean$QIV28_other=="Beaupréau ")] <- commune_liste_poste$com_code[which(commune_liste_poste$code_postal=="49600" & commune_liste_poste$nom_de_la_commune=="BEAUPREAU EN MAUGES")][5]
+data_clean$post_code_work[which(data_clean$QIV28_other=="Bessières 31660")] <- commune_liste_poste$com_code[which(commune_liste_poste$code_postal=="31660" & commune_liste_poste$nom_de_la_commune=="BESSIERES")]
+data_clean$post_code_work[which(data_clean$QIV28_other=="Bourgoin ")] <- commune_liste_poste$com_code[which(commune_liste_poste$code_postal=="38300" & commune_liste_poste$nom_de_la_commune=="BOURGOIN JALLIEU")][1]
+data_clean$post_code_work[which(data_clean$QIV28_other=="CAGNOTTE")] <- commune_liste_poste$com_code[which(commune_liste_poste$code_postal=="40300" & commune_liste_poste$nom_de_la_commune=="CAGNOTTE")]
+data_clean$post_code_work[which(data_clean$QIV28_other=="Carquefou")] <- commune_liste_poste$com_code[which(commune_liste_poste$code_postal=="44470" & commune_liste_poste$nom_de_la_commune=="CARQUEFOU")]
+data_clean$post_code_work[which(data_clean$QIV28_other=="Colombier saugnieu")] <- commune_liste_poste$com_code[which(commune_liste_poste$code_postal=="69125" & commune_liste_poste$nom_de_la_commune=="COLOMBIER SAUGNIEU")][1]
+data_clean$post_code_work[which(data_clean$QIV28_other=="coutras 33230")] <- commune_liste_poste$com_code[which(commune_liste_poste$code_postal=="33230" & commune_liste_poste$nom_de_la_commune=="COUTRAS")]
+data_clean$post_code_work[which(data_clean$QIV28_other=="Dieppe ")] <- commune_liste_poste$com_code[which(commune_liste_poste$code_postal=="76200" & commune_liste_poste$nom_de_la_commune=="DIEPPE")]
+data_clean$post_code_work[which(data_clean$QIV28_other=="Gratentour 31150")] <- commune_liste_poste$com_code[which(commune_liste_poste$code_postal=="31150" & commune_liste_poste$nom_de_la_commune=="GRATENTOUR")]
+data_clean$post_code_work[which(data_clean$QIV28_other=="Le fuilet")] <- commune_liste_poste$com_code[which(commune_liste_poste$code_postal=="49270" & commune_liste_poste$nom_de_la_commune=="MONTREVAULT SUR EVRE")]
+data_clean$post_code_work[which(data_clean$QIV28_other=="Le Tholonet")] <- commune_liste_poste$com_code[which(commune_liste_poste$code_postal=="83340" & commune_liste_poste$nom_de_la_commune=="LE THORONET")]
+data_clean$post_code_work[which(data_clean$QIV28_other=="Ludon medoc ")] <- commune_liste_poste$com_code[which(commune_liste_poste$code_postal=="33290" & commune_liste_poste$nom_de_la_commune=="LUDON MEDOC")]
+data_clean$post_code_work[which(data_clean$QIV28_other=="Manosque")] <- commune_liste_poste$com_code[which(commune_liste_poste$code_postal=="04100" & commune_liste_poste$nom_de_la_commune=="MANOSQUE")]
+data_clean$post_code_work[which(data_clean$QIV28_other=="Marcilly la Campagne 27320")] <- commune_liste_poste$com_code[which(commune_liste_poste$code_postal=="27320" & commune_liste_poste$nom_de_la_commune=="MARCILLY LA CAMPAGNE")]
+data_clean$post_code_work[which(data_clean$QIV28_other %in% c("marseille","Marseille","MARSEILLE","Marseille ","MARSEILLE "))] <- commune_liste_poste$com_code[which(commune_liste_poste$code_postal=="13001" & commune_liste_poste$libelle_d_acheminement=="MARSEILLE")]
+data_clean$post_code_work[which(data_clean$QIV28_other=="Martin église ")] <- commune_liste_poste$com_code[which(commune_liste_poste$code_postal=="76370" & commune_liste_poste$nom_de_la_commune=="MARTIN EGLISE")]
+data_clean$post_code_work[which(data_clean$QIV28_other %in% c("maubauge 59600","maubeuge","Maubeuge"))] <- commune_liste_poste$com_code[which(commune_liste_poste$code_postal=="59600" & commune_liste_poste$nom_de_la_commune=="MAUBEUGE")]
+data_clean$post_code_work[which(data_clean$QIV28_other=="Montpellier 34090")] <- commune_liste_poste$com_code[which(commune_liste_poste$code_postal=="34090" & commune_liste_poste$nom_de_la_commune=="MONTPELLIER")]
+data_clean$post_code_work[which(data_clean$QIV28_other=="Nantes")] <- commune_liste_poste$com_code[which(commune_liste_poste$code_postal=="44000" & commune_liste_poste$nom_de_la_commune=="NANTES")]
+data_clean$post_code_work[which(data_clean$QIV28_other=="Nantes 44300")] <- commune_liste_poste$com_code[which(commune_liste_poste$code_postal=="44300" & commune_liste_poste$nom_de_la_commune=="NANTES")]
+data_clean$post_code_work[which(data_clean$QIV28_other=="NEUVILLE SUR SAONE")] <- commune_liste_poste$com_code[which(commune_liste_poste$code_postal=="69250" & commune_liste_poste$nom_de_la_commune=="NEUVILLE SUR SAONE")]
+data_clean$post_code_work[which(data_clean$QIV28_other=="PEZENAS")] <- commune_liste_poste$com_code[which(commune_liste_poste$code_postal=="34120" & commune_liste_poste$nom_de_la_commune=="PEZENAS")]
+data_clean$post_code_work[which(data_clean$QIV28_other=="Plan de Cuques ")] <- commune_liste_poste$com_code[which(commune_liste_poste$code_postal=="13380" & commune_liste_poste$nom_de_la_commune=="PLAN DE CUQUES")]
+data_clean$post_code_work[which(data_clean$QIV28_other=="Pont d’Ain ")] <- commune_liste_poste$com_code[which(commune_liste_poste$code_postal=="01160" & commune_liste_poste$nom_de_la_commune=="PONT D AIN")]
+data_clean$post_code_work[which(data_clean$QIV28_other=="Pouzols ")] <- commune_liste_poste$com_code[which(commune_liste_poste$code_postal=="34230" & commune_liste_poste$nom_de_la_commune=="POUZOLS")]
+data_clean$post_code_work[which(data_clean$QIV28_other=="saint clair du rhone")] <- commune_liste_poste$com_code[which(commune_liste_poste$code_postal=="38370" & commune_liste_poste$nom_de_la_commune=="ST CLAIR DU RHONE")]
+data_clean$post_code_work[which(data_clean$QIV28_other=="Saint Paul de vence")] <- commune_liste_poste$com_code[which(commune_liste_poste$code_postal=="06570" & commune_liste_poste$nom_de_la_commune=="ST PAUL DE VENCE")]
+data_clean$post_code_work[which(data_clean$QIV28_other=="Saint Savournin")] <- commune_liste_poste$com_code[which(commune_liste_poste$code_postal=="13119" & commune_liste_poste$nom_de_la_commune=="ST SAVOURNIN")]
+data_clean$post_code_work[which(data_clean$QIV28_other=="saint-saire")] <- commune_liste_poste$com_code[which(commune_liste_poste$code_postal=="76270" & commune_liste_poste$nom_de_la_commune=="ST SAIRE")]
+data_clean$post_code_work[which(data_clean$QIV28_other=="Tours 37100")] <- commune_liste_poste$com_code[which(commune_liste_poste$code_postal=="37100" & commune_liste_poste$nom_de_la_commune=="TOURS")]
+data_clean$post_code_work[which(data_clean$QIV28_other=="Verrière le buisson ")] <- commune_liste_poste$com_code[which(commune_liste_poste$code_postal=="91370" & commune_liste_poste$nom_de_la_commune=="VERRIERES LE BUISSON")]
+data_clean$post_code_work[which(data_clean$QIV28_other=="Vieux reng ")] <- commune_liste_poste$com_code[which(commune_liste_poste$code_postal=="59600" & commune_liste_poste$nom_de_la_commune=="VIEUX RENG")]
+data_clean$post_code_work[which(data_clean$QIV28_other=="Villeneuve loubet ")] <- commune_liste_poste$com_code[which(commune_liste_poste$code_postal=="06270" & commune_liste_poste$nom_de_la_commune=="VILLENEUVE LOUBET")]
+data_clean$post_code_work[which(data_clean$QIV28_other=="Wavrechain sous Denain ")] <- commune_liste_poste$com_code[which(commune_liste_poste$code_postal=="59220" & commune_liste_poste$nom_de_la_commune=="WAVRECHAIN SOUS DENAIN")]
+
+commune_liste_poste_unique <- data.frame(commune_liste_poste %>% distinct(code_commune_insee, code_postal, .keep_all=TRUE))
+
+data_clean_com <- merge(data_clean,commune_liste_poste_unique, by.x="post_code_home", by.y="com_code", all.x=TRUE)
+
+# add naturality value and class
+
+com_isochrone <- readRDS("output/com_isochrone.rds")
+data_clean_com_nat <- merge(data_clean_com,com_isochrone, by.x="code_commune_insee", by.y="com_code", all.x=TRUE)
+
+# Save clean response database
+saveRDS(data_clean_com_nat,file="output/data_clean_com_nat.rds")
+
+
+# prepare data for choice analysis with apollo
+
+## add choice descritpion
+choice_description <- read.csv("raw_data/choice_description_wide.csv", header=TRUE)
+
+## one row per individual per choice
+data_clean_long <- melt(data_clean_com_nat, measure.vars=c(unique(choice_description$Choice.situation)))
+names(data_clean_long)[which(names(data_clean_long) %in% c("variable","value"))] <- c("Choice.situation","Chosen_scenario")
+
+## merge responses with data description
+data_apollo <- merge(data_clean_long,choice_description, by=c("Choice.situation"), all.x = TRUE)
+
+## select useful columns and set readable names
+data_apollo <- data_apollo[,c("id","Chosen_scenario","Paysage_1","Acces_1","Biodiversite_1","Biome_1","Temps_1",
+                        "Paysage_2","Acces_2","Biodiversite_2","Biome_2","Temps_2",
+                        "Paysage_SQ","Acces_SQ","Biodiversite_SQ","Biome_SQ","Temps_SQ",
+                        "Q01b","Q01c","Q01d","QIV19","QIV21_SQ001","QIV21_SQ002","QIV21_SQ003","QIV22",
+                        "QI4_SQ002","QI4_SQ003","QI4_SQ004","QI4_SQ005","QI4_SQ006","QI4_other",
+                        "QI5_SQ002","QI5_SQ003","QI5_SQ004","QI5_SQ005","QI5_SQ006",
+                        "QI6_1","QI6_2","QI6_3","QI6_4","QI7",
+                        "QI8_SQ001","QI8_SQ002","QI8_SQ003","QI8_SQ004","QI8_SQ005","QI8_other",
+                        "QIII9_SQ002","QIII9_SQ003","QIII9_SQ004","QIII9_SQ005","QIII9_SQ006","QIII9_SQ007",
+                        "QIII10_SQ001","QIII10_SQ002","QIII10_SQ003","QIII10_SQ004","QIII10_SQ005","QIII10_SQ006","QIII10_other",
+                        "QIII11_SQ001","QIII11_SQ002","QIII11_other","QIII12_SQ001","QIII13_SQ001",
+                        "QIII15_SQ001","QIII15_SQ002","QIII15_SQ003","QIII15_SQ004","QIII15_SQ005","QIII15_SQ006",
+                        "QIII14_SQ001","QIII14_SQ002","QIII14_SQ003","QIII14_SQ004","QIII14_SQ005","QIII14_SQ010","QIII14_SQ006","QIII14_SQ007","QIII14_SQ008","QIII14_SQ009","QIII14_SQ011",
+                        "QIII16_SQ001","QIII16_SQ002","QIII16_SQ003","QIII16_SQ004","QIII16_SQ005","QIII16_SQ006","QIII16_SQ007","QIII16_SQ008","QIII16_other","QIV18",
+                        "QIV23","QIV23_comment","QIV24","QIV24_comment","QIV25","QIV25_comment","QIV26","QIV27","QVnew_SQ001",
+                        "survey_id","time_video_short","post_code_home","post_code_work","com_centre","com_peri","com_name",
+                        "pot_fin_hab","med_disp","p_csp_cadpis","p_csp_arcomce","p_csp_agr","p_csp_empl","p_csp_inter","p_csp_ouvr",
+                        "nb_inact1564","pc_inact1564","dens_pop","part_domtrav_voit","car_mov_evol","ratio_fh",
+                        "part_pop1529","part_pop3044","part_pop4559","part_pop6074","part_pop_65p","p_csp_retr",
+                        "pop","size","nat","class_nat")]
+
+names(data_apollo) <- c("id","Chosen_scenario","Paysage_1","Acces_1","Biodiversite_1","Biome_1","Temps_1",
+                        "Paysage_2","Acces_2","Biodiversite_2","Biome_2","Temps_2",
+                        "Paysage_SQ","Acces_SQ","Biodiversite_SQ","Biome_SQ","Temps_SQ",
+                        "Gender","Age","CSP","Education","Nb_adult","Nb_children_small","Nb_children_big","Income",
+                        "most_freq_journey_professionel","most_freq_journey_associative","most_freq_journey_domestic","most_freq_journey_leisure","most_freq_journey_driver","most_freq_journey_other",
+                        "time_professionel","time_associative","time_domestic","time_leisure","time_driver",
+                        "vehicule_1","vehicule_2","vehicule_3","vehicule_4","carpool",
+                        "hypo_most_freq_journey_professionel","hypo_most_freq_journey_associative","hypo_most_freq_journey_domestic","hypo_most_freq_journey_leisure","hypo_most_freq_journey_driver","hypo_most_freq_journey_other",
+                        "all_attribute_important","non_important_paysage","non_important_biodiversity","non_important_biome","non_important_access","non_important_time",
+                        "SQ_all_not_enough_time","SQ_all_too_important_time_increase","SQ_all_protest1","SQ_all_protest2","SQ_all_protest3","SQ_all_protest4","SQ_all_other",
+                        "SQ_one_not_enough_time","SQ_one_too_important_time_increase","SQ_one_other","Difficulty_CE","Realistic_CE",
+                        "Agree_tram_faster","Agree_tram_cheaper","Agree_tram_more_ecological","Agree_tram_more_practical","Agree_protect_nature_major","Agree_individual_effect",
+                        "Agree_pref_individual_vehicule","Agree_tram_not_fiable","Agree_tram_not_accessible","Agree_tram_too_slow","Agree_tram_not_practicable","Agree_tram_journey_too_complicate","Agree_public_transport_not_a_solution","Agree_dislike_public_transport","Agree_infra_no_impact","Agree_individual_not_enough","Agree_tram_equal_more_traffic_jam",
+                        "Alternative_tram_important","Alternative_pedestrian","Alternative_bicycle","Alternative_bus","Alternative_carpool","Alternative_remote_work","Alternative_closer_work","Alternative_change_city","Alternative_other","Knowledge_project",
+                        "Perso_belong_eco_NGO","Perso_belong_eco_NGO_comment","Perso_nature_activity","Perso_nature_activity_comment","Perso_eco_criteria_shopping","Perso_eco_criteria_shopping_comment","Perso_knowledge_biodiversity","Perso_frequency_nature","Perso_relation_nature",
+                        "survey_id","time_video_short","post_code_home","post_code_work","com_centre","com_peri","com_name",
+                        "pot_fin_hab","med_disp","p_csp_cadpis","p_csp_arcomce","p_csp_agr","p_csp_empl","p_csp_inter","p_csp_ouvr",
+                        "nb_inact1564","pc_inact1564","dens_pop","part_domtrav_voit","car_mov_evol","ratio_fh",
+                        "part_pop1529","part_pop3044","part_pop4559","part_pop6074","part_pop_65p","p_csp_retr",
+                        "pop","size","nat","class_nat")
+
+# regroup age class, csp class...
+
+saveRDS(data_apollo,file="output/data_apollo.rds")
+
