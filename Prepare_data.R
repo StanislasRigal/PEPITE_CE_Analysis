@@ -1281,7 +1281,7 @@ saveRDS(data_clean_com_nat,file="output/data_clean_com_nat.rds")
 # prepare data for choice analysis with apollo
 
 ## add choice descritpion
-choice_description <- read.csv("raw_data/choice_description_wide.csv", header=TRUE)
+choice_description <- read.csv("raw_data/choice_description_widest.csv", header=TRUE)
 
 ## one row per individual per choice
 data_clean_long <- melt(data_clean_com_nat, measure.vars=c(unique(choice_description$Choice.situation)))
@@ -1291,9 +1291,9 @@ names(data_clean_long)[which(names(data_clean_long) %in% c("variable","value"))]
 data_apollo <- merge(data_clean_long,choice_description, by=c("Choice.situation"), all.x = TRUE)
 
 ## select useful columns and set readable names
-data_apollo <- data_apollo[,c("id","Chosen_scenario","Paysage_1","Acces_1","Biodiversite_1","Biome_1","Temps_1",
-                        "Paysage_2","Acces_2","Biodiversite_2","Biome_2","Temps_2",
-                        "Paysage_SQ","Acces_SQ","Biodiversite_SQ","Biome_SQ","Temps_SQ",
+data_apollo <- data_apollo[,c("id","Chosen_scenario","Paysage_25_1","Paysage_75_1","Acces_Non_1","Acces_Oui_1","Biodiversite_faible_1","Biodiversite_moyenne_1","Biodiversite_eleve_1","Biome_urbain_1","Biome_periurbain_1", "Biome_rural_1","Temps_1",
+                              "Paysage_25_2","Paysage_75_2","Acces_Non_2","Acces_Oui_2","Biodiversite_faible_2","Biodiversite_moyenne_2","Biodiversite_eleve_2" ,"Biome_urbain_2","Biome_periurbain_2","Biome_rural_2" ,"Temps_2",
+                              "Paysage_SQ","Acces_SQ","Biodiversite_SQ","Biome_SQ","Temps_SQ",
                         "Q01b","Q01c","Q01d","QIV19","QIV21_SQ001","QIV21_SQ002","QIV21_SQ003","QIV22",
                         "QI4_SQ002","QI4_SQ003","QI4_SQ004","QI4_SQ005","QI4_SQ006","QI4_other",
                         "QI5_SQ002","QI5_SQ003","QI5_SQ004","QI5_SQ005","QI5_SQ006",
@@ -1312,8 +1312,8 @@ data_apollo <- data_apollo[,c("id","Chosen_scenario","Paysage_1","Acces_1","Biod
                         "part_pop1529","part_pop3044","part_pop4559","part_pop6074","part_pop_65p","p_csp_retr",
                         "pop","size","nat","class_nat")]
 
-names(data_apollo) <- c("id","Chosen_scenario","Paysage_1","Acces_1","Biodiversite_1","Biome_1","Temps_1",
-                        "Paysage_2","Acces_2","Biodiversite_2","Biome_2","Temps_2",
+names(data_apollo) <- c("id","Chosen_scenario","Paysage_25_1","Paysage_75_1","Acces_Non_1","Acces_Oui_1","Biodiversite_faible_1","Biodiversite_moyenne_1","Biodiversite_eleve_1","Biome_urbain_1","Biome_periurbain_1", "Biome_rural_1","Temps_1",
+                        "Paysage_25_2","Paysage_75_2","Acces_Non_2","Acces_Oui_2","Biodiversite_faible_2","Biodiversite_moyenne_2","Biodiversite_eleve_2" ,"Biome_urbain_2","Biome_periurbain_2","Biome_rural_2" ,"Temps_2",
                         "Paysage_SQ","Acces_SQ","Biodiversite_SQ","Biome_SQ","Temps_SQ",
                         "Gender","Age","CSP","Education","Nb_adult","Nb_children_small","Nb_children_big","Income",
                         "most_freq_journey_professionel","most_freq_journey_associative","most_freq_journey_domestic","most_freq_journey_leisure","most_freq_journey_driver","most_freq_journey_other",
