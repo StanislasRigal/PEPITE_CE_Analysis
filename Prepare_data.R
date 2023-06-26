@@ -1337,3 +1337,61 @@ names(data_apollo) <- c("id","Chosen_scenario","Paysage_25_1","Paysage_75_1","Ac
 
 saveRDS(data_apollo,file="output/data_apollo.rds")
 
+
+# prepare data for choice analysis without apollo
+
+## add choice descritpion
+choice_description_short <- read.csv("raw_data/choice_description.csv", header=TRUE)
+
+## one row per individual per choice
+data_clean_long <- melt(data_clean_com_nat, measure.vars=c(unique(choice_description_short$Choice.situation)))
+names(data_clean_long)[which(names(data_clean_long) %in% c("variable","value"))] <- c("Choice.situation","Chosen_scenario")
+
+## merge responses with data description
+data_DCE <- merge(data_clean_long,choice_description_short, by=c("Choice.situation"), all.x = TRUE)
+
+data_DCE$choice <- ifelse(data_DCE$Chosen_scenario==data_DCE$Scenario,1,0)
+data_DCE$survey_person <- paste0(data_DCE$survey_id,sep="_", data_DCE$id)
+data_DCE$chid <- paste0(data_DCE$Choice.situation,sep="_",data_DCE$survey_person)
+
+## select useful columns and set readable names
+data_DCE <- data_DCE[,c("id","Scenario","choice","chid","survey_person","Paysage","Acces","Biodiversite","Biome","Temps",
+                              "Q01b","Q01c","Q01d","QIV19","QIV21_SQ001","QIV21_SQ002","QIV21_SQ003","QIV22",
+                              "QI4_SQ002","QI4_SQ003","QI4_SQ004","QI4_SQ005","QI4_SQ006","QI4_other",
+                              "QI5_SQ002","QI5_SQ003","QI5_SQ004","QI5_SQ005","QI5_SQ006",
+                              "QI6_1","QI6_2","QI6_3","QI6_4","QI7",
+                              "QI8_SQ001","QI8_SQ002","QI8_SQ003","QI8_SQ004","QI8_SQ005","QI8_other",
+                              "QIII9_SQ002","QIII9_SQ003","QIII9_SQ004","QIII9_SQ005","QIII9_SQ006","QIII9_SQ007",
+                              "QIII10_SQ001","QIII10_SQ002","QIII10_SQ003","QIII10_SQ004","QIII10_SQ005","QIII10_SQ006","QIII10_other",
+                              "QIII11_SQ001","QIII11_SQ002","QIII11_other","QIII12_SQ001","QIII13_SQ001",
+                              "QIII15_SQ001","QIII15_SQ002","QIII15_SQ003","QIII15_SQ004","QIII15_SQ005","QIII15_SQ006",
+                              "QIII14_SQ001","QIII14_SQ002","QIII14_SQ003","QIII14_SQ004","QIII14_SQ005","QIII14_SQ010","QIII14_SQ006","QIII14_SQ007","QIII14_SQ008","QIII14_SQ009","QIII14_SQ011",
+                              "QIII16_SQ001","QIII16_SQ002","QIII16_SQ003","QIII16_SQ004","QIII16_SQ005","QIII16_SQ006","QIII16_SQ007","QIII16_SQ008","QIII16_other","QIV18",
+                              "QIV23","QIV23_comment","QIV24","QIV24_comment","QIV25","QIV25_comment","QIV26","QIV27","QVnew_SQ001",
+                              "survey_id","time_video_short","post_code_home","post_code_work","com_centre","com_peri","com_name",
+                              "pot_fin_hab","med_disp","p_csp_cadpis","p_csp_arcomce","p_csp_agr","p_csp_empl","p_csp_inter","p_csp_ouvr",
+                              "nb_inact1564","pc_inact1564","dens_pop","part_domtrav_voit","car_mov_evol","ratio_fh",
+                              "part_pop1529","part_pop3044","part_pop4559","part_pop6074","part_pop_65p","p_csp_retr",
+                              "pop","size","nat","class_nat")]
+
+names(data_DCE) <- c("id","Scenario","choice","chid","survey_person","Paysage","Acces","Biodiversite","Biome","Temps",
+                        "Gender","Age","CSP","Education","Nb_adult","Nb_children_small","Nb_children_big","Income",
+                        "most_freq_journey_professionel","most_freq_journey_associative","most_freq_journey_domestic","most_freq_journey_leisure","most_freq_journey_driver","most_freq_journey_other",
+                        "time_professionel","time_associative","time_domestic","time_leisure","time_driver",
+                        "vehicule_1","vehicule_2","vehicule_3","vehicule_4","carpool",
+                        "hypo_most_freq_journey_professionel","hypo_most_freq_journey_associative","hypo_most_freq_journey_domestic","hypo_most_freq_journey_leisure","hypo_most_freq_journey_driver","hypo_most_freq_journey_other",
+                        "all_attribute_important","non_important_paysage","non_important_biodiversity","non_important_biome","non_important_access","non_important_time",
+                        "SQ_all_not_enough_time","SQ_all_too_important_time_increase","SQ_all_protest1","SQ_all_protest2","SQ_all_protest3","SQ_all_protest4","SQ_all_other",
+                        "SQ_one_not_enough_time","SQ_one_too_important_time_increase","SQ_one_other","Difficulty_CE","Realistic_CE",
+                        "Agree_tram_faster","Agree_tram_cheaper","Agree_tram_more_ecological","Agree_tram_more_practical","Agree_protect_nature_major","Agree_individual_effect",
+                        "Agree_pref_individual_vehicule","Agree_tram_not_fiable","Agree_tram_not_accessible","Agree_tram_too_slow","Agree_tram_not_practicable","Agree_tram_journey_too_complicate","Agree_public_transport_not_a_solution","Agree_dislike_public_transport","Agree_infra_no_impact","Agree_individual_not_enough","Agree_tram_equal_more_traffic_jam",
+                        "Alternative_tram_important","Alternative_pedestrian","Alternative_bicycle","Alternative_bus","Alternative_carpool","Alternative_remote_work","Alternative_closer_work","Alternative_change_city","Alternative_other","Knowledge_project",
+                        "Perso_belong_eco_NGO","Perso_belong_eco_NGO_comment","Perso_nature_activity","Perso_nature_activity_comment","Perso_eco_criteria_shopping","Perso_eco_criteria_shopping_comment","Perso_knowledge_biodiversity","Perso_frequency_nature","Perso_relation_nature",
+                        "survey_id","time_video_short","post_code_home","post_code_work","com_centre","com_peri","com_name",
+                        "pot_fin_hab","med_disp","p_csp_cadpis","p_csp_arcomce","p_csp_agr","p_csp_empl","p_csp_inter","p_csp_ouvr",
+                        "nb_inact1564","pc_inact1564","dens_pop","part_domtrav_voit","car_mov_evol","ratio_fh",
+                        "part_pop1529","part_pop3044","part_pop4559","part_pop6074","part_pop_65p","p_csp_retr",
+                        "pop","size","nat","class_nat")
+
+
+saveRDS(data_DCE,file="output/data_DCE.rds")

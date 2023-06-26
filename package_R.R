@@ -12,3 +12,15 @@ library(plyr)
 library(dplyr)
 library(Hmisc)
 library(support.CEs)
+
+remotes::install_github("mauricio1986/gmnl")
+library(dplyr) # A Grammar of Data Manipulation
+library(ggplot2) # Create Elegant Data Visualisations Using the Grammar of Graphics
+library(gmnl) # Multinomial Logit Models with Random Parameters
+library(gridExtra) # Miscellaneous Functions for "Grid" Graphics
+library(kableExtra) # Construct Complex Table with 'kable' and Pipe Syntax
+library(mlogit) # Multinomial Logit Models
+library(stargazer) # Well-Formatted Regression and Summary Statistics Tables
+library(tibble) # Simple Data Frames
+library(tidyr) # Tidy Messy Data
+library(AER) # Applied Econometrics with R
