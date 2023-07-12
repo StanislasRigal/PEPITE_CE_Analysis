@@ -97,25 +97,7 @@ df <- data_DCE[data_DCE$choice==1,] %>% group_by(survey_id) %>%summarise(proport
   mutate(proportion = proportion/sum(proportion)) %>%
   column_to_rownames(var = "survey_id")
 
-data_DCE_numeric <- data_DCE
-data_DCE_numeric$Gender <- as.numeric(as.factor(data_DCE_numeric$Gender))
-data_DCE_numeric <- droplevels(data_DCE_numeric[which(data_DCE_numeric$Gender != 3),])
-data_DCE_numeric$Age <- as.numeric(as.factor(data_DCE_numeric$Age))
-data_DCE_numeric$Income <- as.numeric(as.factor(data_DCE_numeric$Income))
-data_DCE_numeric$Education <- as.numeric(as.factor(data_DCE_numeric$Education))
-data_DCE_numeric$CSPgroup <- as.character(data_DCE_numeric$CSP)
-data_DCE_numeric$CSPgroup[which(data_DCE_numeric$CSPgroup %in% c("Agriculteurs","Employés (employés administratifs de la fonction publique, agents de service et auxiliaires de santé, policiers, militaires, pompiers, agents de sécurité, employés administratifs, employés de commerce, personnels des services directs aux particuliers )","Ouvriers et conducteurs de transport"))] <- "moins"
-data_DCE_numeric$CSPgroup[which(data_DCE_numeric$CSPgroup %in% c("Artisans, commerçants et chefs d'entreprise","Cadres et professions intellectuelles supérieures (professions libérales, cadres administratifs et techniques de la fonction publique, professions scientifiques supérieures, professions de l'information et de l'art, cadres des services administratifs et commerciaux d'entreprise, ingénieurs et cadres techniques d'entreprise)","Professions intermédiaires (professions de l'enseignement primaire et professionnel et du sport, professions intermédiaires de la santé, ministres du culte, professions intermédiaires de la fonction publique, professions intermédiaires administratives et commerciales des entreprises, techniciens, agents de maîtrise)"))] <- "plus"
-data_DCE_numeric$CSPgroup[which(data_DCE_numeric$CSPgroup %in% c("Étudiants","Sans emploi"))] <- "Inactifs"
-data_DCE_numeric$CSPgroup <- as.numeric(as.factor(data_DCE_numeric$CSPgroup))
-data_DCE_numeric$main_vehicule <- as.character(data_DCE_numeric$vehicule_1)
-data_DCE_numeric$main_vehicule[which(data_DCE_numeric$main_vehicule %in% c("bus","métro / RER métropolitain","train (TER / Intercité / TGV)","tramway"))] <- "commun"
-data_DCE_numeric$main_vehicule[which(data_DCE_numeric$main_vehicule %in% c("moto, scooter","trottinette","vélo"))] <- "indiv_nv"
-data_DCE_numeric$main_vehicule <- as.numeric(as.factor(data_DCE_numeric$main_vehicule))
-data_DCE_numeric$asc <- ifelse(data_DCE_numeric$Scenario=="Scénario de référence",1,0)
-
-
-
+data_DCE_numeric <- readRDS("output/data_DCE_numeric.rds")
 
 
 # both survey merged
@@ -129,7 +111,7 @@ data_DCE_mlogit <- mlogit.data(data_DCE_numeric,
 
 # Temps
 
-mixl_Temps <- gmnl(choice ~ Temps + Paysage + Acces + Biodiversite + Biome | 1,
+mixl_Temps <- gmnl(choice ~ Temps + Paysage + Acces + Biodiversite + Biome | asc,
              data = data_DCE_mlogit,
              model = "mixl",
              ranp = c(Temps = "n"),

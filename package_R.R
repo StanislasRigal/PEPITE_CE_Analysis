@@ -12,6 +12,7 @@ library(plyr)
 library(dplyr)
 library(Hmisc)
 library(support.CEs)
+library(see)
 
 remotes::install_github("mauricio1986/gmnl")
 library(dplyr) # A Grammar of Data Manipulation
@@ -24,3 +25,7 @@ library(stargazer) # Well-Formatted Regression and Summary Statistics Tables
 library(tibble) # Simple Data Frames
 library(tidyr) # Tidy Messy Data
 library(AER) # Applied Econometrics with R
+library(poLCA)
+
+source('lc_helpers.r')
+
