@@ -101,10 +101,19 @@ data_DCE_numeric$CSPgroup <- as.character(data_DCE_numeric$CSP)
 data_DCE_numeric$CSPgroup[which(data_DCE_numeric$CSPgroup %in% c("Agriculteurs","Employés (employés administratifs de la fonction publique, agents de service et auxiliaires de santé, policiers, militaires, pompiers, agents de sécurité, employés administratifs, employés de commerce, personnels des services directs aux particuliers )","Ouvriers et conducteurs de transport"))] <- "moins"
 data_DCE_numeric$CSPgroup[which(data_DCE_numeric$CSPgroup %in% c("Artisans, commerçants et chefs d'entreprise","Cadres et professions intellectuelles supérieures (professions libérales, cadres administratifs et techniques de la fonction publique, professions scientifiques supérieures, professions de l'information et de l'art, cadres des services administratifs et commerciaux d'entreprise, ingénieurs et cadres techniques d'entreprise)","Professions intermédiaires (professions de l'enseignement primaire et professionnel et du sport, professions intermédiaires de la santé, ministres du culte, professions intermédiaires de la fonction publique, professions intermédiaires administratives et commerciales des entreprises, techniciens, agents de maîtrise)"))] <- "plus"
 data_DCE_numeric$CSPgroup[which(data_DCE_numeric$CSPgroup %in% c("Étudiants","Sans emploi"))] <- "Inactifs"
+data_DCE_numeric$CSPgroup_inactif <- data_DCE_numeric$CSPgroup_plus <- data_DCE_numeric$CSPgroup_moins <- data_DCE_numeric$CSPgroup_retraite <- 0 
+data_DCE_numeric$CSPgroup_inactif[which(data_DCE_numeric$CSPgroup == "Inactifs")] <- 1
+data_DCE_numeric$CSPgroup_moins[which(data_DCE_numeric$CSPgroup == "moins")] <- 1
+data_DCE_numeric$CSPgroup_plus[which(data_DCE_numeric$CSPgroup == "plus")] <- 1
+data_DCE_numeric$CSPgroup_retraite[which(data_DCE_numeric$CSPgroup == "Retraités")] <- 1
 data_DCE_numeric$CSPgroup <- as.numeric(as.factor(data_DCE_numeric$CSPgroup))
 data_DCE_numeric$main_vehicule <- as.character(data_DCE_numeric$vehicule_1)
 data_DCE_numeric$main_vehicule[which(data_DCE_numeric$main_vehicule %in% c("bus","métro / RER métropolitain","train (TER / Intercité / TGV)","tramway"))] <- "commun"
-data_DCE_numeric$main_vehicule[which(data_DCE_numeric$main_vehicule %in% c("moto, scooter","trottinette","vélo"))] <- "indiv_nv"
+data_DCE_numeric$main_vehicule[which(data_DCE_numeric$main_vehicule %in% c("moto, scooter","voiture"))] <- "indiv_motor"
+data_DCE_numeric$main_vehicule[which(data_DCE_numeric$main_vehicule %in% c("trottinette","vélo","à pied"))] <- "indiv_no_motor"
+data_DCE_numeric$main_vehicule_commun <- ifelse(data_DCE_numeric$main_vehicule == "commun",1,0)
+data_DCE_numeric$main_vehicule_indiv_no_motor <- ifelse(data_DCE_numeric$main_vehicule == "indiv_no_motor",1,0)
+data_DCE_numeric$main_vehicule_indiv_motor <- ifelse(data_DCE_numeric$main_vehicule == "indiv_motor",1,0)
 data_DCE_numeric$main_vehicule <- as.numeric(as.factor(data_DCE_numeric$main_vehicule))
 data_DCE_numeric$asc <- ifelse(data_DCE_numeric$Scenario=="Scénario de référence",1,0)
 data_DCE_numeric$Paysage <- as.numeric(as.factor(data_DCE_numeric$Paysage))-1
@@ -121,6 +130,14 @@ data_DCE_numeric$time_leisure[which(is.na(data_DCE_numeric$time_leisure))] <- 0
 data_DCE_numeric$time_professionel[which(is.na(data_DCE_numeric$time_professionel))] <- 0
 data_DCE_numeric$journey_duration <- data_DCE_numeric$time_associative + data_DCE_numeric$time_domestic + data_DCE_numeric$time_driver +data_DCE_numeric$time_leisure + data_DCE_numeric$time_professionel
 data_DCE_numeric$journey_duration2 <- ifelse(data_DCE_numeric$journey_duration <= 180, data_DCE_numeric$journey_duration, NA)
+data_DCE_numeric$journey_duration3 <- data_DCE_numeric$journey_duration
+data_DCE_numeric$journey_duration3[which(data_DCE_numeric$journey_duration3<21)] <- 1
+data_DCE_numeric$journey_duration3[which(data_duration$all>20 & data_duration$all<31)] <- 2
+data_DCE_numeric$journey_duration3[which(data_duration$all>30 & data_duration$all<41)] <- 3
+data_DCE_numeric$journey_duration3[which(data_duration$all>40 & data_duration$all<61)] <- 4
+data_DCE_numeric$journey_duration3[which(data_duration$all>60 & data_duration$all<91)] <- 5
+data_DCE_numeric$journey_duration3[which(data_duration$all>90)] <- 6
+
 
 saveRDS(data_DCE_numeric,"output/data_DCE_numeric.rds")
 
@@ -138,7 +155,7 @@ mnl.rt0 <- mlogit(choice ~ Temps + Paysage + Acces + Biodiversite + Biome + asc 
 2 * length(coef(mnl.rt0)) - 2 * mnl.rt0$logLik
 
 
-lc2 <- gmnl(choice ~ Temps + Paysage + Acces + Biodiversite + Biome + asc | 0 | 0 | 0 | Gender + Age + Income + CSPgroup + class_nat + survey_id + journey_duration2,
+lc2 <- gmnl(choice ~ Temps + Paysage + Acces + Biodiversite + Biome + asc | 0 | 0 | 0 | Gender + Age + Income + CSPgroup_inactif + CSPgroup_plus + CSPgroup_moins + class_nat + survey_id + journey_duration3 + main_vehicule_indiv_motor + main_vehicule_commun,
             data = data_DCE_mlogit,
             model = 'lc',
             Q = 2,
@@ -159,7 +176,7 @@ freq_g1 <- 1-freq_g2
 shares(lc2)
 
 
-lc3 <- gmnl(choice ~ Temps + Paysage + Acces + Biodiversite + Biome + asc | 0 | 0 | 0 | Gender + Age + Income + CSPgroup + class_nat + survey_id + journey_duration2,
+lc3 <- gmnl(choice ~ Temps + Paysage + Acces + Biodiversite + Biome + asc | 0 | 0 | 0 | Gender + Age + Income + CSPgroup_inactif + CSPgroup_plus + CSPgroup_moins + class_nat + survey_id + journey_duration3 + main_vehicule_indiv_motor + main_vehicule_commun,
             data = data_DCE_mlogit,
             model = 'lc',
             Q = 3,
@@ -187,7 +204,7 @@ predictions <- apply(lc3$Wnq,1,  which.max)
 
 
 
-lc4 <- gmnl(choice ~ Temps + Paysage + Acces + Biodiversite + Biome + asc | 0 | 0 | 0 | Gender + Age + Income + CSPgroup + class_nat + survey_id + journey_duration2,
+lc4 <- gmnl(choice ~ Temps + Paysage + Acces + Biodiversite + Biome + asc | 0 | 0 | 0 | Gender + Age + Income + CSPgroup_inactif + CSPgroup_plus + CSPgroup_moins + class_nat + survey_id + journey_duration3 + main_vehicule_indiv_motor + main_vehicule_commun,
             data = data_DCE_mlogit,
             model = 'lc',
             Q = 4,
@@ -205,7 +222,7 @@ freq_g4 <- exp(coef(lc4)["(class)4"]) / (exp(0) + exp(coef(lc4)["(class)2"]) + e
 freq_g1 <- 1-freq_g2-freq_g3-freq_g4
 shares(lc4)
 
-lc5 <- gmnl(choice ~ Temps + Paysage + Acces + Biodiversite + Biome + asc | 0 | 0 | 0 | Gender + Age + Income + CSPgroup + class_nat + survey_id + journey_duration2,
+lc5 <- gmnl(choice ~ Temps + Paysage + Acces + Biodiversite + Biome + asc | 0 | 0 | 0 | Gender + Age + Income + CSPgroup_inactif + CSPgroup_plus + CSPgroup_moins + class_nat + survey_id + journey_duration3 + main_vehicule_indiv_motor + main_vehicule_commun,
             data = data_DCE_mlogit,
             model = 'lc',
             Q = 5,
@@ -224,7 +241,7 @@ freq_g5 <- exp(coef(lc5)["(class)5"]) / (exp(0) + exp(coef(lc5)["(class)2"]) + e
 freq_g1 <- 1-freq_g2-freq_g3-freq_g4-freq_g5
 shares(lc5)
 
-lc6 <- gmnl(choice ~ Temps + Paysage + Acces + Biodiversite + Biome + asc | 0 | 0 | 0 | Gender + Age + Income + CSPgroup + class_nat + survey_id + journey_duration2,
+lc6 <- gmnl(choice ~ Temps + Paysage + Acces + Biodiversite + Biome + asc | 0 | 0 | 0 | Gender + Age + Income + CSPgroup_inactif + CSPgroup_plus + CSPgroup_moins + class_nat + survey_id + journey_duration3 + main_vehicule_indiv_motor + main_vehicule_commun,
             data = data_DCE_mlogit,
             model = 'lc',
             Q = 6,
@@ -277,21 +294,57 @@ colnames(pi_hat) <- c("q = 1", "q = 2", "q = 3", "q = 4")
 
 # Posterior probability
 predictions <- apply(pi_hat,1,  which.max)
-matrix(round(c(mean(pi_hat[which(predictions==1),1]),mean(pi_hat[which(predictions==1),2]),mean(pi_hat[which(predictions==1),3]),mean(pi_hat[which(predictions==1),4]),
+m4 <- matrix(round(c(mean(pi_hat[which(predictions==1),1]),mean(pi_hat[which(predictions==1),2]),mean(pi_hat[which(predictions==1),3]),mean(pi_hat[which(predictions==1),4]),
                mean(pi_hat[which(predictions==2),1]),mean(pi_hat[which(predictions==2),2]),mean(pi_hat[which(predictions==2),3]),mean(pi_hat[which(predictions==2),4]),
                mean(pi_hat[which(predictions==3),1]),mean(pi_hat[which(predictions==3),2]),mean(pi_hat[which(predictions==3),3]),mean(pi_hat[which(predictions==3),4]),
-               mean(pi_hat[which(predictions==4),1]),mean(pi_hat[which(predictions==4),2]),mean(pi_hat[which(predictions==4),3]),mean(pi_hat[which(predictions==4),4])),2), nrow=4)
+               mean(pi_hat[which(predictions==4),1]),mean(pi_hat[which(predictions==4),2]),mean(pi_hat[which(predictions==4),3]),mean(pi_hat[which(predictions==4),4])),3), nrow=4)
+m4
 
+mean(diag(m4))
+
+pi_hat <- lc2$Qir
+predictions <- apply(pi_hat,1,  which.max)
+m2 <- matrix(round(c(mean(pi_hat[which(predictions==1),1]),mean(pi_hat[which(predictions==1),2]),
+                     mean(pi_hat[which(predictions==2),1]),mean(pi_hat[which(predictions==2),2])),3), nrow=2)
+
+m2
+mean(diag(m2))
+
+pi_hat <- lc3$Qir
+predictions <- apply(pi_hat,1,  which.max)
+m3 <- matrix(round(c(mean(pi_hat[which(predictions==1),1]),mean(pi_hat[which(predictions==1),2]),mean(pi_hat[which(predictions==1),3]),
+                     mean(pi_hat[which(predictions==2),1]),mean(pi_hat[which(predictions==2),2]),mean(pi_hat[which(predictions==2),3]),
+                     mean(pi_hat[which(predictions==3),1]),mean(pi_hat[which(predictions==3),2]),mean(pi_hat[which(predictions==3),3])),3), nrow=3)
+
+m3
+mean(diag(m3))
 
 pi_hat <- lc5$Qir
-
 predictions <- apply(pi_hat,1,  which.max)
-matrix(round(c(mean(pi_hat[which(predictions==1),1]),mean(pi_hat[which(predictions==1),2]),mean(pi_hat[which(predictions==1),3]),mean(pi_hat[which(predictions==1),4]),mean(pi_hat[which(predictions==1),5]),
+m5 <- matrix(round(c(mean(pi_hat[which(predictions==1),1]),mean(pi_hat[which(predictions==1),2]),mean(pi_hat[which(predictions==1),3]),mean(pi_hat[which(predictions==1),4]),mean(pi_hat[which(predictions==1),5]),
                mean(pi_hat[which(predictions==2),1]),mean(pi_hat[which(predictions==2),2]),mean(pi_hat[which(predictions==2),3]),mean(pi_hat[which(predictions==2),4]),mean(pi_hat[which(predictions==2),5]),
                mean(pi_hat[which(predictions==3),1]),mean(pi_hat[which(predictions==3),2]),mean(pi_hat[which(predictions==3),3]),mean(pi_hat[which(predictions==3),4]),mean(pi_hat[which(predictions==3),5]),
                mean(pi_hat[which(predictions==4),1]),mean(pi_hat[which(predictions==4),2]),mean(pi_hat[which(predictions==4),3]),mean(pi_hat[which(predictions==4),4]),mean(pi_hat[which(predictions==4),5]),
-               mean(pi_hat[which(predictions==4),1]),mean(pi_hat[which(predictions==5),2]),mean(pi_hat[which(predictions==5),3]),mean(pi_hat[which(predictions==5),4]),mean(pi_hat[which(predictions==5),5])),2), nrow=5)
+               mean(pi_hat[which(predictions==5),1]),mean(pi_hat[which(predictions==5),2]),mean(pi_hat[which(predictions==5),3]),mean(pi_hat[which(predictions==5),4]),mean(pi_hat[which(predictions==5),5])),3), nrow=5)
 
+m5
+
+mean(diag(m5))
+
+pi_hat <- lc6$Qir
+predictions <- apply(pi_hat,1,  which.max)
+m6 <- matrix(round(c(mean(pi_hat[which(predictions==1),1]),mean(pi_hat[which(predictions==1),2]),mean(pi_hat[which(predictions==1),3]),mean(pi_hat[which(predictions==1),4]),mean(pi_hat[which(predictions==1),5]),mean(pi_hat[which(predictions==1),6]),
+                     mean(pi_hat[which(predictions==2),1]),mean(pi_hat[which(predictions==2),2]),mean(pi_hat[which(predictions==2),3]),mean(pi_hat[which(predictions==2),4]),mean(pi_hat[which(predictions==2),5]),mean(pi_hat[which(predictions==2),6]),
+                     mean(pi_hat[which(predictions==3),1]),mean(pi_hat[which(predictions==3),2]),mean(pi_hat[which(predictions==3),3]),mean(pi_hat[which(predictions==3),4]),mean(pi_hat[which(predictions==3),5]),mean(pi_hat[which(predictions==3),6]),
+                     mean(pi_hat[which(predictions==4),1]),mean(pi_hat[which(predictions==4),2]),mean(pi_hat[which(predictions==4),3]),mean(pi_hat[which(predictions==4),4]),mean(pi_hat[which(predictions==4),5]),mean(pi_hat[which(predictions==4),6]),
+                     mean(pi_hat[which(predictions==5),1]),mean(pi_hat[which(predictions==5),2]),mean(pi_hat[which(predictions==5),3]),mean(pi_hat[which(predictions==5),4]),mean(pi_hat[which(predictions==5),5]),mean(pi_hat[which(predictions==5),6]),
+                     mean(pi_hat[which(predictions==6),1]),mean(pi_hat[which(predictions==6),2]),mean(pi_hat[which(predictions==6),3]),mean(pi_hat[which(predictions==6),4]),mean(pi_hat[which(predictions==6),5]),mean(pi_hat[which(predictions==6),6])),3), nrow=6)
+
+m6
+
+mean(diag(m6))
+
+c(mean(diag(m2)),mean(diag(m3)),mean(diag(m4)),mean(diag(m5)),mean(diag(m6)))
 
 # Get individuals' estimates for Paysage
 bi_Paysage <- effect.gmnl(lc4, par = "Paysage", effect = "ce")$mean
@@ -320,8 +373,8 @@ plot(lc4, par = "Biome", effect = "ce", type = "density", col = "blue")
 
 # classe 1 : saving time
 # classe 2 : trade-off time-biodiv
-# classe 3 : gain access and nice landscape whatever the cost
-# classe 4 : saving biodiversity whatever the cost
+# classe 3 : nature for itself
+# classe 4 : nature to use (landscape, access) whatever the cost
 
 
 #Create a data frame for plotting:
@@ -395,34 +448,92 @@ ggsave("output/lc4_income.png",
        dpi = 300)
 
 #Create a data frame for plotting:
-df <- data.frame(CSPgroup = seq(min(data_DCE_mlogit$CSPgroup),
-                           to = max(data_DCE_mlogit$CSPgroup),
-                           by = (max(data_DCE_mlogit$CSPgroup) - min(data_DCE_mlogit$CSPgroup))/100))
+df <- data.frame(CSPgroup_inactif = seq(min(data_DCE_mlogit$CSPgroup_inactif),
+                           to = max(data_DCE_mlogit$CSPgroup_inactif),
+                           by = (max(data_DCE_mlogit$CSPgroup_inactif) - min(data_DCE_mlogit$CSPgroup_inactif))/100))
 # Use the class-membership model to calculate the membership probabilities
 df <- df %>%
   mutate(p_1 = 1 -
-           (exp(coef(lc4)["(class)2"] + coef(lc4)["class2:CSPgroup"] * CSPgroup) +
-              exp(coef(lc4)["(class)3"] + coef(lc4)["class3:CSPgroup"] * CSPgroup) + 
-              exp(coef(lc4)["(class)4"] + coef(lc4)["class4:CSPgroup"] * CSPgroup))/
-           (1 + exp(coef(lc4)["(class)2"] + coef(lc4)["class2:CSPgroup"] * CSPgroup) + exp(coef(lc4)["(class)3"] + coef(lc4)["class3:CSPgroup"] * CSPgroup) + exp(coef(lc4)["(class)4"] + coef(lc4)["class4:CSPgroup"] * CSPgroup)),
-         p_2 = exp(coef(lc4)["(class)2"] + coef(lc4)["class2:CSPgroup"] * CSPgroup)/
-           (1 + exp(coef(lc4)["(class)2"] + coef(lc4)["class2:CSPgroup"] * CSPgroup) + exp(coef(lc4)["(class)3"] + coef(lc4)["class3:CSPgroup"] * CSPgroup) + exp(coef(lc4)["(class)4"] + coef(lc4)["class4:CSPgroup"] * CSPgroup)),
-         p_3 = exp(coef(lc4)["(class)3"] + coef(lc4)["class3:CSPgroup"] * CSPgroup)/
-           (1 + exp(coef(lc4)["(class)2"] + coef(lc4)["class2:CSPgroup"] * CSPgroup) + exp(coef(lc4)["(class)3"] + coef(lc4)["class3:CSPgroup"] * CSPgroup) + exp(coef(lc4)["(class)4"] + coef(lc4)["class4:CSPgroup"] * CSPgroup)),
-         p_4 = exp(coef(lc4)["(class)4"] + coef(lc4)["class4:CSPgroup"] * CSPgroup)/
-           (1 + exp(coef(lc4)["(class)2"] + coef(lc4)["class2:CSPgroup"] * CSPgroup) + exp(coef(lc4)["(class)3"] + coef(lc4)["class3:CSPgroup"] * CSPgroup) + exp(coef(lc4)["(class)4"] + coef(lc4)["class4:CSPgroup"] * CSPgroup))
+           (exp(coef(lc4)["(class)2"] + coef(lc4)["class2:CSPgroup_inactif"] * CSPgroup_inactif) +
+              exp(coef(lc4)["(class)3"] + coef(lc4)["class3:CSPgroup_inactif"] * CSPgroup_inactif) + 
+              exp(coef(lc4)["(class)4"] + coef(lc4)["class4:CSPgroup_inactif"] * CSPgroup_inactif))/
+           (1 + exp(coef(lc4)["(class)2"] + coef(lc4)["class2:CSPgroup_inactif"] * CSPgroup_inactif) + exp(coef(lc4)["(class)3"] + coef(lc4)["class3:CSPgroup_inactif"] * CSPgroup_inactif) + exp(coef(lc4)["(class)4"] + coef(lc4)["class4:CSPgroup_inactif"] * CSPgroup_inactif)),
+         p_2 = exp(coef(lc4)["(class)2"] + coef(lc4)["class2:CSPgroup_inactif"] * CSPgroup_inactif)/
+           (1 + exp(coef(lc4)["(class)2"] + coef(lc4)["class2:CSPgroup_inactif"] * CSPgroup_inactif) + exp(coef(lc4)["(class)3"] + coef(lc4)["class3:CSPgroup_inactif"] * CSPgroup_inactif) + exp(coef(lc4)["(class)4"] + coef(lc4)["class4:CSPgroup_inactif"] * CSPgroup_inactif)),
+         p_3 = exp(coef(lc4)["(class)3"] + coef(lc4)["class3:CSPgroup_inactif"] * CSPgroup_inactif)/
+           (1 + exp(coef(lc4)["(class)2"] + coef(lc4)["class2:CSPgroup_inactif"] * CSPgroup_inactif) + exp(coef(lc4)["(class)3"] + coef(lc4)["class3:CSPgroup_inactif"] * CSPgroup_inactif) + exp(coef(lc4)["(class)4"] + coef(lc4)["class4:CSPgroup_inactif"] * CSPgroup_inactif)),
+         p_4 = exp(coef(lc4)["(class)4"] + coef(lc4)["class4:CSPgroup_inactif"] * CSPgroup_inactif)/
+           (1 + exp(coef(lc4)["(class)2"] + coef(lc4)["class2:CSPgroup_inactif"] * CSPgroup_inactif) + exp(coef(lc4)["(class)3"] + coef(lc4)["class3:CSPgroup_inactif"] * CSPgroup_inactif) + exp(coef(lc4)["(class)4"] + coef(lc4)["class4:CSPgroup_inactif"] * CSPgroup_inactif))
   ) %>%
   # Pivot longer to put all probabilities in a single column, and label by class
-  pivot_longer(cols = -CSPgroup,
+  pivot_longer(cols = -CSPgroup_inactif,
                names_to = "Class",
                values_to = "p") %>%
   mutate(Class = sub("p_","Class ", Class))
 
-ggplot(df, aes(x = CSPgroup)) +
-  geom_line(aes(x = CSPgroup,
+ggplot(df, aes(x = CSPgroup_inactif)) +
+  geom_line(aes(x = CSPgroup_inactif,
                 y = p,
                 color = Class))
 
+
+#Create a data frame for plotting:
+df <- data.frame(CSPgroup_plus = seq(min(data_DCE_mlogit$CSPgroup_plus),
+                                        to = max(data_DCE_mlogit$CSPgroup_plus),
+                                        by = (max(data_DCE_mlogit$CSPgroup_plus) - min(data_DCE_mlogit$CSPgroup_plus))/100))
+# Use the class-membership model to calculate the membership probabilities
+df <- df %>%
+  mutate(p_1 = 1 -
+           (exp(coef(lc4)["(class)2"] + coef(lc4)["class2:CSPgroup_plus"] * CSPgroup_plus) +
+              exp(coef(lc4)["(class)3"] + coef(lc4)["class3:CSPgroup_plus"] * CSPgroup_plus) + 
+              exp(coef(lc4)["(class)4"] + coef(lc4)["class4:CSPgroup_plus"] * CSPgroup_plus))/
+           (1 + exp(coef(lc4)["(class)2"] + coef(lc4)["class2:CSPgroup_plus"] * CSPgroup_plus) + exp(coef(lc4)["(class)3"] + coef(lc4)["class3:CSPgroup_plus"] * CSPgroup_plus) + exp(coef(lc4)["(class)4"] + coef(lc4)["class4:CSPgroup_plus"] * CSPgroup_plus)),
+         p_2 = exp(coef(lc4)["(class)2"] + coef(lc4)["class2:CSPgroup_plus"] * CSPgroup_plus)/
+           (1 + exp(coef(lc4)["(class)2"] + coef(lc4)["class2:CSPgroup_plus"] * CSPgroup_plus) + exp(coef(lc4)["(class)3"] + coef(lc4)["class3:CSPgroup_plus"] * CSPgroup_plus) + exp(coef(lc4)["(class)4"] + coef(lc4)["class4:CSPgroup_plus"] * CSPgroup_plus)),
+         p_3 = exp(coef(lc4)["(class)3"] + coef(lc4)["class3:CSPgroup_plus"] * CSPgroup_plus)/
+           (1 + exp(coef(lc4)["(class)2"] + coef(lc4)["class2:CSPgroup_plus"] * CSPgroup_plus) + exp(coef(lc4)["(class)3"] + coef(lc4)["class3:CSPgroup_plus"] * CSPgroup_plus) + exp(coef(lc4)["(class)4"] + coef(lc4)["class4:CSPgroup_plus"] * CSPgroup_plus)),
+         p_4 = exp(coef(lc4)["(class)4"] + coef(lc4)["class4:CSPgroup_plus"] * CSPgroup_plus)/
+           (1 + exp(coef(lc4)["(class)2"] + coef(lc4)["class2:CSPgroup_plus"] * CSPgroup_plus) + exp(coef(lc4)["(class)3"] + coef(lc4)["class3:CSPgroup_plus"] * CSPgroup_plus) + exp(coef(lc4)["(class)4"] + coef(lc4)["class4:CSPgroup_plus"] * CSPgroup_plus))
+  ) %>%
+  # Pivot longer to put all probabilities in a single column, and label by class
+  pivot_longer(cols = -CSPgroup_plus,
+               names_to = "Class",
+               values_to = "p") %>%
+  mutate(Class = sub("p_","Class ", Class))
+
+ggplot(df, aes(x = CSPgroup_plus)) +
+  geom_line(aes(x = CSPgroup_plus,
+                y = p,
+                color = Class))
+
+#Create a data frame for plotting:
+df <- data.frame(CSPgroup_moins = seq(min(data_DCE_mlogit$CSPgroup_moins),
+                                        to = max(data_DCE_mlogit$CSPgroup_moins),
+                                        by = (max(data_DCE_mlogit$CSPgroup_moins) - min(data_DCE_mlogit$CSPgroup_moins))/100))
+# Use the class-membership model to calculate the membership probabilities
+df <- df %>%
+  mutate(p_1 = 1 -
+           (exp(coef(lc4)["(class)2"] + coef(lc4)["class2:CSPgroup_moins"] * CSPgroup_moins) +
+              exp(coef(lc4)["(class)3"] + coef(lc4)["class3:CSPgroup_moins"] * CSPgroup_moins) + 
+              exp(coef(lc4)["(class)4"] + coef(lc4)["class4:CSPgroup_moins"] * CSPgroup_moins))/
+           (1 + exp(coef(lc4)["(class)2"] + coef(lc4)["class2:CSPgroup_moins"] * CSPgroup_moins) + exp(coef(lc4)["(class)3"] + coef(lc4)["class3:CSPgroup_moins"] * CSPgroup_moins) + exp(coef(lc4)["(class)4"] + coef(lc4)["class4:CSPgroup_moins"] * CSPgroup_moins)),
+         p_2 = exp(coef(lc4)["(class)2"] + coef(lc4)["class2:CSPgroup_moins"] * CSPgroup_moins)/
+           (1 + exp(coef(lc4)["(class)2"] + coef(lc4)["class2:CSPgroup_moins"] * CSPgroup_moins) + exp(coef(lc4)["(class)3"] + coef(lc4)["class3:CSPgroup_moins"] * CSPgroup_moins) + exp(coef(lc4)["(class)4"] + coef(lc4)["class4:CSPgroup_moins"] * CSPgroup_moins)),
+         p_3 = exp(coef(lc4)["(class)3"] + coef(lc4)["class3:CSPgroup_moins"] * CSPgroup_moins)/
+           (1 + exp(coef(lc4)["(class)2"] + coef(lc4)["class2:CSPgroup_moins"] * CSPgroup_moins) + exp(coef(lc4)["(class)3"] + coef(lc4)["class3:CSPgroup_moins"] * CSPgroup_moins) + exp(coef(lc4)["(class)4"] + coef(lc4)["class4:CSPgroup_moins"] * CSPgroup_moins)),
+         p_4 = exp(coef(lc4)["(class)4"] + coef(lc4)["class4:CSPgroup_moins"] * CSPgroup_moins)/
+           (1 + exp(coef(lc4)["(class)2"] + coef(lc4)["class2:CSPgroup_moins"] * CSPgroup_moins) + exp(coef(lc4)["(class)3"] + coef(lc4)["class3:CSPgroup_moins"] * CSPgroup_moins) + exp(coef(lc4)["(class)4"] + coef(lc4)["class4:CSPgroup_moins"] * CSPgroup_moins))
+  ) %>%
+  # Pivot longer to put all probabilities in a single column, and label by class
+  pivot_longer(cols = -CSPgroup_moins,
+               names_to = "Class",
+               values_to = "p") %>%
+  mutate(Class = sub("p_","Class ", Class))
+
+ggplot(df, aes(x = CSPgroup_moins)) +
+  geom_line(aes(x = CSPgroup_moins,
+                y = p,
+                color = Class))
 
 #Create a data frame for plotting:
 df <- data.frame(class_nat = seq(min(na.omit(data_DCE_mlogit$class_nat)),
@@ -494,6 +605,95 @@ ggsave("output/lc4_framing.png",
        height = 6,
        dpi = 300)
 
+#Create a data frame for plotting:
+df <- data.frame(journey_duration3 = seq(min(data_DCE_mlogit$journey_duration3),
+                                 to = max(data_DCE_mlogit$journey_duration3),
+                                 by = (max(data_DCE_mlogit$journey_duration3) - min(data_DCE_mlogit$journey_duration3))/100))
+# Use the class-membership model to calculate the membership probabilities
+df <- df %>%
+  mutate(p_1 = 1 -
+           (exp(coef(lc4)["(class)2"] + coef(lc4)["class2:journey_duration3"] * journey_duration3) +
+              exp(coef(lc4)["(class)3"] + coef(lc4)["class3:journey_duration3"] * journey_duration3) + 
+              exp(coef(lc4)["(class)4"] + coef(lc4)["class4:journey_duration3"] * journey_duration3))/
+           (1 + exp(coef(lc4)["(class)2"] + coef(lc4)["class2:journey_duration3"] * journey_duration3) + exp(coef(lc4)["(class)3"] + coef(lc4)["class3:journey_duration3"] * journey_duration3) + exp(coef(lc4)["(class)4"] + coef(lc4)["class4:journey_duration3"] * journey_duration3)),
+         p_2 = exp(coef(lc4)["(class)2"] + coef(lc4)["class2:journey_duration3"] * journey_duration3)/
+           (1 + exp(coef(lc4)["(class)2"] + coef(lc4)["class2:journey_duration3"] * journey_duration3) + exp(coef(lc4)["(class)3"] + coef(lc4)["class3:journey_duration3"] * journey_duration3) + exp(coef(lc4)["(class)4"] + coef(lc4)["class4:journey_duration3"] * journey_duration3)),
+         p_3 = exp(coef(lc4)["(class)3"] + coef(lc4)["class3:journey_duration3"] * journey_duration3)/
+           (1 + exp(coef(lc4)["(class)2"] + coef(lc4)["class2:journey_duration3"] * journey_duration3) + exp(coef(lc4)["(class)3"] + coef(lc4)["class3:journey_duration3"] * journey_duration3) + exp(coef(lc4)["(class)4"] + coef(lc4)["class4:journey_duration3"] * journey_duration3)),
+         p_4 = exp(coef(lc4)["(class)4"] + coef(lc4)["class4:journey_duration3"] * journey_duration3)/
+           (1 + exp(coef(lc4)["(class)2"] + coef(lc4)["class2:journey_duration3"] * journey_duration3) + exp(coef(lc4)["(class)3"] + coef(lc4)["class3:journey_duration3"] * journey_duration3) + exp(coef(lc4)["(class)4"] + coef(lc4)["class4:journey_duration3"] * journey_duration3))
+  ) %>%
+  # Pivot longer to put all probabilities in a single column, and label by class
+  pivot_longer(cols = -journey_duration3,
+               names_to = "Class",
+               values_to = "p") %>%
+  mutate(Class = sub("p_","Class ", Class))
+
+ggplot(df, aes(x = journey_duration3)) +
+  geom_line(aes(x = journey_duration3,
+                y = p,
+                color = Class)) +
+  theme_modern()
+
+#Create a data frame for plotting:
+df <- data.frame(main_vehicule_indiv_motor = seq(min(data_DCE_mlogit$main_vehicule_indiv_motor),
+                                 to = max(data_DCE_mlogit$main_vehicule_indiv_motor),
+                                 by = (max(data_DCE_mlogit$main_vehicule_indiv_motor) - min(data_DCE_mlogit$main_vehicule_indiv_motor))/100))
+# Use the class-membership model to calculate the membership probabilities
+df <- df %>%
+  mutate(p_1 = 1 -
+           (exp(coef(lc4)["(class)2"] + coef(lc4)["class2:main_vehicule_indiv_motor"] * main_vehicule_indiv_motor) +
+              exp(coef(lc4)["(class)3"] + coef(lc4)["class3:main_vehicule_indiv_motor"] * main_vehicule_indiv_motor) + 
+              exp(coef(lc4)["(class)4"] + coef(lc4)["class4:main_vehicule_indiv_motor"] * main_vehicule_indiv_motor))/
+           (1 + exp(coef(lc4)["(class)2"] + coef(lc4)["class2:main_vehicule_indiv_motor"] * main_vehicule_indiv_motor) + exp(coef(lc4)["(class)3"] + coef(lc4)["class3:main_vehicule_indiv_motor"] * main_vehicule_indiv_motor) + exp(coef(lc4)["(class)4"] + coef(lc4)["class4:main_vehicule_indiv_motor"] * main_vehicule_indiv_motor)),
+         p_2 = exp(coef(lc4)["(class)2"] + coef(lc4)["class2:main_vehicule_indiv_motor"] * main_vehicule_indiv_motor)/
+           (1 + exp(coef(lc4)["(class)2"] + coef(lc4)["class2:main_vehicule_indiv_motor"] * main_vehicule_indiv_motor) + exp(coef(lc4)["(class)3"] + coef(lc4)["class3:main_vehicule_indiv_motor"] * main_vehicule_indiv_motor) + exp(coef(lc4)["(class)4"] + coef(lc4)["class4:main_vehicule_indiv_motor"] * main_vehicule_indiv_motor)),
+         p_3 = exp(coef(lc4)["(class)3"] + coef(lc4)["class3:main_vehicule_indiv_motor"] * main_vehicule_indiv_motor)/
+           (1 + exp(coef(lc4)["(class)2"] + coef(lc4)["class2:main_vehicule_indiv_motor"] * main_vehicule_indiv_motor) + exp(coef(lc4)["(class)3"] + coef(lc4)["class3:main_vehicule_indiv_motor"] * main_vehicule_indiv_motor) + exp(coef(lc4)["(class)4"] + coef(lc4)["class4:main_vehicule_indiv_motor"] * main_vehicule_indiv_motor)),
+         p_4 = exp(coef(lc4)["(class)4"] + coef(lc4)["class4:main_vehicule_indiv_motor"] * main_vehicule_indiv_motor)/
+           (1 + exp(coef(lc4)["(class)2"] + coef(lc4)["class2:main_vehicule_indiv_motor"] * main_vehicule_indiv_motor) + exp(coef(lc4)["(class)3"] + coef(lc4)["class3:main_vehicule_indiv_motor"] * main_vehicule_indiv_motor) + exp(coef(lc4)["(class)4"] + coef(lc4)["class4:main_vehicule_indiv_motor"] * main_vehicule_indiv_motor))
+  ) %>%
+  # Pivot longer to put all probabilities in a single column, and label by class
+  pivot_longer(cols = -main_vehicule_indiv_motor,
+               names_to = "Class",
+               values_to = "p") %>%
+  mutate(Class = sub("p_","Class ", Class))
+
+ggplot(df, aes(x = main_vehicule_indiv_motor)) +
+  geom_line(aes(x = main_vehicule_indiv_motor,
+                y = p,
+                color = Class)) +
+  theme_modern()
+
+#Create a data frame for plotting:
+df <- data.frame(main_vehicule_commun = seq(min(data_DCE_mlogit$main_vehicule_commun),
+                                 to = max(data_DCE_mlogit$main_vehicule_commun),
+                                 by = (max(data_DCE_mlogit$main_vehicule_commun) - min(data_DCE_mlogit$main_vehicule_commun))/100))
+# Use the class-membership model to calculate the membership probabilities
+df <- df %>%
+  mutate(p_1 = 1 -
+           (exp(coef(lc4)["(class)2"] + coef(lc4)["class2:main_vehicule_commun"] * main_vehicule_commun) +
+              exp(coef(lc4)["(class)3"] + coef(lc4)["class3:main_vehicule_commun"] * main_vehicule_commun) + 
+              exp(coef(lc4)["(class)4"] + coef(lc4)["class4:main_vehicule_commun"] * main_vehicule_commun))/
+           (1 + exp(coef(lc4)["(class)2"] + coef(lc4)["class2:main_vehicule_commun"] * main_vehicule_commun) + exp(coef(lc4)["(class)3"] + coef(lc4)["class3:main_vehicule_commun"] * main_vehicule_commun) + exp(coef(lc4)["(class)4"] + coef(lc4)["class4:main_vehicule_commun"] * main_vehicule_commun)),
+         p_2 = exp(coef(lc4)["(class)2"] + coef(lc4)["class2:main_vehicule_commun"] * main_vehicule_commun)/
+           (1 + exp(coef(lc4)["(class)2"] + coef(lc4)["class2:main_vehicule_commun"] * main_vehicule_commun) + exp(coef(lc4)["(class)3"] + coef(lc4)["class3:main_vehicule_commun"] * main_vehicule_commun) + exp(coef(lc4)["(class)4"] + coef(lc4)["class4:main_vehicule_commun"] * main_vehicule_commun)),
+         p_3 = exp(coef(lc4)["(class)3"] + coef(lc4)["class3:main_vehicule_commun"] * main_vehicule_commun)/
+           (1 + exp(coef(lc4)["(class)2"] + coef(lc4)["class2:main_vehicule_commun"] * main_vehicule_commun) + exp(coef(lc4)["(class)3"] + coef(lc4)["class3:main_vehicule_commun"] * main_vehicule_commun) + exp(coef(lc4)["(class)4"] + coef(lc4)["class4:main_vehicule_commun"] * main_vehicule_commun)),
+         p_4 = exp(coef(lc4)["(class)4"] + coef(lc4)["class4:main_vehicule_commun"] * main_vehicule_commun)/
+           (1 + exp(coef(lc4)["(class)2"] + coef(lc4)["class2:main_vehicule_commun"] * main_vehicule_commun) + exp(coef(lc4)["(class)3"] + coef(lc4)["class3:main_vehicule_commun"] * main_vehicule_commun) + exp(coef(lc4)["(class)4"] + coef(lc4)["class4:main_vehicule_commun"] * main_vehicule_commun))
+  ) %>%
+  # Pivot longer to put all probabilities in a single column, and label by class
+  pivot_longer(cols = -main_vehicule_commun,
+               names_to = "Class",
+               values_to = "p") %>%
+  mutate(Class = sub("p_","Class ", Class))
+
+ggplot(df, aes(x = main_vehicule_commun)) +
+  geom_line(aes(x = main_vehicule_commun,
+                y = p,
+                color = Class)) +
+  theme_modern()
 
 #Create a data frame for plotting:
 df <- data.frame(Perso_relation_nature = seq(min(na.omit(data_DCE_mlogit$Perso_relation_nature)),
@@ -875,3 +1075,136 @@ ggsave("output/ic_mod_S.png",
 # classe 2 : saving biodiversity whatever the cost
 # classe 3 : gain access whatever the cost
 # classe 4 : rural landscape
+
+
+
+# time from classical approaches
+
+data_DCE_mlogit <- mutate(data_DCE_numeric,
+             `Temps:Income` = Temps * Income)
+data_DCE_mlogit$Income2 <- data_DCE_mlogit$Income
+data_DCE_mlogit$Income2[which(data_DCE_mlogit$Income2 %in% c(1:4))] <- 1
+data_DCE_mlogit$Income2[which(data_DCE_mlogit$Income2 %in% c(5:7))] <- 2
+data_DCE_mlogit$Income2[which(data_DCE_mlogit$Income2 %in% c(7:8))] <- 3
+data_DCE_mlogit$Income3 <- data_DCE_mlogit$Income*data_DCE_mlogit$Income
+
+
+data_DCE_mlogit <- mlogit.data(data_DCE_mlogit,
+                               choice = "choice",
+                               shape = "long",
+                               alt.levels = c("Scénario de référence",
+                                              "Scénario 1",
+                                              "Scénario 2" ),
+                               chid.var = "chid")
+
+
+mxl1 <- gmnl(choice ~ Temps + Paysage + Acces + Biodiversite + Biome + asc | Gender + Age + Income + CSPgroup + class_nat + survey_id + journey_duration2,
+            data = data_DCE_mlogit,
+            model = 'mixl',
+            ranp = c(Temps = "n"),
+            R = 50)
+
+mxl2 <- gmnl(choice ~ Temps + Paysage + Acces + Biodiversite + Biome + asc | Income ,
+            data = data_DCE_mlogit,
+            model = 'mixl',
+            ranp = c(Temps = "n"),
+            R = 50)
+
+mxl3 <- gmnl(choice ~ Temps + Temps:Income + Paysage + Acces + Biodiversite + Biome + asc | 1,
+            data = data_DCE_mlogit,
+            model = 'mixl',
+            ranp = c(Temps = "n"),
+            R = 50)
+
+mxl4 <- gmnl(choice ~ Temps + Paysage + Acces + Biodiversite + Biome + asc | 1 | 0 | Income ,
+            data = data_DCE_mlogit,
+            model = 'mixl',
+            mvar = list(Temps = c("Income")),
+            ranp = c(Temps = "n"),
+            R = 50)
+
+mxl5 <- gmnl(choice ~ Temps + Paysage + Acces + Biodiversite + Biome + asc | 1 | 0 | Gender + Age + Income + CSPgroup + class_nat + survey_id + journey_duration2 ,
+             data = data_DCE_mlogit,
+             model = 'mixl',
+             mvar = list(Temps = c("Gender", "Age", "Income", "CSPgroup", "class_nat", "survey_id", "journey_duration2")),
+             ranp = c(Temps = "n"),
+             R = 50)
+
+mxl6 <- gmnl(choice ~ Temps + Paysage + Acces + Biodiversite + Biome + asc | 1 | 0 | Gender + Age + Income2 + CSPgroup + class_nat + survey_id + journey_duration2 ,
+             data = data_DCE_mlogit,
+             model = 'mixl',
+             mvar = list(Temps = c("Gender", "Age", "Income2", "CSPgroup", "class_nat", "survey_id", "journey_duration2")),
+             ranp = c(Temps = "n"),
+             R = 50)
+
+mxl7 <- gmnl(choice ~ Temps + Paysage + Acces + Biodiversite + Biome + asc | 1 | 0 | Gender + Age + Income3 + CSPgroup + class_nat + survey_id + journey_duration2 ,
+             data = data_DCE_mlogit,
+             model = 'mixl',
+             mvar = list(Temps = c("Gender", "Age", "Income3", "CSPgroup", "class_nat", "survey_id", "journey_duration2")),
+             ranp = c(Temps = "n"),
+             R = 50)
+
+# ajouter income en categorie (non lineaier cf Depalma)
+
+mnl_cov <- mlogit(choice ~ Temps + Paysage + Acces + Biodiversite + Biome + asc | Income,
+                  data = data_DCE_mlogit)
+mnl_exp <- mlogit(choice ~ Temps + Temps:Income + Paysage + Acces + Biodiversite + Biome + asc | 1,
+                  data = data_DCE_mlogit)
+
+
+# plot map with number of respondent
+# commune geo from https://public.opendatasoft.com/explore/dataset/georef-france-commune-arrondissement-municipal-millesime/export/?disjunctive.reg_name&disjunctive.dep_name&disjunctive.arrdep_name&disjunctive.ze2020_name&disjunctive.bv2012_name&disjunctive.epci_name&disjunctive.ept_name&disjunctive.com_name&disjunctive.com_arm_name&disjunctive.com_arm_is_mountain_area&sort=year&location=6,46.97276,3.93311&basemap=jawg.light
+spdf <- geojson_read("raw_data/georef-france-commune-arrondissement-municipal-millesime.geojson",  what = "sp")
+
+spdf_metro <- spdf[which(spdf@data$reg_name %in% c("Nouvelle-Aquitaine","Centre-Val de Loire","Bourgogne-Franche-Comté","Hauts-de-France",
+                                                   "Normandie","Grand Est","Bretagne","Occitanie","Île-de-France","Provence-Alpes-Côte d'Azur",
+                                                   "Pays de la Loire","Auvergne-Rhône-Alpes","Corse")),]
+
+data_clean_com_nat <- readRDS("output/data_clean_com_nat.rds")
+response_per_commune <- na.omit(data_clean_com_nat[,c("code_commune_insee" ,"post_code_home")] %>% group_by(code_commune_insee) %>% summarise(count=n()))
+names(response_per_commune)[1] <- "com_code"
+
+spdf_metro@data <- join(spdf_metro@data, response_per_commune, by="com_code")
+
+spdf_metro_resp <- spdf_metro[which(!is.na(spdf_metro@data$count)),]
+
+spdf_metro_resp_fort <- fortify(spdf_metro_resp, region='com_code')
+spdf_metro_resp_fort$com_code <- spdf_metro_resp_fort$id
+sf.df <- join(spdf_metro_resp_fort, spdf_metro_resp@data, by="com_code")
+
+fr_boundary <- ne_states("france",returnclass = "sf")
+fr_boundary <- fr_boundary[which(fr_boundary$type_en=="Metropolitan department"),]
+
+fr_boundary %>% 
+  group_by(admin) %>% 
+  summarise() %>% 
+  ggplot() +
+  geom_sf() +
+  theme(legend.position = 'none')
+
+fr_boundary <- fr_boundary %>% 
+  group_by(admin) %>% 
+  summarise()
+
+city_name <- c("Angers","Aubagne","Avignon","Bordeaux","Grenoble","Le Havre","Lille",
+               "Lyon","Montpellier","Nantes","Nice","Rouen","Strasbourg","Toulouse","Tours",
+               "Geneve","Caen","Paris")
+
+spdf_city <- spdf[which(spdf@data$com_name %in% city_name),]
+spdf_city_fort <- fortify(spdf_city, region='com_name')
+spdf_city_fort$com_name <- spdf_city_fort$id
+spdf_city_fort <- spdf_city_fort %>%
+  group_by(com_name) %>%
+  summarise(long = mean(long, na.rm = T), lat = mean(lat, na.rm = T), group = group)
+
+ggplot(sf.df) + coord_fixed(ratio = 1.3) +
+  geom_sf(data=fr_boundary, fill='white') +
+  geom_polygon(aes(x = long, y = lat, group = com_code, fill=count)) + 
+  scale_fill_gradient(low = "lightblue", high = "darkblue") +
+  theme_void() +
+  geom_text(data = spdf_city_fort, aes(long, lat, label = com_name, group = group), size = 10)
+  
+ggsave("output/map_resp.png",
+       width = 32,
+       height = 24,
+       dpi = 400)

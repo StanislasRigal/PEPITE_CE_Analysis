@@ -11,10 +11,9 @@ library(rgeos)
 library(plyr)
 library(dplyr)
 library(Hmisc)
-library(support.CEs)
+library(suport.CEs)
 library(see)
-
-remotes::install_github("mauricio1986/gmnl")
+#remotes::install_github("mauricio1986/gmnl")
 library(dplyr) # A Grammar of Data Manipulation
 library(ggplot2) # Create Elegant Data Visualisations Using the Grammar of Graphics
 library(gmnl) # Multinomial Logit Models with Random Parameters
@@ -26,6 +25,12 @@ library(tibble) # Simple Data Frames
 library(tidyr) # Tidy Messy Data
 library(AER) # Applied Econometrics with R
 library(poLCA)
+
+library(maptools)
+library(raster)   
+library(rgeos)
+library(rnaturalearth)
+library(maps)
 
 source('lc_helpers.r')
 

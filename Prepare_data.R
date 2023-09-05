@@ -1166,7 +1166,7 @@ data_clean$post_code_home[which(data_clean$Q01_other=="Villemur-sur-Tarn 31340")
 data_clean$post_code_home[which(data_clean$Q01_other=="Villeneuve loubet ")] <- commune_liste_poste$com_code[which(commune_liste_poste$code_postal=="06270" & commune_liste_poste$nom_de_la_commune=="VILLENEUVE LOUBET")]
 data_clean$post_code_home[which(data_clean$Q01_other=="Wavrechain-sous-Denain ")] <- commune_liste_poste$com_code[which(commune_liste_poste$code_postal=="59220" & commune_liste_poste$nom_de_la_commune=="WAVRECHAIN SOUS DENAIN")]
 
-data_clean$post_code_home[which(!(data_clean$post_code_home %in% levels(data_clean$Q01)))] <- NA
+#data_clean$post_code_home[which(!(data_clean$post_code_home %in% levels(data_clean$Q01)))] <- NA
 
 
 data_clean$post_code_work <- as.character(data_clean$QIV28)
@@ -1273,6 +1273,41 @@ data_clean_com <- merge(data_clean,commune_liste_poste_unique, by.x="post_code_h
 
 com_isochrone <- readRDS("output/com_isochrone.rds")
 data_clean_com_nat <- merge(data_clean_com,com_isochrone, by.x="code_commune_insee", by.y="com_code", all.x=TRUE)
+
+# add naturality for communes not initially in the 570
+
+nat_com3 <- readRDS("output/nat_com3.rds")
+
+data_clean_com_nat_com_in_570 <- data_clean_com_nat[which(data_clean_com_nat$post_code_home %in% levels(data_clean$Q01)),]
+data_clean_com_nat_com_out_570 <- data_clean_com_nat[which(!(data_clean_com_nat$post_code_home %in% levels(data_clean$Q01))),]
+
+data_clean_com_nat_com_out_570$nat <- data_clean_com_nat_com_out_570$class_nat <- NULL
+
+nat_com_class <- nat_com3[,c("com_code","nat")]
+nat_com_class$class_nat <- "Naturality --"
+nat_com_class$class_nat[which(nat_com_class$nat>=227 & nat_com_class$nat<256)] <- "Naturality -"
+nat_com_class$class_nat[which(nat_com_class$nat>=256)] <- "Naturality +"
+
+data_clean_com_nat_com_out_570 <- merge(data_clean_com_nat_com_out_570,nat_com_class, by.x="code_commune_insee", by.y="com_code", all.x=TRUE)
+
+data_clean_com_nat <- rbind(data_clean_com_nat_com_in_570, data_clean_com_nat_com_out_570)
+
+# look at mean duration travel
+data_duration <- data_clean_com_nat[,c("QI5_SQ002","QI5_SQ003","QI5_SQ004","QI5_SQ005","QI5_SQ006")]
+data_duration$QI5_SQ002[which(is.na(data_duration$QI5_SQ002))] <- 0
+data_duration$QI5_SQ003[which(is.na(data_duration$QI5_SQ003))] <- 0
+data_duration$QI5_SQ004[which(is.na(data_duration$QI5_SQ004))] <- 0
+data_duration$QI5_SQ005[which(is.na(data_duration$QI5_SQ005))] <- 0
+data_duration$QI5_SQ006[which(is.na(data_duration$QI5_SQ006))] <- 0
+data_duration$all <- data_duration$QI5_SQ002 + data_duration$QI5_SQ003 + data_duration$QI5_SQ004 + data_duration$QI5_SQ005 +data_duration$QI5_SQ006
+hist(data_duration$all)
+data_duration2 <- split(data_duration, cut2(data_duration$all, g=6))
+length(which(data_duration$all<21))
+length(which(data_duration$all>20 & data_duration$all<31))
+length(which(data_duration$all>30 & data_duration$all<41))
+length(which(data_duration$all>40 & data_duration$all<61))
+length(which(data_duration$all>60 & data_duration$all<91))
+length(which(data_duration$all>90))
 
 # Save clean response database
 saveRDS(data_clean_com_nat,file="output/data_clean_com_nat.rds")
