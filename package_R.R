@@ -11,7 +11,7 @@ library(rgeos)
 library(plyr)
 library(dplyr)
 library(Hmisc)
-library(suport.CEs)
+#library(suport.CEs)
 library(see)
 #remotes::install_github("mauricio1986/gmnl")
 library(dplyr) # A Grammar of Data Manipulation

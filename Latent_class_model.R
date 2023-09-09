@@ -90,12 +90,15 @@ data_DCE_numeric$Biome_peri <- ifelse(data_DCE_numeric$Biome == 1,1,0)
 data_DCE_numeric$Biome_urbain <- ifelse(data_DCE_numeric$Biome == 0,1,0)
 data_DCE_numeric$Biome[which(data_DCE_numeric$Biome==-1)] <- 0
 data_DCE_numeric$Biome <- as.factor(data_DCE_numeric$Biome)
-#data_DCE_numeric$Biodiversite <- data_DCE_numeric$Biodiversite + 1
-data_DCE_numeric$Biodiversite[which(data_DCE_numeric$Biodiversite == -1)] <- 0
+data_DCE_numeric$Biodiversite <- data_DCE_numeric$Biodiversite + 1
+#data_DCE_numeric$Biodiversite[which(data_DCE_numeric$Biodiversite == -1)] <- 0
 data_DCE_numeric$Gender <- as.numeric(as.factor(data_DCE_numeric$Gender))
 data_DCE_numeric <- droplevels(data_DCE_numeric[which(data_DCE_numeric$Gender != 3),])
 data_DCE_numeric$Age <- as.numeric(as.factor(data_DCE_numeric$Age))
-data_DCE_numeric$Income <- as.numeric(as.factor(data_DCE_numeric$Income))
+data_DCE_numeric$Income <- as.numeric(factor(data_DCE_numeric$Income, levels=c("Moins de 1200 €","Entre 1200 et 1500 €","Entre 1500 et 1800 €","Entre 1800 et 2100 €",
+                                                                                                     "Entre 2100 et 2600 €","Entre 2600 et 3100 €","Entre 3100 et 3500 €","Entre 3500 et 4200 €",
+                                                                                                     "Entre 4200 et 5400 €","Plus de 5400 €" )))
+data_DCE_numeric$Education[which(data_DCE_numeric$Education=="Primaire (certificat d’études)")] <- "Secondaire court (CAP, BEP) ou niveau baccalauréat"
 data_DCE_numeric$Education <- as.numeric(as.factor(data_DCE_numeric$Education))
 data_DCE_numeric$CSPgroup <- as.character(data_DCE_numeric$CSP)
 data_DCE_numeric$CSPgroup[which(data_DCE_numeric$CSPgroup %in% c("Agriculteurs","Employés (employés administratifs de la fonction publique, agents de service et auxiliaires de santé, policiers, militaires, pompiers, agents de sécurité, employés administratifs, employés de commerce, personnels des services directs aux particuliers )","Ouvriers et conducteurs de transport"))] <- "moins"
@@ -140,6 +143,32 @@ data_DCE_numeric$journey_duration3[which(data_DCE_numeric$journey_duration3>90)]
 
 
 saveRDS(data_DCE_numeric,"output/data_DCE_numeric.rds")
+
+
+
+#calculate correlation between each pairwise combination of variables
+cor_df <- na.omit(data_DCE_numeric[,c("Gender","Age","Income", "CSPgroup_retraite", "CSPgroup_inactif", "CSPgroup_plus", "CSPgroup_moins" ,"class_nat" ,"journey_duration3", "main_vehicule_indiv_no_motor", "main_vehicule_indiv_motor", "main_vehicule_commun","Education","Perso_relation_nature")])
+names(cor_df) <- c("Gender","Age","Income", "Retired", "No_employ", "SPC+", "SPC-" ,"Naturalness" ,"Transport time", "Personal not motorised", "Personal motorised", "Public transport","Education","INS")
+cor_df <- round(cor(cor_df), 2)
+
+#melt the data frame
+melted_cormat <- melt(cor_df)
+
+#create correlation heatmap
+ggplot(data = melted_cormat, aes(x=Var1, y=Var2, fill=value)) + 
+  geom_tile() +
+  geom_text(aes(Var2, Var1, label = value), size = 5) +
+  scale_fill_gradient2(low = "blue", high = "red",
+                       limit = c(-1,1), name="Correlation") +
+  theme(axis.title.x = element_blank(),
+        axis.title.y = element_blank(),
+        panel.background = element_blank(),
+        axis.text.x = element_text(angle = 45, hjust = 1))
+
+ggsave("output/correlation_var.png",
+       width = 12,
+       height = 8,
+       dpi = 400)
 
 # both survey merged
 
@@ -299,7 +328,12 @@ ggsave("output/ic_mod.png",
 plot_ci_lc(lc4)
 plot_ci_lc(lc4, var = c("Temps","Paysage","Acces","Biodiversite","Biome1","Biome2"))
 # modifier pour ggplot :
-plot_ci_lc_ggplot
+plot_ci_lc_ggplot(lc4, var = c("Temps","Paysage","Acces","Biodiversite","Biome1","Biome2"))
+
+ggsave("output/model_estimate.png",
+       width = 6,
+       height = 8,
+       dpi = 400)
 
 # Model evaluation by classification diagnostics
 
@@ -375,6 +409,9 @@ mean(diag(m7))
 
 c(mean(diag(m2)),mean(diag(m3)),mean(diag(m4)),mean(diag(m5)),mean(diag(m6)),mean(diag(m7)))
 
+c(min(shares(lc2)),min(shares(lc3)),min(shares(lc4)),min(shares(lc5)),min(shares(lc6)),min(shares(lc7)))
+round(c(min(shares(lc2)),min(shares(lc3)),min(shares(lc4)),min(shares(lc5)),min(shares(lc6)),min(shares(lc7)))*1094)
+
 # Get individuals' estimates for Paysage
 bi_Paysage <- effect.gmnl(lc4, par = "Paysage", effect = "ce")$mean
 summary(bi_Paysage)
@@ -394,10 +431,16 @@ summary(bi_Biodiversite)
 plot(lc4, par = "Biodiversite", effect = "ce", type = "density", col = "blue")
 
 # Get individuals' estimates for Biome
-bi_Biome <- effect.gmnl(lc4, par = "Biome", effect = "ce")$mean
+bi_Biome <- effect.gmnl(lc4, par = "Biome1", effect = "ce")$mean
 summary(bi_Biome)
 # Plotting the distribution of the individuals' estimates
-plot(lc4, par = "Biome", effect = "ce", type = "density", col = "blue")
+plot(lc4, par = "Biome1", effect = "ce", type = "density", col = "blue")
+
+# Get individuals' estimates for Biome
+bi_Biome <- effect.gmnl(lc4, par = "Biome2", effect = "ce")$mean
+summary(bi_Biome)
+# Plotting the distribution of the individuals' estimates
+plot(lc4, par = "Biome2", effect = "ce", type = "density", col = "blue")
 
 
 # classe 1 : saving time
@@ -1206,6 +1249,32 @@ as.numeric(lc4$coefficients[11]) / as.numeric(lc4$coefficients[7])
 as.numeric(lc4$coefficients[17]) / as.numeric(lc4$coefficients[13])
 as.numeric(lc4$coefficients[23]) / as.numeric(lc4$coefficients[19])
 
+-coef(lc4)["class.1.Paysage"] / coef(lc4)["class.1.Temps"]
+-coef(lc4)["class.1.Acces"] / coef(lc4)["class.1.Temps"]
+-coef(lc4)["class.1.Biodiversite"] / coef(lc4)["class.1.Temps"]
+-coef(lc4)["class.1.Biome1"] / coef(lc4)["class.1.Temps"]
+-coef(lc4)["class.1.Biome2"] / coef(lc4)["class.1.Temps"]
+
+-coef(lc4)["class.2.Paysage"] / coef(lc4)["class.2.Temps"]
+-coef(lc4)["class.2.Acces"] / coef(lc4)["class.2.Temps"]
+-coef(lc4)["class.2.Biodiversite"] / coef(lc4)["class.2.Temps"]
+-coef(lc4)["class.2.Biome1"] / coef(lc4)["class.2.Temps"]
+-coef(lc4)["class.2.Biome2"] / coef(lc4)["class.2.Temps"]
+
+-coef(lc4)["class.3.Paysage"] / coef(lc4)["class.3.Temps"]
+-coef(lc4)["class.3.Acces"] / coef(lc4)["class.3.Temps"]
+-coef(lc4)["class.3.Biodiversite"] / coef(lc4)["class.3.Temps"]
+-coef(lc4)["class.3.Biome1"] / coef(lc4)["class.3.Temps"]
+-coef(lc4)["class.3.Biome2"] / coef(lc4)["class.3.Temps"]
+
+-coef(lc4)["class.4.Paysage"] / coef(lc4)["class.4.Temps"]
+-coef(lc4)["class.4.Acces"] / coef(lc4)["class.4.Temps"]
+-coef(lc4)["class.4.Biodiversite"] / coef(lc4)["class.4.Temps"]
+-coef(lc4)["class.4.Biome1"] / coef(lc4)["class.4.Temps"]
+-coef(lc4)["class.4.Biome2"] / coef(lc4)["class.4.Temps"]
+
+
+
 
 # survey framing long
 
@@ -1407,6 +1476,304 @@ ggsave("output/ic_mod_S.png",
 # classe 4 : rural landscape
 
 
+### three step LC
+
+### 0. Prepare covariables for step 3
+data_clean_com_nat <- readRDS("output/data_clean_com_nat.rds")
+
+data_clean_com_nat_analysis <- data_clean_com_nat[,c("id","Q01b","Q01c","Q01d","QIV19","QIV21_SQ001","QIV21_SQ002","QIV21_SQ003","QIV22",
+            "QI4_SQ002","QI4_SQ003","QI4_SQ004","QI4_SQ005","QI4_SQ006","QI4_other",
+            "QI5_SQ002","QI5_SQ003","QI5_SQ004","QI5_SQ005","QI5_SQ006",
+            "QI6_1","QI6_2","QI6_3","QI6_4","QI7",
+            "QI8_SQ001","QI8_SQ002","QI8_SQ003","QI8_SQ004","QI8_SQ005","QI8_other",
+            "QIII9_SQ002","QIII9_SQ003","QIII9_SQ004","QIII9_SQ005","QIII9_SQ006","QIII9_SQ007",
+            "QIII10_SQ001","QIII10_SQ002","QIII10_SQ003","QIII10_SQ004","QIII10_SQ005","QIII10_SQ006","QIII10_other",
+            "QIII11_SQ001","QIII11_SQ002","QIII11_other","QIII12_SQ001","QIII13_SQ001",
+            "QIII15_SQ001","QIII15_SQ002","QIII15_SQ003","QIII15_SQ004","QIII15_SQ005","QIII15_SQ006",
+            "QIII14_SQ001","QIII14_SQ002","QIII14_SQ003","QIII14_SQ004","QIII14_SQ005","QIII14_SQ010","QIII14_SQ006","QIII14_SQ007","QIII14_SQ008","QIII14_SQ009","QIII14_SQ011",
+            "QIII16_SQ001","QIII16_SQ002","QIII16_SQ003","QIII16_SQ004","QIII16_SQ005","QIII16_SQ006","QIII16_SQ007","QIII16_SQ008","QIII16_other","QIV18",
+            "QIV23","QIV23_comment","QIV24","QIV24_comment","QIV25","QIV25_comment","QIV26","QIV27","QVnew_SQ001",
+            "survey_id","time_video_short","post_code_home","post_code_work","com_centre","com_peri","com_name",
+            "pot_fin_hab","med_disp","p_csp_cadpis","p_csp_arcomce","p_csp_agr","p_csp_empl","p_csp_inter","p_csp_ouvr",
+            "nb_inact1564","pc_inact1564","dens_pop","part_domtrav_voit","car_mov_evol","ratio_fh",
+            "part_pop1529","part_pop3044","part_pop4559","part_pop6074","part_pop_65p","p_csp_retr",
+            "pop","size","nat","class_nat")]
+
+names(data_clean_com_nat_analysis) <- c("id",
+                     "Gender","Age","CSP","Education","Nb_adult","Nb_children_small","Nb_children_big","Income",
+                     "most_freq_journey_professionel","most_freq_journey_associative","most_freq_journey_domestic","most_freq_journey_leisure","most_freq_journey_driver","most_freq_journey_other",
+                     "time_professionel","time_associative","time_domestic","time_leisure","time_driver",
+                     "vehicule_1","vehicule_2","vehicule_3","vehicule_4","carpool",
+                     "hypo_most_freq_journey_professionel","hypo_most_freq_journey_associative","hypo_most_freq_journey_domestic","hypo_most_freq_journey_leisure","hypo_most_freq_journey_driver","hypo_most_freq_journey_other",
+                     "all_attribute_important","non_important_paysage","non_important_biodiversity","non_important_biome","non_important_access","non_important_time",
+                     "SQ_all_not_enough_time","SQ_all_too_important_time_increase","SQ_all_protest1","SQ_all_protest2","SQ_all_protest3","SQ_all_protest4","SQ_all_other",
+                     "SQ_one_not_enough_time","SQ_one_too_important_time_increase","SQ_one_other","Difficulty_CE","Realistic_CE",
+                     "Agree_tram_faster","Agree_tram_cheaper","Agree_tram_more_ecological","Agree_tram_more_practical","Agree_protect_nature_major","Agree_individual_effect",
+                     "Agree_pref_individual_vehicule","Agree_tram_not_fiable","Agree_tram_not_accessible","Agree_tram_too_slow","Agree_tram_not_practicable","Agree_tram_journey_too_complicate","Agree_public_transport_not_a_solution","Agree_dislike_public_transport","Agree_infra_no_impact","Agree_individual_not_enough","Agree_tram_equal_more_traffic_jam",
+                     "Alternative_tram_important","Alternative_pedestrian","Alternative_bicycle","Alternative_bus","Alternative_carpool","Alternative_remote_work","Alternative_closer_work","Alternative_change_city","Alternative_other","Knowledge_project",
+                     "Perso_belong_eco_NGO","Perso_belong_eco_NGO_comment","Perso_nature_activity","Perso_nature_activity_comment","Perso_eco_criteria_shopping","Perso_eco_criteria_shopping_comment","Perso_knowledge_biodiversity","Perso_frequency_nature","Perso_relation_nature",
+                     "survey_id","time_video_short","post_code_home","post_code_work","com_centre","com_peri","com_name",
+                     "pot_fin_hab","med_disp","p_csp_cadpis","p_csp_arcomce","p_csp_agr","p_csp_empl","p_csp_inter","p_csp_ouvr",
+                     "nb_inact1564","pc_inact1564","dens_pop","part_domtrav_voit","car_mov_evol","ratio_fh",
+                     "part_pop1529","part_pop3044","part_pop4559","part_pop6074","part_pop_65p","p_csp_retr",
+                     "pop","size","nat","class_nat")
+
+data_clean_com_nat_analysis$Age <- as.numeric(as.factor(data_clean_com_nat_analysis$Age))
+data_clean_com_nat_analysis$Income <- as.numeric(factor(data_clean_com_nat_analysis$Income, levels=c("Moins de 1200 €","Entre 1200 et 1500 €","Entre 1500 et 1800 €","Entre 1800 et 2100 €",
+                                                                                          "Entre 2100 et 2600 €","Entre 2600 et 3100 €","Entre 3100 et 3500 €","Entre 3500 et 4200 €",
+                                                                                          "Entre 4200 et 5400 €","Plus de 5400 €" )))
+data_clean_com_nat_analysis$Education[which(data_clean_com_nat_analysis$Education=="Primaire (certificat d’études)")] <- "Secondaire court (CAP, BEP) ou niveau baccalauréat"
+data_clean_com_nat_analysis$Education <- as.numeric(as.factor(data_clean_com_nat_analysis$Education))
+data_clean_com_nat_analysis$CSPgroup <- as.character(data_clean_com_nat_analysis$CSP)
+data_clean_com_nat_analysis$CSPgroup[which(data_clean_com_nat_analysis$CSPgroup %in% c("Agriculteurs","Employés (employés administratifs de la fonction publique, agents de service et auxiliaires de santé, policiers, militaires, pompiers, agents de sécurité, employés administratifs, employés de commerce, personnels des services directs aux particuliers )","Ouvriers et conducteurs de transport"))] <- "moins"
+data_clean_com_nat_analysis$CSPgroup[which(data_clean_com_nat_analysis$CSPgroup %in% c("Artisans, commerçants et chefs d'entreprise","Cadres et professions intellectuelles supérieures (professions libérales, cadres administratifs et techniques de la fonction publique, professions scientifiques supérieures, professions de l'information et de l'art, cadres des services administratifs et commerciaux d'entreprise, ingénieurs et cadres techniques d'entreprise)","Professions intermédiaires (professions de l'enseignement primaire et professionnel et du sport, professions intermédiaires de la santé, ministres du culte, professions intermédiaires de la fonction publique, professions intermédiaires administratives et commerciales des entreprises, techniciens, agents de maîtrise)"))] <- "plus"
+data_clean_com_nat_analysis$CSPgroup[which(data_clean_com_nat_analysis$CSPgroup %in% c("Étudiants","Sans emploi"))] <- "Inactifs"
+data_clean_com_nat_analysis$main_vehicule <- as.character(data_clean_com_nat_analysis$vehicule_1)
+data_clean_com_nat_analysis$main_vehicule[which(data_clean_com_nat_analysis$main_vehicule %in% c("bus","métro / RER métropolitain","train (TER / Intercité / TGV)","tramway"))] <- "commun"
+data_clean_com_nat_analysis$main_vehicule[which(data_clean_com_nat_analysis$main_vehicule %in% c("moto, scooter","voiture"))] <- "indiv_motor"
+data_clean_com_nat_analysis$main_vehicule[which(data_clean_com_nat_analysis$main_vehicule %in% c("trottinette","vélo","à pied"))] <- "indiv_no_motor"
+data_clean_com_nat_analysis$class_nat[which(data_clean_com_nat_analysis$class_nat == "Naturality --")] <- "a"
+data_clean_com_nat_analysis$class_nat[which(data_clean_com_nat_analysis$class_nat == "Naturality -")] <- "b"
+data_clean_com_nat_analysis$class_nat[which(data_clean_com_nat_analysis$class_nat == "Naturality +")] <- "c"
+data_clean_com_nat_analysis$class_nat <- as.numeric(as.factor(data_clean_com_nat_analysis$class_nat))
+data_clean_com_nat_analysis$Perso_relation_nature <- as.numeric(data_clean_com_nat_analysis$Perso_relation_nature)
+data_clean_com_nat_analysis$time_associative[which(is.na(data_clean_com_nat_analysis$time_associative))] <- 0
+data_clean_com_nat_analysis$time_domestic[which(is.na(data_clean_com_nat_analysis$time_domestic))] <- 0
+data_clean_com_nat_analysis$time_driver[which(is.na(data_clean_com_nat_analysis$time_driver))] <- 0
+data_clean_com_nat_analysis$time_leisure[which(is.na(data_clean_com_nat_analysis$time_leisure))] <- 0
+data_clean_com_nat_analysis$time_professionel[which(is.na(data_clean_com_nat_analysis$time_professionel))] <- 0
+data_clean_com_nat_analysis$journey_duration <- data_clean_com_nat_analysis$time_associative + data_clean_com_nat_analysis$time_domestic + data_clean_com_nat_analysis$time_driver +data_clean_com_nat_analysis$time_leisure + data_clean_com_nat_analysis$time_professionel
+data_clean_com_nat_analysis$journey_duration2 <- ifelse(data_clean_com_nat_analysis$journey_duration <= 180, data_clean_com_nat_analysis$journey_duration, NA)
+data_clean_com_nat_analysis$journey_duration3 <- data_clean_com_nat_analysis$journey_duration
+data_clean_com_nat_analysis$journey_duration3[which(data_clean_com_nat_analysis$journey_duration3<21)] <- 1
+data_clean_com_nat_analysis$journey_duration3[which(data_clean_com_nat_analysis$journey_duration3>20 & data_clean_com_nat_analysis$journey_duration3<31)] <- 2
+data_clean_com_nat_analysis$journey_duration3[which(data_clean_com_nat_analysis$journey_duration3>30 & data_clean_com_nat_analysis$journey_duration3<41)] <- 3
+data_clean_com_nat_analysis$journey_duration3[which(data_clean_com_nat_analysis$journey_duration3>40 & data_clean_com_nat_analysis$journey_duration3<61)] <- 4
+data_clean_com_nat_analysis$journey_duration3[which(data_clean_com_nat_analysis$journey_duration3>60 & data_clean_com_nat_analysis$journey_duration3<91)] <- 5
+data_clean_com_nat_analysis$journey_duration3[which(data_clean_com_nat_analysis$journey_duration3>90)] <- 6
+
+
+data_clean_com_nat_analysis$survey_person <- paste0(data_clean_com_nat_analysis$survey_id,sep="_",data_clean_com_nat_analysis$id)
+
+
+### 1. Get the best LC model without covariates
+
+#### 1.1 Models
+
+lc_3step_2 <- gmnl(choice ~ Temps + Paysage + Acces + Biodiversite + Biome + asc | 0 | 0 | 0 | 1,
+            data = data_DCE_mlogit,
+            model = 'lc',
+            Q = 2,
+            panel = TRUE)
+summary(lc_3step_2) 
+AIC_lc_3step_2 <- 2 * length(coef(lc_3step_2)) - 2 * lc_3step_2$logLik$maximum
+BIC_lc_3step_2 <- length(coef(lc_3step_2)) * log(nrow(lc_3step_2$residuals)) - 2 * lc_3step_2$logLik$maximum
+CAIC_lc_3step_2 <- length(coef(lc_3step_2)) * (log(nrow(lc_3step_2$residuals)) + 1 ) - 2 * lc_3step_2$logLik$maximum
+AWE_lc_3step_2 <-  2* length(coef(lc_3step_2)) * (log(nrow(lc_3step_2$residuals)) + 1.5 ) - 2 * lc_3step_2$logLik$maximum
+
+shares(lc_3step_2)
+
+
+lc_3step_3 <- gmnl(choice ~ Temps + Paysage + Acces + Biodiversite + Biome + asc | 0 | 0 | 0 | 1,
+            data = data_DCE_mlogit,
+            model = 'lc',
+            Q = 3,
+            panel = TRUE)
+summary(lc_3step_3)
+AIC_lc_3step_3 <- 2 * length(coef(lc_3step_3)) - 2 * lc_3step_3$logLik$maximum
+BIC_lc_3step_3 <- length(coef(lc_3step_3)) * log(nrow(lc_3step_3$residuals)) - 2 * lc_3step_3$logLik$maximum
+CAIC_lc_3step_3 <- length(coef(lc_3step_3)) * (log(nrow(lc_3step_3$residuals)) + 1 ) - 2 * lc_3step_3$logLik$maximum
+AWE_lc_3step_3 <-  2* length(coef(lc_3step_3)) * (log(nrow(lc_3step_3$residuals)) + 1.5 ) - 2 * lc_3step_3$logLik$maximum
+
+shares(lc_3step_3)
+
+
+lc_3step_4 <- gmnl(choice ~ Temps + Paysage + Acces + Biodiversite + Biome + asc | 0 | 0 | 0 | 1,
+            data = data_DCE_mlogit,
+            model = 'lc',
+            Q = 4,
+            panel = TRUE)
+summary(lc_3step_4)
+AIC_lc_3step_4 <- 2 * length(coef(lc_3step_4)) - 2 * lc_3step_4$logLik$maximum
+BIC_lc_3step_4 <- length(coef(lc_3step_4)) * log(nrow(lc_3step_4$residuals)) - 2 * lc_3step_4$logLik$maximum
+CAIC_lc_3step_4 <- length(coef(lc_3step_4)) * (log(nrow(lc_3step_4$residuals)) + 1 ) - 2 * lc_3step_4$logLik$maximum
+AWE_lc_3step_4 <-  2* length(coef(lc_3step_4)) * (log(nrow(lc_3step_4$residuals)) + 1.5 ) - 2 * lc_3step_4$logLik$maximum
+
+shares(lc_3step_4)
+
+lc_3step_5 <- gmnl(choice ~ Temps + Paysage + Acces + Biodiversite + Biome + asc | 0 | 0 | 0 | 1,
+            data = data_DCE_mlogit,
+            model = 'lc',
+            Q = 5,
+            panel = TRUE)
+summary(lc_3step_5)
+AIC_lc_3step_5 <- 2 * length(coef(lc_3step_5)) - 2 * lc_3step_5$logLik$maximum
+BIC_lc_3step_5 <- length(coef(lc_3step_5)) * log(nrow(lc_3step_5$residuals)) - 2 * lc_3step_5$logLik$maximum
+CAIC_lc_3step_5 <- length(coef(lc_3step_5)) * (log(nrow(lc_3step_5$residuals)) + 1 ) - 2 * lc_3step_5$logLik$maximum
+AWE_lc_3step_5 <-  2* length(coef(lc_3step_5)) * (log(nrow(lc_3step_5$residuals)) + 1.5 ) - 2 * lc_3step_5$logLik$maximum
+
+shares(lc_3step_5)
+
+lc_3step_6 <- gmnl(choice ~ Temps + Paysage + Acces + Biodiversite + Biome + asc | 0 | 0 | 0 | 1,
+            data = data_DCE_mlogit,
+            model = 'lc',
+            Q = 6,
+            panel = TRUE)
+summary(lc_3step_6)
+AIC_lc_3step_6 <- 2 * length(coef(lc_3step_6)) - 2 * lc_3step_6$logLik$maximum
+BIC_lc_3step_6 <- length(coef(lc_3step_6)) * log(nrow(lc_3step_6$residuals)) - 2 * lc_3step_6$logLik$maximum
+CAIC_lc_3step_6 <- length(coef(lc_3step_6)) * (log(nrow(lc_3step_6$residuals)) + 1 ) - 2 * lc_3step_6$logLik$maximum
+AWE_lc_3step_6 <-  2* length(coef(lc_3step_6)) * (log(nrow(lc_3step_6$residuals)) + 1.5 ) - 2 * lc_3step_6$logLik$maximum
+
+shares(lc_3step_6)
+
+lc_3step_7 <- gmnl(choice ~ Temps + Paysage + Acces + Biodiversite + Biome + asc | 0 | 0 | 0 | 1,
+            data = data_DCE_mlogit,
+            model = 'lc',
+            Q = 7,
+            panel = TRUE)
+summary(lc_3step_7)
+AIC_lc_3step_7 <- 2 * length(coef(lc_3step_7)) - 2 * lc_3step_7$logLik$maximum
+BIC_lc_3step_7 <- length(coef(lc_3step_7)) * log(nrow(lc_3step_7$residuals)) - 2 * lc_3step_7$logLik$maximum
+CAIC_lc_3step_7 <- length(coef(lc_3step_7)) * (log(nrow(lc_3step_7$residuals)) + 1 ) - 2 * lc_3step_7$logLik$maximum
+AWE_lc_3step_7 <-  2* length(coef(lc_3step_7)) * (log(nrow(lc_3step_7$residuals)) + 1.5 ) - 2 * lc_3step_7$logLik$maximum
+
+shares(lc_3step_7)
+
+#### 1.2 Model fit criteria
+
+IC_mod <- data.frame(group = c(2:6),
+                     AIC = c(AIC_lc_3step_2,AIC_lc_3step_3,AIC_lc_3step_4,AIC_lc_3step_5,AIC_lc_3step_6),
+                     BIC = c(BIC_lc_3step_2,BIC_lc_3step_3,BIC_lc_3step_4,BIC_lc_3step_5,BIC_lc_3step_6),
+                     CAIC = c(CAIC_lc_3step_2,CAIC_lc_3step_3,CAIC_lc_3step_4,CAIC_lc_3step_5,CAIC_lc_3step_6),
+                     AWE = c(AWE_lc_3step_2,AWE_lc_3step_3,AWE_lc_3step_4,AWE_lc_3step_5,AWE_lc_3step_6),
+                     log_likelihood = c(summary(lc_3step_2)$logLik$maximum,summary(lc_3step_3)$logLik$maximum,summary(lc_3step_4)$logLik$maximum,summary(lc_3step_5)$logLik$maximum,summary(lc_3step_6)$logLik$maximum))
+
+IC_mod_long <- melt(IC_mod, id.vars = "group")
+
+ggplot(IC_mod_long) + 
+  geom_line(data=IC_mod_long[which(IC_mod_long$variable!="log_likelihood"),], aes(x = group, y=value, col=variable)) +
+  theme_modern()
+
+
+#### 1.3 Diagnotic criteria
+
+pi_hat <- lc_3step_2$Qir
+predictions <- apply(pi_hat,1,  which.max)
+m2 <- matrix(round(c(mean(pi_hat[which(predictions==1),1]),mean(pi_hat[which(predictions==1),2]),
+                     mean(pi_hat[which(predictions==2),1]),mean(pi_hat[which(predictions==2),2])),3), nrow=2)
+
+m2
+mean(diag(m2))
+
+pi_hat <- lc_3step_3$Qir
+predictions <- apply(pi_hat,1,  which.max)
+m3 <- matrix(round(c(mean(pi_hat[which(predictions==1),1]),mean(pi_hat[which(predictions==1),2]),mean(pi_hat[which(predictions==1),3]),
+                     mean(pi_hat[which(predictions==2),1]),mean(pi_hat[which(predictions==2),2]),mean(pi_hat[which(predictions==2),3]),
+                     mean(pi_hat[which(predictions==3),1]),mean(pi_hat[which(predictions==3),2]),mean(pi_hat[which(predictions==3),3])),3), nrow=3)
+
+m3
+mean(diag(m3))
+
+pi_hat <- lc_3step_4$Qir
+predictions <- apply(pi_hat,1,  which.max)
+m4 <- matrix(round(c(mean(pi_hat[which(predictions==1),1]),mean(pi_hat[which(predictions==1),2]),mean(pi_hat[which(predictions==1),3]),mean(pi_hat[which(predictions==1),4]),
+                     mean(pi_hat[which(predictions==2),1]),mean(pi_hat[which(predictions==2),2]),mean(pi_hat[which(predictions==2),3]),mean(pi_hat[which(predictions==2),4]),
+                     mean(pi_hat[which(predictions==3),1]),mean(pi_hat[which(predictions==3),2]),mean(pi_hat[which(predictions==3),3]),mean(pi_hat[which(predictions==3),4]),
+                     mean(pi_hat[which(predictions==4),1]),mean(pi_hat[which(predictions==4),2]),mean(pi_hat[which(predictions==4),3]),mean(pi_hat[which(predictions==4),4])),3), nrow=4)
+m4
+mean(diag(m4))
+
+pi_hat <- lc_3step_5$Qir
+predictions <- apply(pi_hat,1,  which.max)
+m5 <- matrix(round(c(mean(pi_hat[which(predictions==1),1]),mean(pi_hat[which(predictions==1),2]),mean(pi_hat[which(predictions==1),3]),mean(pi_hat[which(predictions==1),4]),mean(pi_hat[which(predictions==1),5]),
+                     mean(pi_hat[which(predictions==2),1]),mean(pi_hat[which(predictions==2),2]),mean(pi_hat[which(predictions==2),3]),mean(pi_hat[which(predictions==2),4]),mean(pi_hat[which(predictions==2),5]),
+                     mean(pi_hat[which(predictions==3),1]),mean(pi_hat[which(predictions==3),2]),mean(pi_hat[which(predictions==3),3]),mean(pi_hat[which(predictions==3),4]),mean(pi_hat[which(predictions==3),5]),
+                     mean(pi_hat[which(predictions==4),1]),mean(pi_hat[which(predictions==4),2]),mean(pi_hat[which(predictions==4),3]),mean(pi_hat[which(predictions==4),4]),mean(pi_hat[which(predictions==4),5]),
+                     mean(pi_hat[which(predictions==5),1]),mean(pi_hat[which(predictions==5),2]),mean(pi_hat[which(predictions==5),3]),mean(pi_hat[which(predictions==5),4]),mean(pi_hat[which(predictions==5),5])),3), nrow=5)
+
+m5
+
+mean(diag(m5))
+
+pi_hat <- lc_3step_6$Qir
+predictions <- apply(pi_hat,1,  which.max)
+m6 <- matrix(round(c(mean(pi_hat[which(predictions==1),1]),mean(pi_hat[which(predictions==1),2]),mean(pi_hat[which(predictions==1),3]),mean(pi_hat[which(predictions==1),4]),mean(pi_hat[which(predictions==1),5]),mean(pi_hat[which(predictions==1),6]),
+                     mean(pi_hat[which(predictions==2),1]),mean(pi_hat[which(predictions==2),2]),mean(pi_hat[which(predictions==2),3]),mean(pi_hat[which(predictions==2),4]),mean(pi_hat[which(predictions==2),5]),mean(pi_hat[which(predictions==2),6]),
+                     mean(pi_hat[which(predictions==3),1]),mean(pi_hat[which(predictions==3),2]),mean(pi_hat[which(predictions==3),3]),mean(pi_hat[which(predictions==3),4]),mean(pi_hat[which(predictions==3),5]),mean(pi_hat[which(predictions==3),6]),
+                     mean(pi_hat[which(predictions==4),1]),mean(pi_hat[which(predictions==4),2]),mean(pi_hat[which(predictions==4),3]),mean(pi_hat[which(predictions==4),4]),mean(pi_hat[which(predictions==4),5]),mean(pi_hat[which(predictions==4),6]),
+                     mean(pi_hat[which(predictions==5),1]),mean(pi_hat[which(predictions==5),2]),mean(pi_hat[which(predictions==5),3]),mean(pi_hat[which(predictions==5),4]),mean(pi_hat[which(predictions==5),5]),mean(pi_hat[which(predictions==5),6]),
+                     mean(pi_hat[which(predictions==6),1]),mean(pi_hat[which(predictions==6),2]),mean(pi_hat[which(predictions==6),3]),mean(pi_hat[which(predictions==6),4]),mean(pi_hat[which(predictions==6),5]),mean(pi_hat[which(predictions==6),6])),3), nrow=6)
+
+m6
+
+mean(diag(m6))
+
+
+c(mean(diag(m2)),mean(diag(m3)),mean(diag(m4)),mean(diag(m5)),mean(diag(m6)))
+
+c(min(shares(lc_3step_2)),min(shares(lc_3step_3)),min(shares(lc_3step_4)),min(shares(lc_3step_5)),min(shares(lc_3step_6)))
+round(c(min(shares(lc_3step_2)),min(shares(lc_3step_3)),min(shares(lc_3step_4)),min(shares(lc_3step_5)),min(shares(lc_3step_6)))*1094)
+
+plot_ci_lc_ggplot(lc_3step_4, var = c("Temps","Paysage","Acces","Biodiversite","Biome1","Biome2"))
+
+ggsave("output/model_estimate_3step.png",
+       width = 6,
+       height = 8,
+       dpi = 400)
+
+### 2. Get latent variables and merge with covariate
+
+res_lc3 <- data.frame(survey_person=unique(data_DCE_mlogit$survey_person),class=apply(lc_3step_3$Qir,1,  which.max),lc_3step_3$Qir)
+
+names(res_lc3)[3:ncol(res_lc3)] <- paste0("q",1:3)
+
+res_lc3 <- merge(res_lc3,data_clean_com_nat_analysis, by="survey_person",all.x=TRUE)
+
+res_lc3 <- na.omit(res_lc3[,c("class","q1","q2","q3","Gender",
+                      "Age","Education","Income","CSPgroup",
+                      "class_nat","survey_id","journey_duration2","journey_duration3",
+                      "main_vehicule","Perso_relation_nature")])
+res_lc3$q1b <- ifelse(res_lc3$class==1,1,0)
+res_lc3$q2b <- ifelse(res_lc3$class==2,1,0)
+res_lc3$q3b <- ifelse(res_lc3$class==3,1,0)
+
+res_lc3$Income2 <- res_lc3$Income
+res_lc3$Income2[which(res_lc3$Income2 %in% c(1:4))] <- 1
+res_lc3$Income2[which(res_lc3$Income2 %in% c(5:7))] <- 2
+res_lc3$Income2[which(res_lc3$Income2 %in% c(7:8))] <- 3
+res_lc3$Income3 <- res_lc3$Income*res_lc3$Income
+
+### 3. Analyse covariate effects
+
+lm_lc3_q1 <- glm(q1 ~ Gender + Age + Education + Income + CSPgroup + class_nat + survey_id + journey_duration3 + main_vehicule + Perso_relation_nature,
+                 family="binomial",data=res_lc3)
+summary(lm_lc3_q1)
+lm_lc3_q2 <- glm(q2 ~ Gender + Age + Education +Income + CSPgroup + class_nat + survey_id + journey_duration3 + main_vehicule + Perso_relation_nature, 
+                 family="binomial",data=res_lc3)
+summary(lm_lc3_q2)
+lm_lc3_q3 <- glm(q3 ~ Gender + Age + Education +Income + CSPgroup + class_nat + survey_id + journey_duration3 + main_vehicule + Perso_relation_nature, 
+                 family="binomial",data=res_lc3)
+summary(lm_lc3_q3)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 # time from classical approaches
 
@@ -1580,3 +1947,5 @@ ggsave("output/map_resp_geneve.png",
        width = 16,
        height = 12,
        dpi = 400)
+
+
