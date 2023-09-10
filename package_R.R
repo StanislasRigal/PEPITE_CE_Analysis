@@ -31,6 +31,7 @@ library(raster)
 library(rgeos)
 library(rnaturalearth)
 library(maps)
+library(boot)
 
 source('lc_helpers.r')
 

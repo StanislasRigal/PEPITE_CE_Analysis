@@ -1717,57 +1717,269 @@ round(c(min(shares(lc_3step_2)),min(shares(lc_3step_3)),min(shares(lc_3step_4)),
 
 plot_ci_lc_ggplot(lc_3step_4, var = c("Temps","Paysage","Acces","Biodiversite","Biome1","Biome2"))
 
-ggsave("output/model_estimate_3step.png",
+ggsave("output/model_estimate_3step4.png",
        width = 6,
        height = 8,
        dpi = 400)
 
+### 1.4 Conditional proba
+
+
+# Get individuals' estimates for Paysage
+bi_Paysage <- effect.gmnl(lc_3step_4, par = "Paysage", effect = "ce")$mean
+summary(bi_Paysage)
+# Plotting the distribution of the individuals' estimates
+plot(lc_3step_4, par = "Paysage", effect = "ce", type = "density", col = "blue")
+
+# Get individuals' estimates for Acces
+bi_Acces <- effect.gmnl(lc_3step_4, par = "Acces", effect = "ce")$mean
+summary(bi_Acces)
+# Plotting the distribution of the individuals' estimates
+plot(lc_3step_4, par = "Acces", effect = "ce", type = "density", col = "blue")
+
+# Get individuals' estimates for Biodiversite
+bi_Biodiversite <- effect.gmnl(lc_3step_4, par = "Biodiversite", effect = "ce")$mean
+summary(bi_Biodiversite)
+# Plotting the distribution of the individuals' estimates
+plot(lc_3step_4, par = "Biodiversite", effect = "ce", type = "density", col = "blue")
+
+# Get individuals' estimates for Biome
+bi_Biome <- effect.gmnl(lc_3step_4, par = "Biome1", effect = "ce")$mean
+summary(bi_Biome)
+# Plotting the distribution of the individuals' estimates
+plot(lc_3step_4, par = "Biome1", effect = "ce", type = "density", col = "blue")
+
+# Get individuals' estimates for Biome
+bi_Biome <- effect.gmnl(lc_3step_4, par = "Biome2", effect = "ce")$mean
+summary(bi_Biome)
+# Plotting the distribution of the individuals' estimates
+plot(lc_3step_4, par = "Biome2", effect = "ce", type = "density", col = "blue")
+
+#### 1.5 WTA
+
+
+-coef(lc_3step_4)["class.1.Paysage"] / coef(lc_3step_4)["class.1.Temps"]
+-coef(lc_3step_4)["class.1.Acces"] / coef(lc_3step_4)["class.1.Temps"]
+-coef(lc_3step_4)["class.1.Biodiversite"] / coef(lc_3step_4)["class.1.Temps"]
+-coef(lc_3step_4)["class.1.Biome1"] / coef(lc_3step_4)["class.1.Temps"]
+-coef(lc_3step_4)["class.1.Biome2"] / coef(lc_3step_4)["class.1.Temps"]
+
+-coef(lc_3step_4)["class.2.Paysage"] / coef(lc_3step_4)["class.2.Temps"]
+-coef(lc_3step_4)["class.2.Acces"] / coef(lc_3step_4)["class.2.Temps"]
+-coef(lc_3step_4)["class.2.Biodiversite"] / coef(lc_3step_4)["class.2.Temps"]
+-coef(lc_3step_4)["class.2.Biome1"] / coef(lc_3step_4)["class.2.Temps"]
+-coef(lc_3step_4)["class.2.Biome2"] / coef(lc_3step_4)["class.2.Temps"]
+
+-coef(lc_3step_4)["class.3.Paysage"] / coef(lc_3step_4)["class.3.Temps"]
+-coef(lc_3step_4)["class.3.Acces"] / coef(lc_3step_4)["class.3.Temps"]
+-coef(lc_3step_4)["class.3.Biodiversite"] / coef(lc_3step_4)["class.3.Temps"]
+-coef(lc_3step_4)["class.3.Biome1"] / coef(lc_3step_4)["class.3.Temps"]
+-coef(lc_3step_4)["class.3.Biome2"] / coef(lc_3step_4)["class.3.Temps"]
+
+
+-coef(lc_3step_4)["class.4.Paysage"] / coef(lc_3step_4)["class.4.Temps"]
+-coef(lc_3step_4)["class.4.Acces"] / coef(lc_3step_4)["class.4.Temps"]
+-coef(lc_3step_4)["class.4.Biodiversite"] / coef(lc_3step_4)["class.4.Temps"]
+-coef(lc_3step_4)["class.4.Biome1"] / coef(lc_3step_4)["class.4.Temps"]
+-coef(lc_3step_4)["class.4.Biome2"] / coef(lc_3step_4)["class.4.Temps"]
+
+
 ### 2. Get latent variables and merge with covariate
 
-res_lc3 <- data.frame(survey_person=unique(data_DCE_mlogit$survey_person),class=apply(lc_3step_3$Qir,1,  which.max),lc_3step_3$Qir)
+res_lc4 <- data.frame(survey_person=unique(data_DCE_mlogit$survey_person),class=apply(lc_3step_4$Qir,1,  which.max),lc_3step_4$Qir)
 
-names(res_lc3)[3:ncol(res_lc3)] <- paste0("q",1:3)
+names(res_lc4)[3:ncol(res_lc4)] <- paste0("q",1:4)
 
-res_lc3 <- merge(res_lc3,data_clean_com_nat_analysis, by="survey_person",all.x=TRUE)
+res_lc4 <- merge(res_lc4,data_clean_com_nat_analysis, by="survey_person",all.x=TRUE)
 
-res_lc3 <- na.omit(res_lc3[,c("class","q1","q2","q3","Gender",
+res_lc4 <- na.omit(res_lc4[,c("class","q1","q2","q3","q4","Gender",
                       "Age","Education","Income","CSPgroup",
                       "class_nat","survey_id","journey_duration2","journey_duration3",
                       "main_vehicule","Perso_relation_nature")])
-res_lc3$q1b <- ifelse(res_lc3$class==1,1,0)
-res_lc3$q2b <- ifelse(res_lc3$class==2,1,0)
-res_lc3$q3b <- ifelse(res_lc3$class==3,1,0)
+#res_lc4$q1b <- ifelse(res_lc4$class==1,1,0)
+#res_lc4$q2b <- ifelse(res_lc4$class==2,1,0)
+#res_lc4$q3b <- ifelse(res_lc4$class==3,1,0)
 
-res_lc3$Income2 <- res_lc3$Income
-res_lc3$Income2[which(res_lc3$Income2 %in% c(1:4))] <- 1
-res_lc3$Income2[which(res_lc3$Income2 %in% c(5:7))] <- 2
-res_lc3$Income2[which(res_lc3$Income2 %in% c(7:8))] <- 3
-res_lc3$Income3 <- res_lc3$Income*res_lc3$Income
+res_lc4$Income2 <- res_lc4$Income
+res_lc4$Income2[which(res_lc4$Income2 %in% c(1:4))] <- 1
+res_lc4$Income2[which(res_lc4$Income2 %in% c(5:7))] <- 2
+res_lc4$Income2[which(res_lc4$Income2 %in% c(7:8))] <- 3
+res_lc4$Income3 <- res_lc4$Income*res_lc4$Income
 
 ### 3. Analyse covariate effects
 
-lm_lc3_q1 <- glm(q1 ~ Gender + Age + Education + Income + CSPgroup + class_nat + survey_id + journey_duration3 + main_vehicule + Perso_relation_nature,
-                 family="binomial",data=res_lc3)
-summary(lm_lc3_q1)
-lm_lc3_q2 <- glm(q2 ~ Gender + Age + Education +Income + CSPgroup + class_nat + survey_id + journey_duration3 + main_vehicule + Perso_relation_nature, 
-                 family="binomial",data=res_lc3)
-summary(lm_lc3_q2)
-lm_lc3_q3 <- glm(q3 ~ Gender + Age + Education +Income + CSPgroup + class_nat + survey_id + journey_duration3 + main_vehicule + Perso_relation_nature, 
-                 family="binomial",data=res_lc3)
-summary(lm_lc3_q3)
+lm_lc4_q1 <- glm(q1 ~ Gender + Age + factor(Education) + Income + 
+                   CSPgroup + factor(class_nat) + survey_id + journey_duration2 + main_vehicule + Perso_relation_nature,
+                 family="binomial",data=res_lc4)
+summary(lm_lc4_q1)
+M1.step <- step(lm_lc4_q1)
+#step(lm_lc4_q1,k=log(nrow(res_lc4))) BIC 
+
+#calculate McFadden's R-squared for model
+with(summary(M1.step), 1 - deviance/null.deviance)
+
+glm.diag.plots(M1.step,glm.diag(M1.step)) # ou
+
+# Residual vs. fitted
+E2 <- resid(M1.step, type="pearson")
+F2 <- fitted(M1.step, type="response")
+plot(x=F2, y=E2, xlab="fitted values", ylab="Pearson residuals")
+abline(h=0, lty=2)
+# Cook's distance
+plot(cooks.distance(M1.step), ylim=c(0,1), ylab="Cook distance values", type="h")
+# Pearson residuals vs. continous covariate
+plot(x=res_lc4$Income, y=E2, xlab="Income", ylab="Pearson residuals")
+abline(h=0, lty=2)
+plot(x=res_lc4$Age, y=E2, xlab="Age", ylab="Pearson residuals")
+abline(h=0, lty=2)
+plot(x=res_lc4$journey_duration2, y=E2, xlab="Daily transportation time", ylab="Pearson residuals")
+abline(h=0, lty=2)
+plot(x=res_lc4$Perso_relation_nature, y=E2, xlab="INS scale", ylab="Pearson residuals")
+abline(h=0, lty=2)
+
+lm_lc4_q2 <- glm(q2 ~ Gender + Age + factor(Education) + Income + 
+                   CSPgroup + factor(class_nat) + survey_id + journey_duration2 + main_vehicule + Perso_relation_nature, 
+                 family="binomial",data=res_lc4)
+summary(lm_lc4_q2)
+M2.step <- step(lm_lc4_q2)
+#step(lm_lc4_q2,k=log(nrow(res_lc4)))
+
+glm.diag.plots(M2.step,glm.diag(M2.step))
+with(summary(M2.step), 1 - deviance/null.deviance)
 
 
+lm_lc4_q3 <- glm(q3 ~ Gender + Age + factor(Education) + Income + 
+                   CSPgroup + factor(class_nat) + survey_id + journey_duration2 + main_vehicule + Perso_relation_nature, 
+                 family="binomial",data=res_lc4)
+summary(lm_lc4_q3)
+M3.step <- step(lm_lc4_q3)
+#step(lm_lc4_q3,k=log(nrow(res_lc4)))
+
+glm.diag.plots(M3.step,glm.diag(M3.step))
+with(summary(M3.step), 1 - deviance/null.deviance)
+
+lm_lc4_q2 <- glm(q2 ~ Gender + Age + factor(Education) + Income + 
+                   CSPgroup + factor(class_nat) + survey_id + journey_duration2 + main_vehicule + Perso_relation_nature, 
+                 family="binomial",data=res_lc4)
+summary(lm_lc4_q2)
+M2.step <- step(lm_lc4_q2)
+#step(lm_lc4_q2,k=log(nrow(res_lc4)))
+
+glm.diag.plots(M2.step,glm.diag(M2.step))
+with(summary(M2.step), 1 - deviance/null.deviance)
 
 
+lm_lc4_q4 <- glm(q4 ~ Gender + Age + factor(Education) + Income + 
+                   CSPgroup + factor(class_nat) + survey_id + journey_duration2 + main_vehicule + Perso_relation_nature, 
+                 family="binomial",data=res_lc4)
+summary(lm_lc4_q4)
+M4.step <- step(lm_lc4_q4)
+#step(lm_lc4_q4,k=log(nrow(res_lc4)))
+
+glm.diag.plots(M4.step,glm.diag(M4.step))
+with(summary(M4.step), 1 - deviance/null.deviance)
 
 
+### plot odds
 
 
+boxLabels = c("Income","Naturalness -","Naturalness +","INS")
+df <- data.frame(yAxis = length(boxLabels):1, 
+                 boxOdds = exp(coef(M1.step)[-1]), 
+                 boxCILow = exp(coef(M1.step)[-1]-1.96*summary(M1.step)$coefficients[2:5,2]), 
+                 boxCIHigh = exp(coef(M1.step)[-1]+1.96*summary(M1.step)$coefficients[2:5,2])
+)
 
 
+ggplot(df, aes(x = boxOdds, y = boxLabels)) + 
+    geom_vline(aes(xintercept = 1), size = .25, linetype = "dashed") + 
+    geom_errorbarh(aes(xmax = boxCIHigh, xmin = boxCILow), size = .5, height = 
+                     .2, color = "gray50") +
+    geom_point(size = 3.5, color = "#00bfc4ff") +
+    theme_modern()+
+    ylab("") +
+    xlab("Odds ratio") +
+    annotate(geom = "text", y =1.1, x = 1, 
+             label = paste0("McFadden R² = ", round(with(summary(M1.step), 1 - deviance/null.deviance),2)), size = 3.5, hjust = 0)
+
+ggsave("output/model_odd1.png",
+       width = 4,
+       height = 6,
+       dpi = 400)
 
 
+boxLabels = c("Gender","Age","Framing","INS")
+df <- data.frame(yAxis = length(boxLabels):1, 
+                 boxOdds = exp(coef(M2.step)[-1]), 
+                 boxCILow = exp(coef(M2.step)[-1]-1.96*summary(M2.step)$coefficients[2:5,2]), 
+                 boxCIHigh = exp(coef(M2.step)[-1]+1.96*summary(M2.step)$coefficients[2:5,2])
+)
 
+
+ggplot(df, aes(x = boxOdds, y = boxLabels)) + 
+  geom_vline(aes(xintercept = 1), size = .25, linetype = "dashed") + 
+  geom_errorbarh(aes(xmax = boxCIHigh, xmin = boxCILow), size = .5, height = 
+                   .2, color = "gray50") +
+  geom_point(size = 3.5, color = "#7cae00ff") +
+  theme_modern()+
+  ylab("") +
+  xlab("Odds ratio") +
+  annotate(geom = "text", y =1.5, x = 1, 
+           label = paste0("McFadden R² = ", round(with(summary(M2.step), 1 - deviance/null.deviance),2)), size = 3.5, hjust = 0)
+
+ggsave("output/model_odd2.png",
+       width = 4,
+       height = 6,
+       dpi = 400)
+
+boxLabels = c("Gender","Age","Naturalness -","Naturalness +","INS")
+df <- data.frame(yAxis = length(boxLabels):1, 
+                 boxOdds = exp(coef(M3.step)[-1]), 
+                 boxCILow = exp(coef(M3.step)[-1]-1.96*summary(M3.step)$coefficients[2:6,2]), 
+                 boxCIHigh = exp(coef(M3.step)[-1]+1.96*summary(M3.step)$coefficients[2:6,2])
+)
+
+
+ggplot(df, aes(x = boxOdds, y = boxLabels)) + 
+  geom_vline(aes(xintercept = 1), size = .25, linetype = "dashed") + 
+  geom_errorbarh(aes(xmax = boxCIHigh, xmin = boxCILow), size = .5, height = 
+                   .2, color = "gray50") +
+  geom_point(size = 3.5, color = "#f8766dff") +
+  theme_modern()+
+  ylab("") +
+  xlab("Odds ratio") +
+  annotate(geom = "text", y =0.6, x = 1, 
+           label = paste0("McFadden R² = ", round(with(summary(M3.step), 1 - deviance/null.deviance),2)), size = 3.5, hjust = 0)
+
+ggsave("output/model_odd3.png",
+       width = 4,
+       height = 6,
+       dpi = 400)
+
+
+boxLabels = c("Framing","INS")
+df <- data.frame(yAxis = length(boxLabels):1, 
+                 boxOdds = exp(coef(M4.step)[-1]), 
+                 boxCILow = exp(coef(M4.step)[-1]-1.96*summary(M4.step)$coefficients[2:3,2]), 
+                 boxCIHigh = exp(coef(M4.step)[-1]+1.96*summary(M4.step)$coefficients[2:3,2])
+)
+
+
+ggplot(df, aes(x = boxOdds, y = boxLabels)) + 
+  geom_vline(aes(xintercept = 1), size = .25, linetype = "dashed") + 
+  geom_errorbarh(aes(xmax = boxCIHigh, xmin = boxCILow), size = .5, height = 
+                   .2, color = "gray50") +
+  geom_point(size = 3.5, color = "#c77cffff") +
+  theme_modern()+
+  ylab("") +
+  xlab("Odds ratio") +
+  annotate(geom = "text", y =0.5, x = 1, 
+           label = paste0("McFadden R² = ", round(with(summary(M4.step), 1 - deviance/null.deviance),2)), size = 3.5, hjust = 0)
+
+ggsave("output/model_odd4.png",
+       width = 4,
+       height = 6,
+       dpi = 400)
 
 
 
