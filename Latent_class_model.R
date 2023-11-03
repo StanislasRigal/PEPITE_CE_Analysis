@@ -1758,30 +1758,42 @@ plot(lc_3step_4, par = "Biome2", effect = "ce", type = "density", col = "blue")
 #### 1.5 WTA
 
 
--coef(lc_3step_4)["class.1.Paysage"] / coef(lc_3step_4)["class.1.Temps"]
--coef(lc_3step_4)["class.1.Acces"] / coef(lc_3step_4)["class.1.Temps"]
--coef(lc_3step_4)["class.1.Biodiversite"] / coef(lc_3step_4)["class.1.Temps"]
--coef(lc_3step_4)["class.1.Biome1"] / coef(lc_3step_4)["class.1.Temps"]
--coef(lc_3step_4)["class.1.Biome2"] / coef(lc_3step_4)["class.1.Temps"]
+#-coef(lc_3step_4)["class.1.Paysage"] / coef(lc_3step_4)["class.1.Temps"]
+#-coef(lc_3step_4)["class.1.Acces"] / coef(lc_3step_4)["class.1.Temps"]
+#-coef(lc_3step_4)["class.1.Biodiversite"] / coef(lc_3step_4)["class.1.Temps"]
+#-coef(lc_3step_4)["class.1.Biome1"] / coef(lc_3step_4)["class.1.Temps"]
+#-coef(lc_3step_4)["class.1.Biome2"] / coef(lc_3step_4)["class.1.Temps"]
 
--coef(lc_3step_4)["class.2.Paysage"] / coef(lc_3step_4)["class.2.Temps"]
--coef(lc_3step_4)["class.2.Acces"] / coef(lc_3step_4)["class.2.Temps"]
--coef(lc_3step_4)["class.2.Biodiversite"] / coef(lc_3step_4)["class.2.Temps"]
--coef(lc_3step_4)["class.2.Biome1"] / coef(lc_3step_4)["class.2.Temps"]
--coef(lc_3step_4)["class.2.Biome2"] / coef(lc_3step_4)["class.2.Temps"]
+#-coef(lc_3step_4)["class.2.Paysage"] / coef(lc_3step_4)["class.2.Temps"]
+#-coef(lc_3step_4)["class.2.Acces"] / coef(lc_3step_4)["class.2.Temps"]
+#-coef(lc_3step_4)["class.2.Biodiversite"] / coef(lc_3step_4)["class.2.Temps"]
+#-coef(lc_3step_4)["class.2.Biome1"] / coef(lc_3step_4)["class.2.Temps"]
+#-coef(lc_3step_4)["class.2.Biome2"] / coef(lc_3step_4)["class.2.Temps"]
 
--coef(lc_3step_4)["class.3.Paysage"] / coef(lc_3step_4)["class.3.Temps"]
--coef(lc_3step_4)["class.3.Acces"] / coef(lc_3step_4)["class.3.Temps"]
--coef(lc_3step_4)["class.3.Biodiversite"] / coef(lc_3step_4)["class.3.Temps"]
--coef(lc_3step_4)["class.3.Biome1"] / coef(lc_3step_4)["class.3.Temps"]
--coef(lc_3step_4)["class.3.Biome2"] / coef(lc_3step_4)["class.3.Temps"]
+wtp <- -coef(lc_3step_4)["class.3.Paysage"] / coef(lc_3step_4)["class.3.Temps"]
+sig <- -coef(lc_3step_4)["class.3.Paysage"] / coef(lc_3step_4)["class.3.Temps"]*sqrt(((summary(lc_3step_4)$CoefTable["class.3.Paysage","Std. Error"]/coef(lc_3step_4)["class.3.Paysage"])^2 + (summary(lc_3step_4)$CoefTable["class.3.Temps","Std. Error"]/coef(lc_3step_4)["class.3.Temps"])^2 ))
+1.96*sig
+wtp <- -coef(lc_3step_4)["class.3.Acces"] / coef(lc_3step_4)["class.3.Temps"]
+sig <- -coef(lc_3step_4)["class.3.Acces"] / coef(lc_3step_4)["class.3.Temps"]*sqrt(((summary(lc_3step_4)$CoefTable["class.3.Acces","Std. Error"]/coef(lc_3step_4)["class.3.Acces"])^2 + (summary(lc_3step_4)$CoefTable["class.3.Temps","Std. Error"]/coef(lc_3step_4)["class.3.Temps"])^2 ))
+1.96*sig
+wtp <- -coef(lc_3step_4)["class.3.Biodiversite"] / coef(lc_3step_4)["class.3.Temps"]
+sig <- -coef(lc_3step_4)["class.3.Biodiversite"] / coef(lc_3step_4)["class.3.Temps"]*sqrt(((summary(lc_3step_4)$CoefTable["class.3.Biodiversite","Std. Error"]/coef(lc_3step_4)["class.3.Biodiversite"])^2 + (summary(lc_3step_4)$CoefTable["class.3.Temps","Std. Error"]/coef(lc_3step_4)["class.3.Temps"])^2 ))
+1.96*sig
+#-coef(lc_3step_4)["class.3.Biome1"] / coef(lc_3step_4)["class.3.Temps"]
+#-coef(lc_3step_4)["class.3.Biome2"] / coef(lc_3step_4)["class.3.Temps"]
 
 
--coef(lc_3step_4)["class.4.Paysage"] / coef(lc_3step_4)["class.4.Temps"]
--coef(lc_3step_4)["class.4.Acces"] / coef(lc_3step_4)["class.4.Temps"]
--coef(lc_3step_4)["class.4.Biodiversite"] / coef(lc_3step_4)["class.4.Temps"]
--coef(lc_3step_4)["class.4.Biome1"] / coef(lc_3step_4)["class.4.Temps"]
--coef(lc_3step_4)["class.4.Biome2"] / coef(lc_3step_4)["class.4.Temps"]
+#-coef(lc_3step_4)["class.4.Paysage"] / coef(lc_3step_4)["class.4.Temps"]
+wtp <- -coef(lc_3step_4)["class.4.Acces"] / coef(lc_3step_4)["class.4.Temps"]
+sig <- -coef(lc_3step_4)["class.4.Acces"] / coef(lc_3step_4)["class.4.Temps"]*sqrt(((summary(lc_3step_4)$CoefTable["class.4.Acces","Std. Error"]/coef(lc_3step_4)["class.4.Acces"])^2 + (summary(lc_3step_4)$CoefTable["class.4.Temps","Std. Error"]/coef(lc_3step_4)["class.4.Temps"])^2 ))
+1.96*sig
+wtp <- -coef(lc_3step_4)["class.4.Biodiversite"] / coef(lc_3step_4)["class.4.Temps"]
+sig <- -coef(lc_3step_4)["class.4.Biodiversite"] / coef(lc_3step_4)["class.4.Temps"]*sqrt(((summary(lc_3step_4)$CoefTable["class.4.Biodiversite","Std. Error"]/coef(lc_3step_4)["class.4.Biodiversite"])^2 + (summary(lc_3step_4)$CoefTable["class.4.Temps","Std. Error"]/coef(lc_3step_4)["class.4.Temps"])^2 ))
+1.96*sig
+wtp <- -coef(lc_3step_4)["class.4.Biome1"] / coef(lc_3step_4)["class.4.Temps"]
+sig <- -coef(lc_3step_4)["class.4.Biome1"] / coef(lc_3step_4)["class.4.Temps"]*sqrt(((summary(lc_3step_4)$CoefTable["class.4.Biome1","Std. Error"]/coef(lc_3step_4)["class.4.Biome1"])^2 + (summary(lc_3step_4)$CoefTable["class.4.Temps","Std. Error"]/coef(lc_3step_4)["class.4.Temps"])^2 ))
+1.96*sig
+#-coef(lc_3step_4)["class.4.Biome2"] / coef(lc_3step_4)["class.4.Temps"]
 
 
 ### 2. Get latent variables and merge with covariate
@@ -1982,10 +1994,165 @@ ggsave("output/model_odd4.png",
        dpi = 400)
 
 
+### Graph composition socio-demographique par groupe
+
+data_soc_dem <- res_lc4[,c("class","Gender","Age", "Education", "Income", "CSPgroup", "class_nat","Perso_relation_nature")]
+data_soc_dem$Gender <- as.character(data_soc_dem$Gender)
+data_soc_dem$Gender[which(data_soc_dem$Gender=="Femme")] <- "Women"
+data_soc_dem$Gender[which(data_soc_dem$Gender=="Homme")] <- "Men"
+data_soc_dem$Age <- as.character(data_soc_dem$Age)
+data_soc_dem$Age[which(data_soc_dem$Age=="1")] <- "18-29 yo"
+data_soc_dem$Age[which(data_soc_dem$Age=="2")] <- "30-44 yo"
+data_soc_dem$Age[which(data_soc_dem$Age=="3")] <- "45-59 yo"
+data_soc_dem$Age[which(data_soc_dem$Age=="4")] <- "60 yo and above"
+data_soc_dem$Education <- as.character(data_soc_dem$Education)
+data_soc_dem$Education[which(data_soc_dem$Education=="1")] <- "Below secondary or short"
+data_soc_dem$Education[which(data_soc_dem$Education=="2")] <- "Secondary long"
+data_soc_dem$Education[which(data_soc_dem$Education=="3")] <- "Superior"
+data_soc_dem$Income <- as.character(data_soc_dem$Income)
+data_soc_dem$Income2 <- NA
+data_soc_dem$Income2[which(data_soc_dem$Income=="1")] <- 1200
+data_soc_dem$Income2[which(data_soc_dem$Income=="2")] <- 1350
+data_soc_dem$Incomeé[which(data_soc_dem$Income=="3")] <- 1650
+data_soc_dem$Income2[which(data_soc_dem$Income=="4")] <- 1950
+data_soc_dem$Income2[which(data_soc_dem$Income=="5")] <- 2350
+data_soc_dem$Income2[which(data_soc_dem$Income=="6")] <- 2850
+data_soc_dem$Income2[which(data_soc_dem$Income=="7")] <- 3300
+data_soc_dem$Income2[which(data_soc_dem$Income=="8")] <- 3850
+data_soc_dem$Income2[which(data_soc_dem$Income=="9")] <- 4800
+data_soc_dem$Income2[which(data_soc_dem$Income=="10")] <- 5400
+data_soc_dem$Income[which(data_soc_dem$Income=="1")] <- "1200 € and below"
+data_soc_dem$Income[which(data_soc_dem$Income=="2")] <- "1201-1500 €"
+data_soc_dem$Income[which(data_soc_dem$Income=="3")] <- "1501-1800 €"
+data_soc_dem$Income[which(data_soc_dem$Income=="4")] <- "1801-2100 €"
+data_soc_dem$Income[which(data_soc_dem$Income=="5")] <- "2101-2600 €"
+data_soc_dem$Income[which(data_soc_dem$Income=="6")] <- "2601-3100 €"
+data_soc_dem$Income[which(data_soc_dem$Income=="7")] <- "3101-3500 €"
+data_soc_dem$Income[which(data_soc_dem$Income=="8")] <- "3501-4200 €"
+data_soc_dem$Income[which(data_soc_dem$Income=="9")] <- "4201-5400 €"
+data_soc_dem$Income[which(data_soc_dem$Income=="10")] <- "5401 € and above"
+data_soc_dem$CSPgroup[which(data_soc_dem$CSPgroup=="moins")] <- "Lower SPC"
+data_soc_dem$CSPgroup[which(data_soc_dem$CSPgroup=="plus")] <- "Higher SPC"
+data_soc_dem$CSPgroup[which(data_soc_dem$CSPgroup=="Retraités")] <- "Retired"
+data_soc_dem$CSPgroup[which(data_soc_dem$CSPgroup=="Inactifs")] <- "Not in employment"
+data_soc_dem$class_nat <- as.character(data_soc_dem$class_nat)
+data_soc_dem$class_nat[which(data_soc_dem$class_nat=="1")] <- "Very low naturalness"
+data_soc_dem$class_nat[which(data_soc_dem$class_nat=="2")] <- "Low naturalness"
+data_soc_dem$class_nat[which(data_soc_dem$class_nat=="3")] <- "Above average naturalness"
+data_soc_dem_short <- data_soc_dem
+
+data_soc_dem <- melt(data_soc_dem,id.vars = "class", measure.vars = c("Gender","Age", "Education", "Income", "CSPgroup", "class_nat","Perso_relation_nature"))
+ggplot(data_soc_dem, aes(x=value, fill=as.factor(class))) + 
+  geom_bar(position="dodge",stat = "count") +
+  theme_modern()
+ggplot(data_soc_dem[data_soc_dem$variable=="Gender",], aes(x=value, fill=as.factor(class))) + 
+  geom_bar(position="dodge",stat = "count") +
+  theme_modern() +
+  theme(axis.title.x = element_blank(),
+        axis.title.y = element_blank(),
+        panel.background = element_blank(),
+        axis.text.x = element_text(angle = 45, hjust = 1))
+ggplot(data_soc_dem[data_soc_dem$variable=="Age",], aes(x=value, fill=as.factor(class))) + 
+  geom_bar(position="dodge",stat = "count") +
+  theme_modern()+
+  theme(axis.title.x = element_blank(),
+        axis.title.y = element_blank(),
+        panel.background = element_blank(),
+        axis.text.x = element_text(angle = 45, hjust = 1))
+ggplot(data_soc_dem[data_soc_dem$variable=="Education",], aes(x=value, fill=as.factor(class))) + 
+  geom_bar(position="dodge",stat = "count") +
+  theme_modern()+
+  theme(axis.title.x = element_blank(),
+        axis.title.y = element_blank(),
+        panel.background = element_blank(),
+        axis.text.x = element_text(angle = 45, hjust = 1))
+ggplot(data_soc_dem[data_soc_dem$variable=="Income",], aes(x=value, fill=as.factor(class))) + 
+  geom_bar(position="dodge",stat = "count") +
+  theme_modern()+
+  theme(axis.title.x = element_blank(),
+        axis.title.y = element_blank(),
+        panel.background = element_blank(),
+        axis.text.x = element_text(angle = 45, hjust = 1))
+ggplot(data_soc_dem[data_soc_dem$variable=="CSPgroup",], aes(x=value, fill=as.factor(class))) + 
+  geom_bar(position="dodge",stat = "count") +
+  theme_modern()+
+  theme(axis.title.x = element_blank(),
+        axis.title.y = element_blank(),
+        panel.background = element_blank(),
+        axis.text.x = element_text(angle = 45, hjust = 1))
+ggplot(data_soc_dem[data_soc_dem$variable=="class_nat",], aes(x=value, fill=as.factor(class))) + 
+  geom_bar(position="dodge",stat = "count") +
+  theme_modern()+
+  theme(axis.title.x = element_blank(),
+        axis.title.y = element_blank(),
+        panel.background = element_blank(),
+        axis.text.x = element_text(angle = 45, hjust = 1))
 
 
+ggplot(data_soc_dem[data_soc_dem$variable=="Gender",], aes(fill=value, x=as.factor(class))) + 
+  geom_bar(position="fill",stat = "count") +
+  theme_modern() +
+  theme(axis.title.x = element_blank(),
+        axis.title.y = element_blank(),
+        panel.background = element_blank(),
+        axis.text.x = element_text(angle = 45, hjust = 1))
+ggplot(data_soc_dem[data_soc_dem$variable=="Age",], aes(fill=value, x=as.factor(class))) + 
+  geom_bar(position="fill",stat = "count") +
+  theme_modern()+
+  scale_fill_viridis_d() +
+  theme(axis.title.x = element_blank(),
+        axis.title.y = element_blank(),
+        panel.background = element_blank(),
+        axis.text.x = element_text(angle = 45, hjust = 1))
+ggplot(data_soc_dem[data_soc_dem$variable=="Education",], aes(fill=value, x=as.factor(class))) + 
+  geom_bar(position="fill",stat = "count") +
+  theme_modern()+
+  scale_fill_viridis_d() +
+  theme(axis.title.x = element_blank(),
+        axis.title.y = element_blank(),
+        panel.background = element_blank(),
+        axis.text.x = element_text(angle = 45, hjust = 1))
+ggplot(data_soc_dem[data_soc_dem$variable=="Income",], aes(fill=value, x=as.factor(class))) + 
+  geom_bar(position="fill",stat = "count") +
+  theme_modern()+
+  scale_fill_viridis_d() +
+  theme(axis.title.x = element_blank(),
+        axis.title.y = element_blank(),
+        panel.background = element_blank(),
+        axis.text.x = element_text(angle = 45, hjust = 1))
+ggplot(data_soc_dem[data_soc_dem$variable=="CSPgroup",], aes(fill=value, x=as.factor(class))) + 
+  geom_bar(position="fill",stat = "count") +
+  theme_modern()+
+  theme(axis.title.x = element_blank(),
+        axis.title.y = element_blank(),
+        panel.background = element_blank(),
+        axis.text.x = element_text(angle = 45, hjust = 1))
+ggplot(data_soc_dem[data_soc_dem$variable=="class_nat",], aes(fill=value, x=as.factor(class))) + 
+  geom_bar(position="fill",stat = "count") +
+  theme_modern()+
+  scale_fill_viridis_d() +
+  theme(axis.title.x = element_blank(),
+        axis.title.y = element_blank(),
+        panel.background = element_blank(),
+        axis.text.x = element_text(angle = 45, hjust = 1))
+ggplot(data_soc_dem[data_soc_dem$variable=="Perso_relation_nature",], aes(fill=value, x=as.factor(class))) + 
+  geom_bar(position="fill",stat = "count") +
+  scale_fill_viridis_d() +
+  theme_modern()+
+  theme(axis.title.x = element_blank(),
+        axis.title.y = element_blank(),
+        panel.background = element_blank(),
+        axis.text.x = element_text(angle = 45, hjust = 1))
 
+ggsave("output/group_compo1.png",
+       width = 6,
+       height = 4,
+       dpi = 400)
 
+# groupe 1 hommes pauvres peu éduqué qui vivent dans milieu peu naturel peu relation nature
+# groupe 2 hommes actifs class sup
+# groupe 3 femmes plus agées riches qui vivent en milieu préservé
+# groupe 4 femmes relation nature
 
 # time from classical approaches
 
@@ -2161,3 +2328,16 @@ ggsave("output/map_resp_geneve.png",
        dpi = 400)
 
 
+# Calcul indice Gini
+
+Gini(as.numeric(as.factor(data_soc_dem_short$Income)))
+
+Gini(as.numeric(as.factor(data_soc_dem_short$Income[which(data_soc_dem_short$class==1)])))
+Gini(as.numeric(as.factor(data_soc_dem_short$Income[which(data_soc_dem_short$class==2)])))
+Gini(as.numeric(as.factor(data_soc_dem_short$Income[which(data_soc_dem_short$class==3)])))
+Gini(as.numeric(as.factor(data_soc_dem_short$Income[which(data_soc_dem_short$class==4)])))
+
+median(data_soc_dem_short$Income2[which(data_soc_dem_short$class==1)], na.rm = TRUE)
+median(data_soc_dem_short$Income2[which(data_soc_dem_short$class==2)], na.rm = TRUE)
+median(data_soc_dem_short$Income2[which(data_soc_dem_short$class==3)], na.rm = TRUE)
+median(data_soc_dem_short$Income2[which(data_soc_dem_short$class==4)], na.rm = TRUE)
