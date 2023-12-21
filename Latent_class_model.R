@@ -1555,6 +1555,109 @@ data_clean_com_nat_analysis$journey_duration3[which(data_clean_com_nat_analysis$
 
 data_clean_com_nat_analysis$survey_person <- paste0(data_clean_com_nat_analysis$survey_id,sep="_",data_clean_com_nat_analysis$id)
 
+# do the same in english for publi
+
+data_clean_com_nat <- readRDS("output/data_clean_com_nat.rds")
+
+data_clean_com_nat_analysis <- data_clean_com_nat[,c("id","Q01b","Q01c","Q01d","QIV19","QIV21_SQ001","QIV21_SQ002","QIV21_SQ003","QIV22",
+                                                     "QI4_SQ002","QI4_SQ003","QI4_SQ004","QI4_SQ005","QI4_SQ006","QI4_other",
+                                                     "QI5_SQ002","QI5_SQ003","QI5_SQ004","QI5_SQ005","QI5_SQ006",
+                                                     "QI6_1","QI6_2","QI6_3","QI6_4","QI7",
+                                                     "QI8_SQ001","QI8_SQ002","QI8_SQ003","QI8_SQ004","QI8_SQ005","QI8_other",
+                                                     "QIII9_SQ002","QIII9_SQ003","QIII9_SQ004","QIII9_SQ005","QIII9_SQ006","QIII9_SQ007",
+                                                     "QIII10_SQ001","QIII10_SQ002","QIII10_SQ003","QIII10_SQ004","QIII10_SQ005","QIII10_SQ006","QIII10_other",
+                                                     "QIII11_SQ001","QIII11_SQ002","QIII11_other","QIII12_SQ001","QIII13_SQ001",
+                                                     "QIII15_SQ001","QIII15_SQ002","QIII15_SQ003","QIII15_SQ004","QIII15_SQ005","QIII15_SQ006",
+                                                     "QIII14_SQ001","QIII14_SQ002","QIII14_SQ003","QIII14_SQ004","QIII14_SQ005","QIII14_SQ010","QIII14_SQ006","QIII14_SQ007","QIII14_SQ008","QIII14_SQ009","QIII14_SQ011",
+                                                     "QIII16_SQ001","QIII16_SQ002","QIII16_SQ003","QIII16_SQ004","QIII16_SQ005","QIII16_SQ006","QIII16_SQ007","QIII16_SQ008","QIII16_other","QIV18",
+                                                     "QIV23","QIV23_comment","QIV24","QIV24_comment","QIV25","QIV25_comment","QIV26","QIV27","QVnew_SQ001",
+                                                     "survey_id","time_video_short","post_code_home","post_code_work","com_centre","com_peri","com_name",
+                                                     "pot_fin_hab","med_disp","p_csp_cadpis","p_csp_arcomce","p_csp_agr","p_csp_empl","p_csp_inter","p_csp_ouvr",
+                                                     "nb_inact1564","pc_inact1564","dens_pop","part_domtrav_voit","car_mov_evol","ratio_fh",
+                                                     "part_pop1529","part_pop3044","part_pop4559","part_pop6074","part_pop_65p","p_csp_retr",
+                                                     "pop","size","nat","class_nat")]
+
+names(data_clean_com_nat_analysis) <- c("id",
+                                        "Gender","Age","CSP","Education","Nb_adult","Nb_children_small","Nb_children_big","Income",
+                                        "most_freq_journey_professionel","most_freq_journey_associative","most_freq_journey_domestic","most_freq_journey_leisure","most_freq_journey_driver","most_freq_journey_other",
+                                        "time_professionel","time_associative","time_domestic","time_leisure","time_driver",
+                                        "vehicule_1","vehicule_2","vehicule_3","vehicule_4","carpool",
+                                        "hypo_most_freq_journey_professionel","hypo_most_freq_journey_associative","hypo_most_freq_journey_domestic","hypo_most_freq_journey_leisure","hypo_most_freq_journey_driver","hypo_most_freq_journey_other",
+                                        "all_attribute_important","non_important_paysage","non_important_biodiversity","non_important_biome","non_important_access","non_important_time",
+                                        "SQ_all_not_enough_time","SQ_all_too_important_time_increase","SQ_all_protest1","SQ_all_protest2","SQ_all_protest3","SQ_all_protest4","SQ_all_other",
+                                        "SQ_one_not_enough_time","SQ_one_too_important_time_increase","SQ_one_other","Difficulty_CE","Realistic_CE",
+                                        "Agree_tram_faster","Agree_tram_cheaper","Agree_tram_more_ecological","Agree_tram_more_practical","Agree_protect_nature_major","Agree_individual_effect",
+                                        "Agree_pref_individual_vehicule","Agree_tram_not_fiable","Agree_tram_not_accessible","Agree_tram_too_slow","Agree_tram_not_practicable","Agree_tram_journey_too_complicate","Agree_public_transport_not_a_solution","Agree_dislike_public_transport","Agree_infra_no_impact","Agree_individual_not_enough","Agree_tram_equal_more_traffic_jam",
+                                        "Alternative_tram_important","Alternative_pedestrian","Alternative_bicycle","Alternative_bus","Alternative_carpool","Alternative_remote_work","Alternative_closer_work","Alternative_change_city","Alternative_other","Knowledge_project",
+                                        "Perso_belong_eco_NGO","Perso_belong_eco_NGO_comment","Perso_nature_activity","Perso_nature_activity_comment","Perso_eco_criteria_shopping","Perso_eco_criteria_shopping_comment","Perso_knowledge_biodiversity","Perso_frequency_nature","Perso_relation_nature",
+                                        "survey_id","time_video_short","post_code_home","post_code_work","com_centre","com_peri","com_name",
+                                        "pot_fin_hab","med_disp","p_csp_cadpis","p_csp_arcomce","p_csp_agr","p_csp_empl","p_csp_inter","p_csp_ouvr",
+                                        "nb_inact1564","pc_inact1564","dens_pop","part_domtrav_voit","car_mov_evol","ratio_fh",
+                                        "part_pop1529","part_pop3044","part_pop4559","part_pop6074","part_pop_65p","p_csp_retr",
+                                        "pop","size","nat","class_nat")
+
+data_clean_com_nat_analysis$Age <- as.numeric(as.factor(data_clean_com_nat_analysis$Age))
+data_clean_com_nat_analysis$Income <- as.numeric(factor(data_clean_com_nat_analysis$Income, levels=c("Moins de 1200 €","Entre 1200 et 1500 €","Entre 1500 et 1800 €","Entre 1800 et 2100 €",
+                                                                                                     "Entre 2100 et 2600 €","Entre 2600 et 3100 €","Entre 3100 et 3500 €","Entre 3500 et 4200 €",
+                                                                                                     "Entre 4200 et 5400 €","Plus de 5400 €" )))
+data_clean_com_nat_analysis$Education[which(data_clean_com_nat_analysis$Education=="Primaire (certificat d’études)")] <- "Secondary short"
+data_clean_com_nat_analysis$Education <- as.numeric(as.factor(data_clean_com_nat_analysis$Education))
+data_clean_com_nat_analysis$CSPgroup <- as.character(data_clean_com_nat_analysis$CSP)
+data_clean_com_nat_analysis$CSPgroup[which(data_clean_com_nat_analysis$CSPgroup %in% c("Agriculteurs","Employés (employés administratifs de la fonction publique, agents de service et auxiliaires de santé, policiers, militaires, pompiers, agents de sécurité, employés administratifs, employés de commerce, personnels des services directs aux particuliers )","Ouvriers et conducteurs de transport"))] <- "minus"
+data_clean_com_nat_analysis$CSPgroup[which(data_clean_com_nat_analysis$CSPgroup %in% c("Artisans, commerçants et chefs d'entreprise","Cadres et professions intellectuelles supérieures (professions libérales, cadres administratifs et techniques de la fonction publique, professions scientifiques supérieures, professions de l'information et de l'art, cadres des services administratifs et commerciaux d'entreprise, ingénieurs et cadres techniques d'entreprise)","Professions intermédiaires (professions de l'enseignement primaire et professionnel et du sport, professions intermédiaires de la santé, ministres du culte, professions intermédiaires de la fonction publique, professions intermédiaires administratives et commerciales des entreprises, techniciens, agents de maîtrise)"))] <- "plus"
+data_clean_com_nat_analysis$CSPgroup[which(data_clean_com_nat_analysis$CSPgroup %in% c("Étudiants","Sans emploi"))] <- "inactive"
+data_clean_com_nat_analysis$main_vehicule <- as.character(data_clean_com_nat_analysis$vehicule_1)
+data_clean_com_nat_analysis$main_vehicule[which(data_clean_com_nat_analysis$main_vehicule %in% c("bus","métro / RER métropolitain","train (TER / Intercité / TGV)","tramway"))] <- "commun"
+data_clean_com_nat_analysis$main_vehicule[which(data_clean_com_nat_analysis$main_vehicule %in% c("moto, scooter","voiture"))] <- "indiv_motor"
+data_clean_com_nat_analysis$main_vehicule[which(data_clean_com_nat_analysis$main_vehicule %in% c("trottinette","vélo","à pied"))] <- "indiv_no_motor"
+data_clean_com_nat_analysis$class_nat[which(data_clean_com_nat_analysis$class_nat == "Naturality --")] <- "a"
+data_clean_com_nat_analysis$class_nat[which(data_clean_com_nat_analysis$class_nat == "Naturality -")] <- "b"
+data_clean_com_nat_analysis$class_nat[which(data_clean_com_nat_analysis$class_nat == "Naturality +")] <- "c"
+data_clean_com_nat_analysis$class_nat <- as.numeric(as.factor(data_clean_com_nat_analysis$class_nat))
+data_clean_com_nat_analysis$Perso_relation_nature <- as.numeric(data_clean_com_nat_analysis$Perso_relation_nature)
+data_clean_com_nat_analysis$time_associative[which(is.na(data_clean_com_nat_analysis$time_associative))] <- 0
+data_clean_com_nat_analysis$time_domestic[which(is.na(data_clean_com_nat_analysis$time_domestic))] <- 0
+data_clean_com_nat_analysis$time_driver[which(is.na(data_clean_com_nat_analysis$time_driver))] <- 0
+data_clean_com_nat_analysis$time_leisure[which(is.na(data_clean_com_nat_analysis$time_leisure))] <- 0
+data_clean_com_nat_analysis$time_professionel[which(is.na(data_clean_com_nat_analysis$time_professionel))] <- 0
+data_clean_com_nat_analysis$journey_duration <- data_clean_com_nat_analysis$time_associative + data_clean_com_nat_analysis$time_domestic + data_clean_com_nat_analysis$time_driver +data_clean_com_nat_analysis$time_leisure + data_clean_com_nat_analysis$time_professionel
+data_clean_com_nat_analysis$journey_duration2 <- ifelse(data_clean_com_nat_analysis$journey_duration <= 180, data_clean_com_nat_analysis$journey_duration, NA)
+data_clean_com_nat_analysis$journey_duration3 <- data_clean_com_nat_analysis$journey_duration
+data_clean_com_nat_analysis$journey_duration3[which(data_clean_com_nat_analysis$journey_duration3<21)] <- 1
+data_clean_com_nat_analysis$journey_duration3[which(data_clean_com_nat_analysis$journey_duration3>20 & data_clean_com_nat_analysis$journey_duration3<31)] <- 2
+data_clean_com_nat_analysis$journey_duration3[which(data_clean_com_nat_analysis$journey_duration3>30 & data_clean_com_nat_analysis$journey_duration3<41)] <- 3
+data_clean_com_nat_analysis$journey_duration3[which(data_clean_com_nat_analysis$journey_duration3>40 & data_clean_com_nat_analysis$journey_duration3<61)] <- 4
+data_clean_com_nat_analysis$journey_duration3[which(data_clean_com_nat_analysis$journey_duration3>60 & data_clean_com_nat_analysis$journey_duration3<91)] <- 5
+data_clean_com_nat_analysis$journey_duration3[which(data_clean_com_nat_analysis$journey_duration3>90)] <- 6
+
+
+data_clean_com_nat_analysis$survey_person <- paste0(data_clean_com_nat_analysis$survey_id,sep="_",data_clean_com_nat_analysis$id)
+
+subset_data <- data_clean_com_nat_analysis[,c("survey_person","Gender",
+                          "Age","Education","Income","CSPgroup",
+                          "class_nat","survey_id","journey_duration2","journey_duration3",
+                          "main_vehicule","Perso_relation_nature")]
+
+subset_data$Gender <- as.character(subset_data$Gender)
+subset_data$Gender[which(subset_data$Gender=="Femme")] <- "Woman"
+subset_data$Gender[which(subset_data$Gender=="Homme")] <- "Man"
+subset_data$Gender[which(subset_data$Gender=="Préfère ne pas répondre")] <- NA
+subset_data$CSPgroup <- as.character(subset_data$CSPgroup)
+subset_data$CSPgroup[which(subset_data$CSPgroup=="Retraités")] <- "retired"
+
+write.csv(subset_data, "output/data_indiv_publi.csv", row.names = FALSE)
+
+data_DCE_numeric <- readRDS("output/data_DCE_numeric.rds")
+
+subset_data <- data_DCE_numeric[,c("choice","Scenario",
+                                   "survey_person","chid","Temps",
+                                   "Paysage","Acces","Biodiversite","Biome")]
+names(subset_data) <- c("choice","Scenario",
+                        "survey_person","chid","Time",
+                        "Landscape","Acces","Biodiversity","Biome")
+
+write.csv(subset_data, "output/data_DCE_publi.csv", row.names = FALSE)
+
 
 ### 1. Get the best LC model without covariates
 
