@@ -140,7 +140,20 @@ data_DCE_numeric$journey_duration3[which(data_DCE_numeric$journey_duration3>30 &
 data_DCE_numeric$journey_duration3[which(data_DCE_numeric$journey_duration3>40 & data_DCE_numeric$journey_duration3<61)] <- 4
 data_DCE_numeric$journey_duration3[which(data_DCE_numeric$journey_duration3>60 & data_DCE_numeric$journey_duration3<91)] <- 5
 data_DCE_numeric$journey_duration3[which(data_DCE_numeric$journey_duration3>90)] <- 6
-
+data_DCE_numeric$Perso_knowledge_biodiversity[which(data_DCE_numeric$Perso_knowledge_biodiversity=="Limité")] <- 1
+data_DCE_numeric$Perso_knowledge_biodiversity[which(data_DCE_numeric$Perso_knowledge_biodiversity=="Moyen")] <- 2
+data_DCE_numeric$Perso_knowledge_biodiversity[which(data_DCE_numeric$Perso_knowledge_biodiversity=="Élevé")] <- 3
+data_DCE_numeric$Perso_knowledge_biodiversity <- as.numeric(data_DCE_numeric$Perso_knowledge_biodiversity)
+data_DCE_numeric$Perso_belong_eco_NGO[which(data_DCE_numeric$Perso_belong_eco_NGO=="Oui")] <- 1
+data_DCE_numeric$Perso_belong_eco_NGO[which(data_DCE_numeric$Perso_belong_eco_NGO=="Non")] <- 0
+data_DCE_numeric$Perso_belong_eco_NGO <- as.numeric(data_DCE_numeric$Perso_belong_eco_NGO)
+data_DCE_numeric$Perso_nature_activity[which(data_DCE_numeric$Perso_nature_activity=="Oui")] <- 1
+data_DCE_numeric$Perso_nature_activity[which(data_DCE_numeric$Perso_nature_activity=="Non")] <- 0
+data_DCE_numeric$Perso_nature_activity <- as.numeric(data_DCE_numeric$Perso_nature_activity)
+data_DCE_numeric$Perso_eco_criteria_shopping[which(data_DCE_numeric$Perso_eco_criteria_shopping=="Oui")] <- 1
+data_DCE_numeric$Perso_eco_criteria_shopping[which(data_DCE_numeric$Perso_eco_criteria_shopping=="Non")] <- 0
+data_DCE_numeric$Perso_eco_criteria_shopping <- as.numeric(data_DCE_numeric$Perso_eco_criteria_shopping)
+data_DCE_numeric$Perso_behaviour_nature <- data_DCE_numeric$Perso_eco_criteria_shopping + data_DCE_numeric$Perso_nature_activity + data_DCE_numeric$Perso_belong_eco_NGO
 
 saveRDS(data_DCE_numeric,"output/data_DCE_numeric.rds")
 

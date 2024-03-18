@@ -109,6 +109,377 @@ data_DCE_mlogit <- mlogit.data(data_DCE_numeric,
                                id.var = "survey_person",
                                chid.var = "chid")
 
+
+# Temps
+
+
+mixl_Temps1 <- gmnl(choice ~ Temps + Paysage + Acces + Biodiversite + Biome + asc | 0 | 0 | Gender + Age + Income + CSPgroup_inactif + CSPgroup_plus +
+                      CSPgroup_moins + class_nat + survey_id + journey_duration3 + 
+                      main_vehicule_indiv_motor + main_vehicule_commun + Perso_relation_nature,
+                    data = data_DCE_mlogit,
+                    model = "mixl",
+                    ranp = c(Temps = "n",
+                             Paysage = "n",
+                             Acces = "n",
+                             Biodiversite = "n",
+                             Biome1 = "n",
+                             Biome2 = "n"),
+                    mvar = list(Temps = c("survey_id"),
+                                Paysage = c("survey_id"),
+                                Acces = c("survey_id"),
+                                Biodiversite = c("survey_id"),
+                                Biome1 = c("survey_id"),
+                                Biome2 = c("survey_id")),
+                    R = 60)
+mixl_Temps1$logLik$message
+summary(mixl_Temps1)
+
+saveRDS(mixl_Temps1,"output/mixl_Temps1.rds")
+
+
+
+mixl_Temps2 <- gmnl(choice ~ Temps + Paysage + Acces + Biodiversite + Biome + asc | 0 | 0 | Gender + Age + Income + CSPgroup_inactif + CSPgroup_plus +
+                     CSPgroup_moins + class_nat + survey_id + journey_duration3 + 
+                     main_vehicule_indiv_motor + main_vehicule_commun + Perso_relation_nature,
+                   data = data_DCE_mlogit,
+                   model = "mixl",
+                   ranp = c(Temps = "n",
+                            Paysage = "n",
+                            Acces = "n",
+                            Biodiversite = "n",
+                            Biome1 = "n",
+                            Biome2 = "n"),
+                   mvar = list(Temps = c("Gender", "Age", "Income","survey_id"),
+                               Paysage = c("Gender", "Age", "Income","survey_id"),
+                               Acces = c("Gender", "Age", "Income","survey_id"),
+                               Biodiversite = c("Gender", "Age", "Income","survey_id"),
+                               Biome1 = c("Gender", "Age", "Income","survey_id"),
+                               Biome2 = c("Gender", "Age", "Income","survey_id")),
+                   R = 60)
+mixl_Temps2$logLik$message
+summary(mixl_Temps)
+
+saveRDS(mixl_Temps2,"output/mixl_Temps2.rds")
+
+
+mixl_Temps3 <- gmnl(choice ~ Temps + Paysage + Acces + Biodiversite + Biome + asc | 0 | 0 | Gender + Age + Income + CSPgroup_inactif + CSPgroup_plus +
+                     CSPgroup_moins + class_nat + survey_id + journey_duration3 + 
+                     main_vehicule_indiv_motor + main_vehicule_commun + Perso_relation_nature,
+                   data = data_DCE_mlogit,
+                   model = "mixl",
+                   ranp = c(Temps = "n",
+                            Paysage = "n",
+                            Acces = "n",
+                            Biodiversite = "n",
+                            Biome1 = "n",
+                            Biome2 = "n"),
+                   mvar = list(Temps = c("Gender", "Age", "Income","Perso_relation_nature","survey_id","class_nat"),
+                               Paysage = c("Gender", "Age", "Income","Perso_relation_nature","survey_id","class_nat"),
+                               Acces = c("Gender", "Age", "Income","Perso_relation_nature","survey_id","class_nat"),
+                               Biodiversite = c("Gender", "Age", "Income","Perso_relation_nature","survey_id","class_nat"),
+                               Biome1 = c("Gender", "Age", "Income","Perso_relation_nature","survey_id","class_nat"),
+                               Biome2 = c("Gender", "Age", "Income","Perso_relation_nature","survey_id","class_nat")),
+                   R = 60)
+mixl_Temps3$logLik$message
+summary(mixl_Temps3)
+
+saveRDS(mixl_Temps3,"output/mixl_Temps3.rds")
+
+mixl_Temps4 <- gmnl(choice ~ Temps + Paysage + Acces + Biodiversite + Biome + asc | 0 | 0 | Gender + Age + Income + CSPgroup_inactif + CSPgroup_plus +
+                     CSPgroup_moins + class_nat + survey_id + journey_duration3 + 
+                     main_vehicule_indiv_motor + main_vehicule_commun + Perso_relation_nature,
+                   data = data_DCE_mlogit,
+                   model = "mixl",
+                   ranp = c(Temps = "n",
+                            Paysage = "n",
+                            Acces = "n",
+                            Biodiversite = "n",
+                            Biome1 = "n",
+                            Biome2 = "n"),
+                   mvar = list(Temps = c("Gender", "Age", "Income","Perso_relation_nature","survey_id","class_nat","main_vehicule_indiv_motor","main_vehicule_commun","journey_duration3"),
+                               Paysage = c("Gender", "Age", "Income","Perso_relation_nature","survey_id","class_nat","main_vehicule_indiv_motor","main_vehicule_commun","journey_duration3"),
+                               Acces = c("Gender", "Age", "Income","Perso_relation_nature","survey_id","class_nat","main_vehicule_indiv_motor","main_vehicule_commun","journey_duration3"),
+                               Biodiversite = c("Gender", "Age", "Income","Perso_relation_nature","survey_id","class_nat","main_vehicule_indiv_motor","main_vehicule_commun","journey_duration3"),
+                               Biome1 = c("Gender", "Age", "Income","Perso_relation_nature","survey_id","class_nat","main_vehicule_indiv_motor","main_vehicule_commun","journey_duration3"),
+                               Biome2 = c("Gender", "Age", "Income","Perso_relation_nature","survey_id","class_nat","main_vehicule_indiv_motor","main_vehicule_commun","journey_duration3")),
+                   R = 60)
+mixl_Temps4$logLik$message
+summary(mixl_Temps4)
+
+saveRDS(mixl_Temps4,"output/mixl_Temps4.rds")
+
+
+mixl_Temps5 <- gmnl(choice ~ Temps + Paysage + Acces + Biodiversite + Biome + asc | 0 | 0 | Gender + Age + Income + CSPgroup_inactif + CSPgroup_plus +
+                      CSPgroup_moins + class_nat + survey_id + journey_duration3 + 
+                      main_vehicule_indiv_motor + main_vehicule_commun + Perso_relation_nature,
+                    data = data_DCE_mlogit,
+                    model = "mixl",
+                    ranp = c(Temps = "ln",
+                             Paysage = "n",
+                             Acces = "n",
+                             Biodiversite = "n",
+                             Biome1 = "n",
+                             Biome2 = "n",
+                             asc = "n"),
+                    mvar = list(Temps = c("Gender", "Age", "Income","Perso_relation_nature","survey_id","class_nat","main_vehicule_indiv_motor","main_vehicule_commun","journey_duration3"),
+                                Paysage = c("Gender", "Age", "Income","Perso_relation_nature","survey_id","class_nat","main_vehicule_indiv_motor","main_vehicule_commun","journey_duration3"),
+                                Acces = c("Gender", "Age", "Income","Perso_relation_nature","survey_id","class_nat"),
+                                Biodiversite = c("Gender", "Age", "Income","Perso_relation_nature","survey_id","class_nat"),
+                                Biome1 = c("Gender", "Age", "Income","Perso_relation_nature","survey_id","class_nat"),
+                                Biome2 = c("Gender", "Age", "Income","Perso_relation_nature","survey_id","class_nat"),
+                                asc = c("Gender", "Age", "Income","Perso_relation_nature","survey_id","class_nat","main_vehicule_indiv_motor","main_vehicule_commun","journey_duration3")),
+                    R = 60)
+mixl_Temps5$logLik$message
+summary(mixl_Temps5)
+
+saveRDS(mixl_Temps5,"output/mixl_Temps5.rds")
+
+
+
+test <- data_DCE_numeric[,c("Gender", "Age", "Income", "CSPgroup_inactif", "CSPgroup_plus","CSPgroup_retraite",
+                            "CSPgroup_moins", "class_nat", "survey_id", "journey_duration3","Perso_knowledge_biodiversity","Perso_behaviour_nature",
+                            "main_vehicule_indiv_motor","main_vehicule_indiv_no_motor", "main_vehicule_commun","Education", "Perso_relation_nature")]
+#calculate correlation between each pairwise combination of variables
+cor_df <- round(cor(na.omit(test)), 2)
+
+#melt the data frame
+melted_cormat <- melt(cor_df)
+
+#create correlation heatmap
+ggplot(data = melted_cormat, aes(x=Var1, y=Var2, fill=value)) + 
+  geom_tile() +
+  geom_text(aes(Var2, Var1, label = value), size = 5) +
+  scale_fill_gradient2(low = "blue", high = "red",
+                       limit = c(-1,1), name="Correlation") +
+  theme(axis.title.x = element_blank(),
+        axis.title.y = element_blank(),
+        panel.background = element_blank(),
+        axis.text.x = element_text(angle = 45, vjust = 1, hjust=1))
+
+mixl_Temps5t <- gmnl(choice ~ Temps + Paysage + Acces + Biodiversite + Biome + asc | 0 | 0 | Gender + Age + Income + CSPgroup_inactif +
+                       CSPgroup_moins + class_nat + survey_id + journey_duration3 +
+                       main_vehicule_indiv_no_motor + main_vehicule_commun + Perso_relation_nature + Perso_behaviour_nature,
+                     data = data_DCE_mlogit,
+                     model = "mixl",
+                     panel=TRUE,
+                     ranp = c(Temps = "t",
+                              Paysage = "n",
+                              Acces = "n",
+                              Biodiversite = "n",
+                              Biome1 = "n",
+                              Biome2 = "n",
+                              asc = "n"),
+                     mvar = list(Temps = c("Gender", "Age", "Income","Perso_relation_nature","Perso_behaviour_nature","survey_id","class_nat","CSPgroup_inactif","CSPgroup_moins","main_vehicule_commun","main_vehicule_indiv_no_motor","journey_duration3"),
+                                 Paysage = c("Gender", "Age", "Income","Perso_relation_nature","Perso_behaviour_nature","survey_id","class_nat","CSPgroup_inactif","CSPgroup_moins","main_vehicule_commun","main_vehicule_indiv_no_motor","journey_duration3"),
+                                 Acces = c("Gender", "Age", "Income","Perso_relation_nature","Perso_behaviour_nature","survey_id","class_nat","CSPgroup_inactif","CSPgroup_moins","main_vehicule_commun","main_vehicule_indiv_no_motor","journey_duration3"),
+                                 Biodiversite = c("Gender", "Age", "Income","Perso_relation_nature","Perso_behaviour_nature","survey_id","class_nat","CSPgroup_inactif","CSPgroup_moins","main_vehicule_commun","main_vehicule_indiv_no_motor","journey_duration3"),
+                                 Biome1 = c("Gender", "Age", "Income","Perso_relation_nature","Perso_behaviour_nature","survey_id","class_nat","CSPgroup_inactif","CSPgroup_moins","main_vehicule_commun","main_vehicule_indiv_no_motor","journey_duration3"),
+                                 Biome2 = c("Gender", "Age", "Income","Perso_relation_nature","Perso_behaviour_nature","survey_id","class_nat","CSPgroup_inactif","CSPgroup_moins","main_vehicule_commun","main_vehicule_indiv_no_motor","journey_duration3"),
+                                 asc = c("Gender", "Age", "Income","Perso_relation_nature","Perso_behaviour_nature","survey_id","class_nat","CSPgroup_inactif","CSPgroup_moins","main_vehicule_commun","main_vehicule_indiv_no_motor","journey_duration3")),
+                     R = 2000)
+
+summary(mixl_Temps5t)
+
+saveRDS(mixl_Temps5,"mixl_Temps5t.rds")
+
+mixl_Temps5 <- readRDS("output/mixl_Temps5b.rds") # R 2000
+
+
+
+mixl_Temps5t2 <- gmnl(choice ~ Temps + Paysage + Acces + Biodiversite + Biome + asc | 0 | 0 | Gender + Age + Income + CSPgroup_inactif +
+                        CSPgroup_moins + class_nat + survey_id + journey_duration3 +
+                        main_vehicule_indiv_no_motor + main_vehicule_commun + Perso_relation_nature + Perso_behaviour_nature,
+                      data = data_DCE_mlogit,
+                      model = "mixl",
+                      panel=TRUE,
+                      ranp = c(Temps = "t",
+                               Paysage = "n",
+                               Acces = "n",
+                               Biodiversite = "n",
+                               Biome1 = "n",
+                               Biome2 = "n",
+                               asc = "n"),
+                      mvar = list(Temps = c("Gender", "Age", "Income","Perso_relation_nature","Perso_behaviour_nature","survey_id","class_nat","CSPgroup_inactif","CSPgroup_moins","main_vehicule_commun","main_vehicule_indiv_no_motor","journey_duration3"),
+                                  Paysage = c("Perso_relation_nature","Perso_behaviour_nature","survey_id","class_nat","main_vehicule_commun","main_vehicule_indiv_no_motor","journey_duration3"),
+                                  Acces = c("Perso_relation_nature","Perso_behaviour_nature","survey_id","class_nat","main_vehicule_commun","main_vehicule_indiv_no_motor","journey_duration3"),
+                                  Biodiversite = c("Perso_relation_nature","Perso_behaviour_nature","survey_id","class_nat","main_vehicule_commun","main_vehicule_indiv_no_motor","journey_duration3"),
+                                  Biome1 = c("Perso_relation_nature","Perso_behaviour_nature","survey_id","class_nat","main_vehicule_commun","main_vehicule_indiv_no_motor","journey_duration3"),
+                                  Biome2 = c("Perso_relation_nature","Perso_behaviour_nature","survey_id","class_nat","main_vehicule_commun","main_vehicule_indiv_no_motor","journey_duration3"),
+                                  asc = c("Gender", "Age", "Income","Perso_relation_nature","Perso_behaviour_nature","survey_id","class_nat","CSPgroup_inactif","CSPgroup_moins","main_vehicule_commun","main_vehicule_indiv_no_motor","journey_duration3")),
+                      R = 60)
+
+mixl_Temps5t3 <- gmnl(choice ~ Temps + Paysage + Acces + Biodiversite + Biome + asc | 0 | 0 | Gender + Age + Income + CSPgroup_inactif +
+                        CSPgroup_moins + class_nat + survey_id + journey_duration3 +
+                        main_vehicule_indiv_no_motor + main_vehicule_commun + Perso_relation_nature + Perso_behaviour_nature,
+                      data = data_DCE_mlogit,
+                      model = "mixl",
+                      panel=TRUE,
+                      ranp = c(Temps = "t",
+                               Paysage = "n",
+                               Acces = "n",
+                               Biodiversite = "n",
+                               asc = "n"),
+                      mvar = list(Temps = c("Gender", "Age", "Income","Perso_relation_nature","Perso_behaviour_nature","survey_id","class_nat","CSPgroup_inactif","CSPgroup_moins","main_vehicule_commun","main_vehicule_indiv_no_motor","journey_duration3"),
+                                  Paysage = c("Perso_relation_nature","Perso_behaviour_nature","survey_id","class_nat","main_vehicule_commun","main_vehicule_indiv_no_motor","journey_duration3"),
+                                  Acces = c("Perso_relation_nature","Perso_behaviour_nature","survey_id","class_nat","main_vehicule_commun","main_vehicule_indiv_no_motor","journey_duration3"),
+                                  Biodiversite = c("Perso_relation_nature","Perso_behaviour_nature","survey_id","class_nat","main_vehicule_commun","main_vehicule_indiv_no_motor","journey_duration3"),
+                                  asc = c("Gender", "Age", "Income","Perso_relation_nature","Perso_behaviour_nature","survey_id","class_nat","CSPgroup_inactif","CSPgroup_moins","main_vehicule_commun","main_vehicule_indiv_no_motor","journey_duration3")),
+                      R = 60)
+
+
+summary(mixl_Temps5t3)
+
+saveRDS(mixl_Temps5t3,"mixl_Temps5t3.rds")
+
+
+mixl_Temps5t4 <- gmnl(choice ~ Temps + Paysage + Acces + Biodiversite + Biome + asc | 0 | 0 | Gender + Age + Income + CSPgroup_inactif +
+                        CSPgroup_moins + class_nat + survey_id + journey_duration3 +
+                        main_vehicule_indiv_no_motor + main_vehicule_commun + Perso_relation_nature + Perso_behaviour_nature,
+                      data = data_DCE_mlogit,
+                      model = "mixl",
+                      panel=TRUE,
+                      ranp = c(Temps = "t",
+                               Paysage = "n",
+                               Acces = "n",
+                               Biodiversite = "n",
+                               asc = "n"),
+                      mvar = list(Temps = c("Gender", "Age", "Income","Perso_relation_nature","Perso_behaviour_nature","survey_id","class_nat","CSPgroup_inactif","CSPgroup_moins","main_vehicule_commun","main_vehicule_indiv_no_motor","journey_duration3"),
+                                  Paysage = c("Gender", "Age", "Income","Perso_relation_nature","Perso_behaviour_nature","survey_id","class_nat","CSPgroup_inactif","CSPgroup_moins","main_vehicule_commun","main_vehicule_indiv_no_motor","journey_duration3"),
+                                  Acces = c("Gender", "Age", "Income","Perso_relation_nature","Perso_behaviour_nature","survey_id","class_nat","CSPgroup_inactif","CSPgroup_moins","main_vehicule_commun","main_vehicule_indiv_no_motor","journey_duration3"),
+                                  Biodiversite = c("Gender", "Age", "Income","Perso_relation_nature","Perso_behaviour_nature","survey_id","class_nat","CSPgroup_inactif","CSPgroup_moins","main_vehicule_commun","main_vehicule_indiv_no_motor","journey_duration3"),
+                                  asc = c("Gender", "Age", "Income","Perso_relation_nature","Perso_behaviour_nature","survey_id","class_nat","CSPgroup_inactif","CSPgroup_moins","main_vehicule_commun","main_vehicule_indiv_no_motor","journey_duration3")),
+                      R = 60)
+
+
+summary(mixl_Temps5t4)
+
+saveRDS(mixl_Temps5t4,"mixl_Temps5t4.rds")
+
+
+
+
+
+mixl_Temps5t5 <- gmnl(choice ~ Temps + Paysage + Acces + Biodiversite + Biome + asc | 0 | 0 | Gender + Age + Income + CSPgroup_inactif +
+                        CSPgroup_moins + class_nat + survey_id + journey_duration3 +
+                        main_vehicule_indiv_motor + Perso_relation_nature + Perso_behaviour_nature,
+                      data = data_DCE_mlogit,
+                      model = "mixl",
+                      panel=TRUE,
+                      ranp = c(Temps = "t",
+                               Paysage = "n",
+                               Acces = "n",
+                               Biodiversite = "n",
+                               Biome1 = "n",
+                               Biome2 = "n",
+                               asc = "n"),
+                      mvar = list(Temps = c("Gender", "Age", "Income","Perso_relation_nature","Perso_behaviour_nature","survey_id","class_nat","CSPgroup_inactif","CSPgroup_moins","main_vehicule_indiv_motor","journey_duration3"),
+                                  Paysage = c("Gender", "Age", "Income","Perso_relation_nature","Perso_behaviour_nature","survey_id","class_nat","CSPgroup_inactif","CSPgroup_moins","main_vehicule_indiv_motor","journey_duration3"),
+                                  Acces = c("Gender", "Age", "Income","Perso_relation_nature","Perso_behaviour_nature","survey_id","class_nat","CSPgroup_inactif","CSPgroup_moins","main_vehicule_indiv_motor","journey_duration3"),
+                                  Biodiversite = c("Gender", "Age", "Income","Perso_relation_nature","Perso_behaviour_nature","survey_id","class_nat","CSPgroup_inactif","CSPgroup_moins","main_vehicule_indiv_motor","journey_duration3"),
+                                  asc = c("Gender", "Age", "Income","Perso_relation_nature","Perso_behaviour_nature","survey_id","class_nat","CSPgroup_inactif","CSPgroup_moins","main_vehicule_indiv_motor","journey_duration3")),
+                      R = 60)
+
+
+summary(mixl_Temps5t5)
+
+saveRDS(mixl_Temps5t5,"mixl_Temps5t5.rds")
+
+
+
+
+mixl_Temps5t6 <- gmnl(choice ~ Temps + Paysage + Acces + Biodiversite + Biome + asc | 0 | 0 | Gender + Age + Income + CSPgroup_inactif +
+                        CSPgroup_moins + CSPgroup_retraite + class_nat + survey_id + journey_duration3 +
+                        main_vehicule_indiv_motor + Perso_relation_nature + Perso_behaviour_nature,
+                      data = data_DCE_mlogit,
+                      model = "mixl",
+                      panel=TRUE,
+                      ranp = c(Temps = "t",
+                               Paysage = "n",
+                               Acces = "n",
+                               Biodiversite = "n",
+                               Biome1 = "n",
+                               Biome2 = "n",
+                               asc = "n"),
+                      mvar = list(Temps = c("Gender", "Age", "Income","Perso_relation_nature","Perso_behaviour_nature","survey_id","class_nat","CSPgroup_inactif","CSPgroup_retraite","CSPgroup_moins","main_vehicule_indiv_motor","journey_duration3"),
+                                  Paysage = c("Gender", "Age", "Income","Perso_relation_nature","Perso_behaviour_nature","survey_id","class_nat","CSPgroup_inactif","CSPgroup_retraite","CSPgroup_moins","main_vehicule_indiv_motor","journey_duration3"),
+                                  Acces = c("Gender", "Age", "Income","Perso_relation_nature","Perso_behaviour_nature","survey_id","class_nat","CSPgroup_inactif","CSPgroup_retraite","CSPgroup_moins","main_vehicule_indiv_motor","journey_duration3"),
+                                  Biodiversite = c("Gender", "Age", "Income","Perso_relation_nature","Perso_behaviour_nature","survey_id","class_nat","CSPgroup_inactif","CSPgroup_retraite","CSPgroup_moins","main_vehicule_indiv_motor","journey_duration3"),
+                                  asc = c("Gender", "Age", "Income","Perso_relation_nature","Perso_behaviour_nature","survey_id","class_nat","CSPgroup_inactif","CSPgroup_retraite","CSPgroup_moins","main_vehicule_indiv_motor","journey_duration3")),
+                      R = 2000)
+
+
+summary(mixl_Temps5t6)
+
+saveRDS(mixl_Temps5t6,"mixl_Temps5t6.rds")
+
+mixl_Temps <- readRDS("output/mixl_Temps5t6.rds") # R 2000
+summary(mixl_Temps)
+
+
+# Retrieve the estimated parameters
+mu <- coef(mixl_Temps)['Temps']
+sigma <- coef(mixl_Temps)['sd.Temps']
+# Create a data frame for plotting
+df <- data.frame(x =seq(from = -3,
+                        to = 1.5,
+                        by = 0.005)) %>%
+  # Draw from the normal distribution for x given the mean and sd
+  mutate(normal = dnorm(x,
+                        mean = mu,
+                        sd = sigma))
+# Same, but only positive values of x
+df_p <- data.frame(x = seq(from = 0,
+                           to = 0.2,
+                           by = 0.005)) %>%
+  mutate(normal = dnorm(x,
+                        mean = mu,
+                        sd = sigma))
+
+# Plot
+ggplot() +
+  # Plot the distribution
+  geom_area(data = df,
+            aes(x = x,
+                y = normal),
+            fill = "orange",
+            alpha = 0.5) +
+  geom_hline(yintercept = 0) + # Add y axis
+  geom_vline(xintercept = 0) + # Add x axis
+  ylab("f(x)") + # Label the y axis
+  xlab(expression(beta[n][Temps])) + # Label the x axis
+  ggtitle("Unconditional distribution for Temps parameter")
+
+# Percent of population with a positive parameter for Temps
+1 - pnorm(0,
+          mean = coef(mixl_Temps)['Temps'],
+          sd = coef(mixl_Temps)['sd.Temps'])
+
+# Define parameters for the distribution
+bn_Temps <- effect.gmnl(mixl_Temps,
+                        par = "Temps",# Choose conditional effect
+                        effect = "ce")
+
+df <- data.frame(bn_Temps = bn_Temps$mean)
+ggplot() +
+  geom_density(data = df,
+               aes(x = bn_Temps),
+               fill = "orange",
+               alpha = 0.5) +
+  geom_hline(yintercept = 0) + # Add y axis
+  geom_vline(xintercept = 0) + # Add x axis
+  ylab("f(x)") + # Label the y axis
+  xlab(expression(beta[n][Temps])) + # Label the x axis
+  ggtitle("Conditional distribution for Temps parameter")
+
+
+# willingness to accept time
+wtp.gmnl(mixl_Temps, wrt = "Temps")
+
+
+
+
+
+#### Old code
 # Temps
 
 mixl_Temps <- gmnl(choice ~ Temps + Paysage + Acces + Biodiversite + Biome | asc,

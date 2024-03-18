@@ -1042,8 +1042,8 @@ data_355435 <- data
 
 # merge both survey while keeping survey id
 
-data_355435$survey_id <- 355435
-data_672984$survey_id <- 672984
+data_355435$survey_id <- 355435 #court
+data_672984$survey_id <- 672984 #long
 
 names(data_672984) <- sub(".*..Dur","Dur" , names(data_672984))
 names(data_355435) <- sub(".*..Dur","Dur" , names(data_355435))
