@@ -416,60 +416,136 @@ mixl_Temps <- readRDS("output/mixl_Temps5t6.rds") # R 2000
 summary(mixl_Temps)
 
 
-# Retrieve the estimated parameters
+# Retrieve the estimated parameters for unconditional distribution
 mu <- coef(mixl_Temps)['Temps']
 sigma <- coef(mixl_Temps)['sd.Temps']
+# Percent of population with a positive parameter for Temps
+1 - ptri(0, mode = coef(mixl_Temps)['Temps'],
+         min = coef(mixl_Temps)['Temps']-1.96*coef(mixl_Temps)['sd.Temps'],
+         max = coef(mixl_Temps)['Temps']+1.96*coef(mixl_Temps)['sd.Temps'])
 # Create a data frame for plotting
-df <- data.frame(x =seq(from = -3,
-                        to = 1.5,
+df_uncond <- data.frame(x = seq(from = -2,
+                        to = 0.75,
                         by = 0.005)) %>%
   # Draw from the normal distribution for x given the mean and sd
-  mutate(normal = dnorm(x,
-                        mean = mu,
-                        sd = sigma))
-# Same, but only positive values of x
-df_p <- data.frame(x = seq(from = 0,
-                           to = 0.2,
-                           by = 0.005)) %>%
-  mutate(normal = dnorm(x,
-                        mean = mu,
-                        sd = sigma))
+  mutate(normal = dtri(x,
+                       mode = mu,
+                       min = mu-1.96*sigma,
+                       max = mu+1.96*sigma))
+# Define parameters for the conditional distribution
+bn_Temps <- effect.gmnl(mixl_Temps,
+                        par = "Temps",# Choose conditional effect
+                        effect = "ce")
+df_cond <- data.frame(bn_Temps = bn_Temps$mean)
 
 # Plot
 ggplot() +
   # Plot the distribution
-  geom_area(data = df,
+  geom_area(data = df_uncond,
             aes(x = x,
                 y = normal),
-            fill = "orange",
+            fill = "grey",
             alpha = 0.5) +
-  geom_hline(yintercept = 0) + # Add y axis
-  geom_vline(xintercept = 0) + # Add x axis
-  ylab("f(x)") + # Label the y axis
-  xlab(expression(beta[n][Temps])) + # Label the x axis
-  ggtitle("Unconditional distribution for Temps parameter")
-
-# Percent of population with a positive parameter for Temps
-1 - pnorm(0,
-          mean = coef(mixl_Temps)['Temps'],
-          sd = coef(mixl_Temps)['sd.Temps'])
-
-# Define parameters for the distribution
-bn_Temps <- effect.gmnl(mixl_Temps,
-                        par = "Temps",# Choose conditional effect
-                        effect = "ce")
-
-df <- data.frame(bn_Temps = bn_Temps$mean)
-ggplot() +
-  geom_density(data = df,
+  geom_density(data = df_cond,
                aes(x = bn_Temps),
                fill = "orange",
+               colour = NA,
                alpha = 0.5) +
   geom_hline(yintercept = 0) + # Add y axis
   geom_vline(xintercept = 0) + # Add x axis
+  theme_modern() +
   ylab("f(x)") + # Label the y axis
-  xlab(expression(beta[n][Temps])) + # Label the x axis
-  ggtitle("Conditional distribution for Temps parameter")
+  xlab(expression(beta[n][Temps])) #+ # Label the x axis
+  #ggtitle("Unconditional distribution for Temps parameter")
+
+ggsave("output/distrib_temp.png",
+       width = 8,
+       height = 8,
+       dpi = 400)
+
+mu <- coef(mixl_Temps)['Paysage']
+sigma <- coef(mixl_Temps)['sd.Paysage']
+df_uncond <- data.frame(x = seq(from = -3,to = 3,by = 0.005)) %>%
+  mutate(normal = dnorm(x,mean = mu,sd = sigma))
+bn_Paysage <- effect.gmnl(mixl_Temps,par = "Paysage",effect = "ce")
+df_cond <- data.frame(bn_Paysage = bn_Paysage$mean)
+
+ggplot() +
+  geom_area(data = df_uncond, aes(x = x, y = normal),
+            fill = "grey", alpha = 0.5) +
+  geom_density(data = df_cond, aes(x = bn_Paysage),
+               fill = "orange", colour = NA, alpha = 0.5) +
+  geom_hline(yintercept = 0) + geom_vline(xintercept = 0) + 
+  theme_modern() + ylab("f(x)") + xlab(expression(beta[n][Paysage]))
+
+ggsave("output/distrib_paysage.png",
+       width = 8,
+       height = 8,
+       dpi = 400)
+
+mu <- coef(mixl_Temps)['Acces']
+sigma <- coef(mixl_Temps)['sd.Acces']
+df_uncond <- data.frame(x = seq(from = -3,to = 5,by = 0.005)) %>%
+  mutate(normal = dnorm(x,mean = mu,sd = sigma))
+bn_Acces <- effect.gmnl(mixl_Temps,par = "Acces",effect = "ce")
+df_cond <- data.frame(bn_Acces = bn_Acces$mean)
+
+ggplot() +
+  geom_area(data = df_uncond, aes(x = x, y = normal),
+            fill = "grey", alpha = 0.5) +
+  geom_density(data = df_cond, aes(x = bn_Acces),
+               fill = "orange", colour = NA, alpha = 0.5) +
+  geom_hline(yintercept = 0) + geom_vline(xintercept = 0) + 
+  theme_modern() + ylab("f(x)") + xlab(expression(beta[n][Acces]))
+
+ggsave("output/distrib_acces.png",
+       width = 8,
+       height = 8,
+       dpi = 400)
+
+
+mu <- coef(mixl_Temps)['Biodiversite']
+sigma <- coef(mixl_Temps)['sd.Biodiversite']
+df_uncond <- data.frame(x = seq(from = -3,to = 3,by = 0.005)) %>%
+  mutate(normal = dnorm(x,mean = mu,sd = sigma))
+bn_Biodiversite <- effect.gmnl(mixl_Temps,par = "Biodiversite",effect = "ce")
+df_cond <- data.frame(bn_Biodiversite = bn_Biodiversite$mean)
+
+ggplot() +
+  geom_area(data = df_uncond, aes(x = x, y = normal),
+            fill = "grey", alpha = 0.5) +
+  geom_density(data = df_cond, aes(x = bn_Biodiversite),
+               fill = "orange", colour = NA, alpha = 0.5) +
+  geom_hline(yintercept = 0) + geom_vline(xintercept = 0) + 
+  theme_modern() + ylab("f(x)") + xlab(expression(beta[n][Biodiversite]))
+
+ggsave("output/distrib_biodiversite.png",
+       width = 8,
+       height = 8,
+       dpi = 400)
+
+
+mu <- coef(mixl_Temps)['asc']
+sigma <- coef(mixl_Temps)['sd.asc']
+df_uncond <- data.frame(x = seq(from = -10,to = 10,by = 0.005)) %>%
+  mutate(normal = dnorm(x,mean = mu,sd = sigma))
+bn_asc <- effect.gmnl(mixl_Temps,par = "asc",effect = "ce")
+df_cond <- data.frame(bn_asc = bn_asc$mean)
+
+ggplot() +
+  geom_area(data = df_uncond, aes(x = x, y = normal),
+            fill = "grey", alpha = 0.5) +
+  geom_density(data = df_cond, aes(x = bn_asc),
+               fill = "orange", colour = NA, alpha = 0.5) +
+  geom_hline(yintercept = 0) + geom_vline(xintercept = 0) + 
+  theme_modern() + ylab("f(x)") + xlab(expression(beta[n][asc]))
+
+ggsave("output/distrib_asc.png",
+       width = 8,
+       height = 8,
+       dpi = 400)
+
+
 
 
 # willingness to accept time
