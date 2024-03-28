@@ -1886,28 +1886,28 @@ plot(lc_3step_4, par = "Biome2", effect = "ce", type = "density", col = "blue")
 #-coef(lc_3step_4)["class.2.Biome1"] / coef(lc_3step_4)["class.2.Temps"]
 #-coef(lc_3step_4)["class.2.Biome2"] / coef(lc_3step_4)["class.2.Temps"]
 
-wtp <- -coef(lc_3step_4)["class.3.Paysage"] / coef(lc_3step_4)["class.3.Temps"]
-sig <- -coef(lc_3step_4)["class.3.Paysage"] / coef(lc_3step_4)["class.3.Temps"]*sqrt(((summary(lc_3step_4)$CoefTable["class.3.Paysage","Std. Error"]/coef(lc_3step_4)["class.3.Paysage"])^2 + (summary(lc_3step_4)$CoefTable["class.3.Temps","Std. Error"]/coef(lc_3step_4)["class.3.Temps"])^2 ))
+wtp_g3_paysage <- -coef(lc_3step_4)["class.3.Paysage"] / coef(lc_3step_4)["class.3.Temps"]
+sig_g3_paysage <- -coef(lc_3step_4)["class.3.Paysage"] / coef(lc_3step_4)["class.3.Temps"]*sqrt(((summary(lc_3step_4)$CoefTable["class.3.Paysage","Std. Error"]/coef(lc_3step_4)["class.3.Paysage"])^2 + (summary(lc_3step_4)$CoefTable["class.3.Temps","Std. Error"]/coef(lc_3step_4)["class.3.Temps"])^2 ))
 1.96*sig
-wtp <- -coef(lc_3step_4)["class.3.Acces"] / coef(lc_3step_4)["class.3.Temps"]
-sig <- -coef(lc_3step_4)["class.3.Acces"] / coef(lc_3step_4)["class.3.Temps"]*sqrt(((summary(lc_3step_4)$CoefTable["class.3.Acces","Std. Error"]/coef(lc_3step_4)["class.3.Acces"])^2 + (summary(lc_3step_4)$CoefTable["class.3.Temps","Std. Error"]/coef(lc_3step_4)["class.3.Temps"])^2 ))
+wtp_g3_acces <- -coef(lc_3step_4)["class.3.Acces"] / coef(lc_3step_4)["class.3.Temps"]
+sig_g3_acces <- -coef(lc_3step_4)["class.3.Acces"] / coef(lc_3step_4)["class.3.Temps"]*sqrt(((summary(lc_3step_4)$CoefTable["class.3.Acces","Std. Error"]/coef(lc_3step_4)["class.3.Acces"])^2 + (summary(lc_3step_4)$CoefTable["class.3.Temps","Std. Error"]/coef(lc_3step_4)["class.3.Temps"])^2 ))
 1.96*sig
-wtp <- -coef(lc_3step_4)["class.3.Biodiversite"] / coef(lc_3step_4)["class.3.Temps"]
-sig <- -coef(lc_3step_4)["class.3.Biodiversite"] / coef(lc_3step_4)["class.3.Temps"]*sqrt(((summary(lc_3step_4)$CoefTable["class.3.Biodiversite","Std. Error"]/coef(lc_3step_4)["class.3.Biodiversite"])^2 + (summary(lc_3step_4)$CoefTable["class.3.Temps","Std. Error"]/coef(lc_3step_4)["class.3.Temps"])^2 ))
+wtp_g3_biodiv <- -coef(lc_3step_4)["class.3.Biodiversite"] / coef(lc_3step_4)["class.3.Temps"]
+sig_g3_biodiv <- -coef(lc_3step_4)["class.3.Biodiversite"] / coef(lc_3step_4)["class.3.Temps"]*sqrt(((summary(lc_3step_4)$CoefTable["class.3.Biodiversite","Std. Error"]/coef(lc_3step_4)["class.3.Biodiversite"])^2 + (summary(lc_3step_4)$CoefTable["class.3.Temps","Std. Error"]/coef(lc_3step_4)["class.3.Temps"])^2 ))
 1.96*sig
 #-coef(lc_3step_4)["class.3.Biome1"] / coef(lc_3step_4)["class.3.Temps"]
 #-coef(lc_3step_4)["class.3.Biome2"] / coef(lc_3step_4)["class.3.Temps"]
 
 
 #-coef(lc_3step_4)["class.4.Paysage"] / coef(lc_3step_4)["class.4.Temps"]
-wtp <- -coef(lc_3step_4)["class.4.Acces"] / coef(lc_3step_4)["class.4.Temps"]
-sig <- -coef(lc_3step_4)["class.4.Acces"] / coef(lc_3step_4)["class.4.Temps"]*sqrt(((summary(lc_3step_4)$CoefTable["class.4.Acces","Std. Error"]/coef(lc_3step_4)["class.4.Acces"])^2 + (summary(lc_3step_4)$CoefTable["class.4.Temps","Std. Error"]/coef(lc_3step_4)["class.4.Temps"])^2 ))
+wtp_g4_acces <- -coef(lc_3step_4)["class.4.Acces"] / coef(lc_3step_4)["class.4.Temps"]
+sig_g4_acces <- -coef(lc_3step_4)["class.4.Acces"] / coef(lc_3step_4)["class.4.Temps"]*sqrt(((summary(lc_3step_4)$CoefTable["class.4.Acces","Std. Error"]/coef(lc_3step_4)["class.4.Acces"])^2 + (summary(lc_3step_4)$CoefTable["class.4.Temps","Std. Error"]/coef(lc_3step_4)["class.4.Temps"])^2 ))
 1.96*sig
-wtp <- -coef(lc_3step_4)["class.4.Biodiversite"] / coef(lc_3step_4)["class.4.Temps"]
-sig <- -coef(lc_3step_4)["class.4.Biodiversite"] / coef(lc_3step_4)["class.4.Temps"]*sqrt(((summary(lc_3step_4)$CoefTable["class.4.Biodiversite","Std. Error"]/coef(lc_3step_4)["class.4.Biodiversite"])^2 + (summary(lc_3step_4)$CoefTable["class.4.Temps","Std. Error"]/coef(lc_3step_4)["class.4.Temps"])^2 ))
+wtp_g4_biodiv <- -coef(lc_3step_4)["class.4.Biodiversite"] / coef(lc_3step_4)["class.4.Temps"]
+sig_g4_biodiv <- -coef(lc_3step_4)["class.4.Biodiversite"] / coef(lc_3step_4)["class.4.Temps"]*sqrt(((summary(lc_3step_4)$CoefTable["class.4.Biodiversite","Std. Error"]/coef(lc_3step_4)["class.4.Biodiversite"])^2 + (summary(lc_3step_4)$CoefTable["class.4.Temps","Std. Error"]/coef(lc_3step_4)["class.4.Temps"])^2 ))
 1.96*sig
-wtp <- -coef(lc_3step_4)["class.4.Biome1"] / coef(lc_3step_4)["class.4.Temps"]
-sig <- -coef(lc_3step_4)["class.4.Biome1"] / coef(lc_3step_4)["class.4.Temps"]*sqrt(((summary(lc_3step_4)$CoefTable["class.4.Biome1","Std. Error"]/coef(lc_3step_4)["class.4.Biome1"])^2 + (summary(lc_3step_4)$CoefTable["class.4.Temps","Std. Error"]/coef(lc_3step_4)["class.4.Temps"])^2 ))
+wtp_g4_biome <- -coef(lc_3step_4)["class.4.Biome1"] / coef(lc_3step_4)["class.4.Temps"]
+sig_g4_biome <- -coef(lc_3step_4)["class.4.Biome1"] / coef(lc_3step_4)["class.4.Temps"]*sqrt(((summary(lc_3step_4)$CoefTable["class.4.Biome1","Std. Error"]/coef(lc_3step_4)["class.4.Biome1"])^2 + (summary(lc_3step_4)$CoefTable["class.4.Temps","Std. Error"]/coef(lc_3step_4)["class.4.Temps"])^2 ))
 1.96*sig
 #-coef(lc_3step_4)["class.4.Biome2"] / coef(lc_3step_4)["class.4.Temps"]
 
@@ -1923,10 +1923,13 @@ res_lc4 <- merge(res_lc4,data_clean_com_nat_analysis, by="survey_person",all.x=T
 res_lc4 <- na.omit(res_lc4[,c("class","q1","q2","q3","q4","Gender",
                       "Age","Education","Income","CSPgroup",
                       "class_nat","survey_id","journey_duration2","journey_duration3",
-                      "main_vehicule","Perso_relation_nature")])
+                      "main_vehicule","Perso_relation_nature","Nb_adult")])
 #res_lc4$q1b <- ifelse(res_lc4$class==1,1,0)
 #res_lc4$q2b <- ifelse(res_lc4$class==2,1,0)
 #res_lc4$q3b <- ifelse(res_lc4$class==3,1,0)
+
+res_lc4$Nb_adult[which(res_lc4$Nb_adult==22)] <- 2
+res_lc4$Nb_adult[which(res_lc4$Nb_adult==0)] <- 1
 
 res_lc4$Income2 <- res_lc4$Income
 res_lc4$Income2[which(res_lc4$Income2 %in% c(1:4))] <- 1
@@ -2112,7 +2115,7 @@ ggsave("output/model_odd4.png",
 
 ### Graph composition socio-demographique par groupe
 
-data_soc_dem <- res_lc4[,c("class","Gender","Age", "Education", "Income", "CSPgroup", "class_nat","Perso_relation_nature")]
+data_soc_dem <- res_lc4[,c("class","Gender","Age", "Education", "Income", "CSPgroup", "class_nat","Perso_relation_nature","Nb_adult")]
 data_soc_dem$Gender <- as.character(data_soc_dem$Gender)
 data_soc_dem$Gender[which(data_soc_dem$Gender=="Femme")] <- "Women"
 data_soc_dem$Gender[which(data_soc_dem$Gender=="Homme")] <- "Men"
@@ -2129,7 +2132,7 @@ data_soc_dem$Income <- as.character(data_soc_dem$Income)
 data_soc_dem$Income2 <- NA
 data_soc_dem$Income2[which(data_soc_dem$Income=="1")] <- 1200
 data_soc_dem$Income2[which(data_soc_dem$Income=="2")] <- 1350
-data_soc_dem$Incomeé[which(data_soc_dem$Income=="3")] <- 1650
+data_soc_dem$Income2[which(data_soc_dem$Income=="3")] <- 1650
 data_soc_dem$Income2[which(data_soc_dem$Income=="4")] <- 1950
 data_soc_dem$Income2[which(data_soc_dem$Income=="5")] <- 2350
 data_soc_dem$Income2[which(data_soc_dem$Income=="6")] <- 2850
@@ -2270,6 +2273,73 @@ ggsave("output/group_compo1.png",
 # groupe 3 femmes plus agées riches qui vivent en milieu préservé
 # groupe 4 femmes relation nature
 
+
+### translate WTT to WTP from income
+
+data_soc_dem_short$Income_cap <- data_soc_dem_short$Income2/data_soc_dem_short$Nb_adult
+
+income_g1 <- mean(data_soc_dem_short$Income2[which(data_soc_dem_short$class==1)])/151.67
+income_med_g1 <- median(data_soc_dem_short$Income2[which(data_soc_dem_short$class==1)])/151.67
+sd_income_g1 <- sd(data_soc_dem_short$Income2[which(data_soc_dem_short$class==1)])
+income_g2 <- mean(data_soc_dem_short$Income2[which(data_soc_dem_short$class==2)])/151.67
+income_med_g2 <- median(data_soc_dem_short$Income2[which(data_soc_dem_short$class==2)])/151.67
+sd_income_g2 <- sd(data_soc_dem_short$Income2[which(data_soc_dem_short$class==2)])
+income_g3 <- mean(data_soc_dem_short$Income2[which(data_soc_dem_short$class==3)])/151.67
+income_med_g3 <- median(data_soc_dem_short$Income2[which(data_soc_dem_short$class==3)])/151.67
+sd_income_g3 <- sd(data_soc_dem_short$Income2[which(data_soc_dem_short$class==3)])
+income_g4 <- mean(data_soc_dem_short$Income2[which(data_soc_dem_short$class==4)])/151.67
+income_med_g4 <- median(data_soc_dem_short$Income2[which(data_soc_dem_short$class==4)])/151.67
+sd_income_g4 <- sd(data_soc_dem_short$Income2[which(data_soc_dem_short$class==4)])
+
+income_cap_g1 <- mean(data_soc_dem_short$Income_cap[which(data_soc_dem_short$class==1)])/151.67
+income_cap_med_g1 <- median(data_soc_dem_short$Income_cap[which(data_soc_dem_short$class==1)])/151.67
+sd_income_cap_g1 <- sd(data_soc_dem_short$Income_cap[which(data_soc_dem_short$class==1)])
+income_cap_g2 <- mean(data_soc_dem_short$Income_cap[which(data_soc_dem_short$class==2)])/151.67
+income_cap_med_g2 <- median(data_soc_dem_short$Income_cap[which(data_soc_dem_short$class==2)])/151.67
+sd_income_cap_g2 <- sd(data_soc_dem_short$Income_cap[which(data_soc_dem_short$class==2)])
+income_cap_g3 <- mean(data_soc_dem_short$Income_cap[which(data_soc_dem_short$class==3)])/151.67
+income_cap_med_g3 <- median(data_soc_dem_short$Income_cap[which(data_soc_dem_short$class==3)])/151.67
+sd_income_cap_g3 <- sd(data_soc_dem_short$Income_cap[which(data_soc_dem_short$class==3)])
+income_cap_g4 <- mean(data_soc_dem_short$Income_cap[which(data_soc_dem_short$class==4)])/151.67
+income_cap_med_g4 <- median(data_soc_dem_short$Income_cap[which(data_soc_dem_short$class==4)])/151.67
+sd_income_cap_g4 <- sd(data_soc_dem_short$Income_cap[which(data_soc_dem_short$class==4)])
+
+# compute WTP for group 1 and 2, constant
+# trajet 20 min donc 1/3 h et 1/3 revenu,  151,67 h par mois 
+# valeur pour 1h de trajet
+
+#value_travel_time_g1 <- 1/3*income_g1
+value_travel_time_g1 <- 1/3*income_cap_g1
+#value_travel_time_g1 <- 1/3*income_cap_med_g1
+
+#value_travel_time_g2 <- 1/3*income_g2
+value_travel_time_g2 <- 1/3*income_cap_g2
+#value_travel_time_g2 <- 1/3*income_cap_med_g2
+
+#value_travel_time_g3 <- 1/3*income_g3
+value_travel_time_g3 <- 1/3*income_cap_g3
+#value_travel_time_g3 <- 1/3*income_cap_med_g3
+
+#value_travel_time_g4 <- 1/3*income_g4
+value_travel_time_g4 <- 1/3*income_cap_g4
+#value_travel_time_g4 <- 1/3*income_cap_med_g4
+
+value_travel_time_g3*wtp_g3_paysage/60
+value_travel_time_g3*wtp_g3_acces/60
+value_travel_time_g3*wtp_g3_biodiv/60
+
+value_travel_time_g4*wtp_g4_acces/60
+value_travel_time_g4*wtp_g4_biodiv/60
+value_travel_time_g4*wtp_g4_biome/60
+
+# benefice infra
+
+nrow(data_soc_dem_short[which(data_soc_dem_short$class==1),])*20/60*value_travel_time_g1
+nrow(data_soc_dem_short[which(data_soc_dem_short$class==2),])*20/60*value_travel_time_g2
+nrow(data_soc_dem_short[which(data_soc_dem_short$class==3),])*20/60*value_travel_time_g3
+nrow(data_soc_dem_short[which(data_soc_dem_short$class==4),])*20/60*value_travel_time_g4
+
+###
 # time from classical approaches
 
 data_DCE_mlogit <- mutate(data_DCE_numeric,

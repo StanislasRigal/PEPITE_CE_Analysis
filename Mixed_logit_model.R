@@ -455,12 +455,12 @@ ggplot() +
   geom_vline(xintercept = 0) + # Add x axis
   theme_modern() +
   ylab("f(x)") + # Label the y axis
-  xlab(expression(beta[n][Temps])) #+ # Label the x axis
+  xlab(expression(beta[n]["Travel time increase"])) #+ # Label the x axis
   #ggtitle("Unconditional distribution for Temps parameter")
 
 ggsave("output/distrib_temp.png",
-       width = 8,
-       height = 8,
+       width = 5,
+       height = 5,
        dpi = 400)
 
 mu <- coef(mixl_Temps)['Paysage']
@@ -476,11 +476,11 @@ ggplot() +
   geom_density(data = df_cond, aes(x = bn_Paysage),
                fill = "orange", colour = NA, alpha = 0.5) +
   geom_hline(yintercept = 0) + geom_vline(xintercept = 0) + 
-  theme_modern() + ylab("f(x)") + xlab(expression(beta[n][Paysage]))
+  theme_modern() + ylab("f(x)") + xlab(expression(beta[n][Landscape]))
 
 ggsave("output/distrib_paysage.png",
-       width = 8,
-       height = 8,
+       width = 5,
+       height = 5,
        dpi = 400)
 
 mu <- coef(mixl_Temps)['Acces']
@@ -496,11 +496,11 @@ ggplot() +
   geom_density(data = df_cond, aes(x = bn_Acces),
                fill = "orange", colour = NA, alpha = 0.5) +
   geom_hline(yintercept = 0) + geom_vline(xintercept = 0) + 
-  theme_modern() + ylab("f(x)") + xlab(expression(beta[n][Acces]))
+  theme_modern() + ylab("f(x)") + xlab(expression(beta[n]["Nature use"]))
 
 ggsave("output/distrib_acces.png",
-       width = 8,
-       height = 8,
+       width = 5,
+       height = 5,
        dpi = 400)
 
 
@@ -517,11 +517,11 @@ ggplot() +
   geom_density(data = df_cond, aes(x = bn_Biodiversite),
                fill = "orange", colour = NA, alpha = 0.5) +
   geom_hline(yintercept = 0) + geom_vline(xintercept = 0) + 
-  theme_modern() + ylab("f(x)") + xlab(expression(beta[n][Biodiversite]))
+  theme_modern() + ylab("f(x)") + xlab(expression(beta[n][Biodiversity]))
 
 ggsave("output/distrib_biodiversite.png",
-       width = 8,
-       height = 8,
+       width = 5,
+       height = 5,
        dpi = 400)
 
 
@@ -538,11 +538,11 @@ ggplot() +
   geom_density(data = df_cond, aes(x = bn_asc),
                fill = "orange", colour = NA, alpha = 0.5) +
   geom_hline(yintercept = 0) + geom_vline(xintercept = 0) + 
-  theme_modern() + ylab("f(x)") + xlab(expression(beta[n][asc]))
+  theme_modern() + ylab("f(x)") + xlab(expression(beta[n][ASC]))
 
 ggsave("output/distrib_asc.png",
-       width = 8,
-       height = 8,
+       width = 5,
+       height = 5,
        dpi = 400)
 
 
