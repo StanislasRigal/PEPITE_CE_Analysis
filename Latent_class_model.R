@@ -2278,6 +2278,8 @@ ggsave("output/group_compo1.png",
 
 data_soc_dem_short$Income_cap <- data_soc_dem_short$Income2/data_soc_dem_short$Nb_adult
 
+saveRDS(data_soc_dem_short,"output/data_soc_dem_short.rds")
+
 income_g1 <- mean(data_soc_dem_short$Income2[which(data_soc_dem_short$class==1)])/151.67
 income_med_g1 <- median(data_soc_dem_short$Income2[which(data_soc_dem_short$class==1)])/151.67
 sd_income_g1 <- sd(data_soc_dem_short$Income2[which(data_soc_dem_short$class==1)])
@@ -2338,6 +2340,74 @@ nrow(data_soc_dem_short[which(data_soc_dem_short$class==1),])*20/60*value_travel
 nrow(data_soc_dem_short[which(data_soc_dem_short$class==2),])*20/60*value_travel_time_g2
 nrow(data_soc_dem_short[which(data_soc_dem_short$class==3),])*20/60*value_travel_time_g3
 nrow(data_soc_dem_short[which(data_soc_dem_short$class==4),])*20/60*value_travel_time_g4
+
+
+# manque de bénéfice de l'infrastructure dû à l'augmentation du temps de trajet par integration écologique
+## analyse classique
+average_time_value_per_capita <- sum(data_soc_dem_short$Income_cap/151.67*1/3)/nrow(data_soc_dem_short)
+
+manque_benefice_2min <- average_time_value_per_capita*2/60
+manque_benefice_4min <- average_time_value_per_capita*4/60
+manque_benefice_6min <- average_time_value_per_capita*6/60
+manque_benefice_8min <- average_time_value_per_capita*8/60
+
+pourcentage_utilisateur_transport_commun <- 0.106 # https://www.statistiques.developpement-durable.gouv.fr/resultats-detailles-de-lenquete-mobilite-des-personnes-de-2019?rubrique=60&dossier=1345 et https://www.statistiques.developpement-durable.gouv.fr/media/5041/download?inline
+impact_tram_freq_transport_commun <- 0.208-0.025 # effet tram periode recente moins temoin https://journals.openedition.org/rge/3508 https://doi.org/10.4000/rge.3508
+
+pourcentage_utilisateur_tram <- pourcentage_utilisateur_transport_commun * impact_tram_freq_transport_commun
+nb_personne_par_zone <- sum(com_isochrone$pop)
+
+manque_benefice_2min_infra_monetaire <- manque_benefice_2min * nb_personne_par_zone * pourcentage_utilisateur_tram
+manque_benefice_2min_infra_temps <- 2 * nb_personne_par_zone * pourcentage_utilisateur_tram
+
+## analyse avec groupe
+
+proba_g1 <- nrow(data_soc_dem_short[which(data_soc_dem_short$class==1),])/nrow(data_soc_dem_short)
+proba_g2 <- nrow(data_soc_dem_short[which(data_soc_dem_short$class==2),])/nrow(data_soc_dem_short)
+proba_g3 <- nrow(data_soc_dem_short[which(data_soc_dem_short$class==3),])/nrow(data_soc_dem_short)
+proba_g4 <- nrow(data_soc_dem_short[which(data_soc_dem_short$class==4),])/nrow(data_soc_dem_short)
+
+manque_benefice_2min_paysage <- 2/60*value_travel_time_g1*proba_g1 + 2/60*value_travel_time_g2*proba_g2 +
+  (2-wtp_g3_paysage)/60*value_travel_time_g3*proba_g3 + 2/60*value_travel_time_g4*proba_g4
+manque_benefice_2min_acces <- 2/60*value_travel_time_g1*proba_g1 + 2/60*value_travel_time_g2*proba_g2 +
+  (2-wtp_g3_acces)/60*value_travel_time_g3*proba_g3 + (2-wtp_g4_acces)/60*value_travel_time_g4*proba_g4
+manque_benefice_2min_biodiv <- 2/60*value_travel_time_g1*proba_g1 + 2/60*value_travel_time_g2*proba_g2 +
+  (2-wtp_g3_biodiv)/60*value_travel_time_g3*proba_g3 + (2-wtp_g4_biodiv)/60*value_travel_time_g4*proba_g4
+manque_benefice_2min_biome <- 2/60*value_travel_time_g1*proba_g1 + 2/60*value_travel_time_g2*proba_g2 +
+  2/60*value_travel_time_g3*proba_g3 + (2-wtp_g4_biome)/60*value_travel_time_g4*proba_g4
+
+manque_benefice_4min_paysage <- 4/60*value_travel_time_g1*proba_g1 + 4/60*value_travel_time_g2*proba_g2 +
+  (4-wtp_g3_paysage)/60*value_travel_time_g3*proba_g3 + 4/60*value_travel_time_g4*proba_g4
+manque_benefice_4min_acces <- 4/60*value_travel_time_g1*proba_g1 + 4/60*value_travel_time_g2*proba_g2 +
+  (4-wtp_g3_acces)/60*value_travel_time_g3*proba_g3 + (4-wtp_g4_acces)/60*value_travel_time_g4*proba_g4
+manque_benefice_4min_biodiv <- 4/60*value_travel_time_g1*proba_g1 + 4/60*value_travel_time_g2*proba_g2 +
+  (4-wtp_g3_biodiv)/60*value_travel_time_g3*proba_g3 + (4-wtp_g4_biodiv)/60*value_travel_time_g4*proba_g4
+manque_benefice_4min_biome <- 4/60*value_travel_time_g1*proba_g1 + 4/60*value_travel_time_g2*proba_g2 +
+  4/60*value_travel_time_g3*proba_g3 + (4-wtp_g4_biome)/60*value_travel_time_g4*proba_g4
+
+manque_benefice_6min_paysage <- 6/60*value_travel_time_g1*proba_g1 + 6/60*value_travel_time_g2*proba_g2 +
+  (6-wtp_g3_paysage)/60*value_travel_time_g3*proba_g3 + 6/60*value_travel_time_g4*proba_g4
+manque_benefice_6min_acces <- 6/60*value_travel_time_g1*proba_g1 + 6/60*value_travel_time_g2*proba_g2 +
+  (6-wtp_g3_acces)/60*value_travel_time_g3*proba_g3 + (6-wtp_g4_acces)/60*value_travel_time_g4*proba_g4
+manque_benefice_6min_biodiv <- 6/60*value_travel_time_g1*proba_g1 + 6/60*value_travel_time_g2*proba_g2 +
+  (6-wtp_g3_biodiv)/60*value_travel_time_g3*proba_g3 + (6-wtp_g4_biodiv)/60*value_travel_time_g4*proba_g4
+manque_benefice_6min_biome <- 6/60*value_travel_time_g1*proba_g1 + 6/60*value_travel_time_g2*proba_g2 +
+  6/60*value_travel_time_g3*proba_g3 + (6-wtp_g4_biome)/60*value_travel_time_g4*proba_g4
+
+manque_benefice_8min_paysage <- 8/60*value_travel_time_g1*proba_g1 + 8/60*value_travel_time_g2*proba_g2 +
+  (8-wtp_g3_paysage)/60*value_travel_time_g3*proba_g3 + 8/60*value_travel_time_g4*proba_g4
+manque_benefice_8min_acces <- 8/60*value_travel_time_g1*proba_g1 + 8/60*value_travel_time_g2*proba_g2 +
+  (8-wtp_g3_acces)/60*value_travel_time_g3*proba_g3 + (8-wtp_g4_acces)/60*value_travel_time_g4*proba_g4
+manque_benefice_8min_biodiv <- 8/60*value_travel_time_g1*proba_g1 + 8/60*value_travel_time_g2*proba_g2 +
+  (8-wtp_g3_biodiv)/60*value_travel_time_g3*proba_g3 + (8-wtp_g4_biodiv)/60*value_travel_time_g4*proba_g4
+manque_benefice_8min_biome <- 8/60*value_travel_time_g1*proba_g1 + 8/60*value_travel_time_g2*proba_g2 +
+  8/60*value_travel_time_g3*proba_g3 + (8-wtp_g4_biome)/60*value_travel_time_g4*proba_g4
+
+
+manque_benefice_2min_infra_monetaire_paysage <- manque_benefice_2min_paysage * nb_personne_par_zone * pourcentage_utilisateur_tram
+
+
+
 
 ###
 # time from classical approaches
