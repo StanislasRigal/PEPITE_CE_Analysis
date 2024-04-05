@@ -155,8 +155,8 @@ data_DCE_numeric$Perso_eco_criteria_shopping[which(data_DCE_numeric$Perso_eco_cr
 data_DCE_numeric$Perso_eco_criteria_shopping <- as.numeric(data_DCE_numeric$Perso_eco_criteria_shopping)
 data_DCE_numeric$Perso_behaviour_nature <- data_DCE_numeric$Perso_eco_criteria_shopping + data_DCE_numeric$Perso_nature_activity + data_DCE_numeric$Perso_belong_eco_NGO
 
-saveRDS(data_DCE_numeric,"output/data_DCE_numeric.rds")
-
+# saveRDS(data_DCE_numeric,"output/data_DCE_numeric.rds")
+data_DCE_numeric <- readRDS("output/data_DCE_numeric.rds")
 
 
 #calculate correlation between each pairwise combination of variables
@@ -1920,10 +1920,30 @@ names(res_lc4)[3:ncol(res_lc4)] <- paste0("q",1:4)
 
 res_lc4 <- merge(res_lc4,data_clean_com_nat_analysis, by="survey_person",all.x=TRUE)
 
+res_lc4$wtt_paysage <- effect.gmnl(lc_3step_4,par = "Paysage",effect = "wtp", wrt="Temps")$mean
+res_lc4$wtt_acces <- effect.gmnl(lc_3step_4,par = "Acces",effect = "wtp", wrt="Temps")$mean
+res_lc4$wtt_biodiv <- effect.gmnl(lc_3step_4,par = "Biodiversite",effect = "wtp", wrt="Temps")$mean
+res_lc4$wtt_biome <- effect.gmnl(lc_3step_4,par = "Biome1",effect = "wtp", wrt="Temps")$mean
+
+table(res_lc4$class,res_lc4$SQ_one_not_enough_time)
+table(res_lc4$class,res_lc4$SQ_one_too_important_time_increase)
+table(res_lc4$class,res_lc4$SQ_all_not_enough_time)
+
+dt <- na.omit(res_lc4[,c("class","SQ_one_not_enough_time")])
+dt$SQ_one_not_enough_time <- as.character(dt$SQ_one_not_enough_time)
+dt$SQ_one_not_enough_time[which(dt$SQ_one_not_enough_time=="Oui")] <- "Yes"
+dt$SQ_one_not_enough_time[which(dt$SQ_one_not_enough_time=="Non sélectionné")] <- "No"
+names(dt) <- c("Class","Select reference because not enough time")
+dt <- as.table(as.matrix(table(dt)))
+library("vcd")
+assoc(head(dt, 5), shade = TRUE, las=3)
+
+
 res_lc4 <- na.omit(res_lc4[,c("class","q1","q2","q3","q4","Gender",
                       "Age","Education","Income","CSPgroup",
                       "class_nat","survey_id","journey_duration2","journey_duration3",
-                      "main_vehicule","Perso_relation_nature","Nb_adult")])
+                      "main_vehicule","Perso_relation_nature","Nb_adult",
+                      "wtt_paysage","wtt_acces","wtt_biodiv","wtt_biome")])
 #res_lc4$q1b <- ifelse(res_lc4$class==1,1,0)
 #res_lc4$q2b <- ifelse(res_lc4$class==2,1,0)
 #res_lc4$q3b <- ifelse(res_lc4$class==3,1,0)
@@ -2115,7 +2135,8 @@ ggsave("output/model_odd4.png",
 
 ### Graph composition socio-demographique par groupe
 
-data_soc_dem <- res_lc4[,c("class","Gender","Age", "Education", "Income", "CSPgroup", "class_nat","Perso_relation_nature","Nb_adult")]
+data_soc_dem <- res_lc4[,c("class","Gender","Age", "Education", "Income", "CSPgroup", "class_nat","Perso_relation_nature","Nb_adult",
+                           "wtt_paysage","wtt_acces","wtt_biodiv","wtt_biome")]
 data_soc_dem$Gender <- as.character(data_soc_dem$Gender)
 data_soc_dem$Gender[which(data_soc_dem$Gender=="Femme")] <- "Women"
 data_soc_dem$Gender[which(data_soc_dem$Gender=="Homme")] <- "Men"
@@ -2278,7 +2299,8 @@ ggsave("output/group_compo1.png",
 
 data_soc_dem_short$Income_cap <- data_soc_dem_short$Income2/data_soc_dem_short$Nb_adult
 
-saveRDS(data_soc_dem_short,"output/data_soc_dem_short.rds")
+# saveRDS(data_soc_dem_short,"output/data_soc_dem_short.rds")
+data_soc_dem_short <- readRDS("output/data_soc_dem_short.rds")
 
 income_g1 <- mean(data_soc_dem_short$Income2[which(data_soc_dem_short$class==1)])/151.67
 income_med_g1 <- median(data_soc_dem_short$Income2[which(data_soc_dem_short$class==1)])/151.67
@@ -2295,16 +2317,16 @@ sd_income_g4 <- sd(data_soc_dem_short$Income2[which(data_soc_dem_short$class==4)
 
 income_cap_g1 <- mean(data_soc_dem_short$Income_cap[which(data_soc_dem_short$class==1)])/151.67
 income_cap_med_g1 <- median(data_soc_dem_short$Income_cap[which(data_soc_dem_short$class==1)])/151.67
-sd_income_cap_g1 <- sd(data_soc_dem_short$Income_cap[which(data_soc_dem_short$class==1)])
+sd_income_cap_g1 <- sd(data_soc_dem_short$Income_cap[which(data_soc_dem_short$class==1)]/151.67)
 income_cap_g2 <- mean(data_soc_dem_short$Income_cap[which(data_soc_dem_short$class==2)])/151.67
 income_cap_med_g2 <- median(data_soc_dem_short$Income_cap[which(data_soc_dem_short$class==2)])/151.67
-sd_income_cap_g2 <- sd(data_soc_dem_short$Income_cap[which(data_soc_dem_short$class==2)])
+sd_income_cap_g2 <- sd(data_soc_dem_short$Income_cap[which(data_soc_dem_short$class==2)]/151.67)
 income_cap_g3 <- mean(data_soc_dem_short$Income_cap[which(data_soc_dem_short$class==3)])/151.67
 income_cap_med_g3 <- median(data_soc_dem_short$Income_cap[which(data_soc_dem_short$class==3)])/151.67
-sd_income_cap_g3 <- sd(data_soc_dem_short$Income_cap[which(data_soc_dem_short$class==3)])
+sd_income_cap_g3 <- sd(data_soc_dem_short$Income_cap[which(data_soc_dem_short$class==3)]/151.67)
 income_cap_g4 <- mean(data_soc_dem_short$Income_cap[which(data_soc_dem_short$class==4)])/151.67
 income_cap_med_g4 <- median(data_soc_dem_short$Income_cap[which(data_soc_dem_short$class==4)])/151.67
-sd_income_cap_g4 <- sd(data_soc_dem_short$Income_cap[which(data_soc_dem_short$class==4)])
+sd_income_cap_g4 <- sd(data_soc_dem_short$Income_cap[which(data_soc_dem_short$class==4)]/151.67)
 
 # compute WTP for group 1 and 2, constant
 # trajet 20 min donc 1/3 h et 1/3 revenu,  151,67 h par mois 
@@ -2312,18 +2334,26 @@ sd_income_cap_g4 <- sd(data_soc_dem_short$Income_cap[which(data_soc_dem_short$cl
 
 #value_travel_time_g1 <- 1/3*income_g1
 value_travel_time_g1 <- 1/3*income_cap_g1
+value_travel_time_g1_low <- 1/3*(income_cap_g1-1.96*sd_income_cap_g1)
+value_travel_time_g1_upp <- 1/3*(income_cap_g1+1.96*sd_income_cap_g1)
 #value_travel_time_g1 <- 1/3*income_cap_med_g1
 
 #value_travel_time_g2 <- 1/3*income_g2
 value_travel_time_g2 <- 1/3*income_cap_g2
+value_travel_time_g2_low <- 1/3*(income_cap_g2-1.96*sd_income_cap_g2)
+value_travel_time_g2_upp <- 1/3*(income_cap_g2+1.96*sd_income_cap_g2)
 #value_travel_time_g2 <- 1/3*income_cap_med_g2
 
 #value_travel_time_g3 <- 1/3*income_g3
 value_travel_time_g3 <- 1/3*income_cap_g3
+value_travel_time_g3_low <- 1/3*(income_cap_g3-1.96*sd_income_cap_g3)
+value_travel_time_g3_upp <- 1/3*(income_cap_g3+1.96*sd_income_cap_g3)
 #value_travel_time_g3 <- 1/3*income_cap_med_g3
 
 #value_travel_time_g4 <- 1/3*income_g4
 value_travel_time_g4 <- 1/3*income_cap_g4
+value_travel_time_g4_low <- 1/3*(income_cap_g4-1.96*sd_income_cap_g4)
+value_travel_time_g4_upp <- 1/3*(income_cap_g4+1.96*sd_income_cap_g4)
 #value_travel_time_g4 <- 1/3*income_cap_med_g4
 
 value_travel_time_g3*wtp_g3_paysage/60
@@ -2345,20 +2375,48 @@ nrow(data_soc_dem_short[which(data_soc_dem_short$class==4),])*20/60*value_travel
 # manque de bénéfice de l'infrastructure dû à l'augmentation du temps de trajet par integration écologique
 ## analyse classique
 average_time_value_per_capita <- sum(data_soc_dem_short$Income_cap/151.67*1/3)/nrow(data_soc_dem_short)
+sd_time_value_per_capita <- sd(data_soc_dem_short$Income_cap/151.67*1/3)
 
 manque_benefice_2min <- average_time_value_per_capita*2/60
+manque_benefice_2min_low <- (average_time_value_per_capita-1.96*sd_time_value_per_capita)*2/60
+manque_benefice_2min_upp <- (average_time_value_per_capita+1.96*sd_time_value_per_capita)*2/60
 manque_benefice_4min <- average_time_value_per_capita*4/60
+manque_benefice_4min_low <- (average_time_value_per_capita-1.96*sd_time_value_per_capita)*4/60
+manque_benefice_4min_upp <- (average_time_value_per_capita+1.96*sd_time_value_per_capita)*4/60
 manque_benefice_6min <- average_time_value_per_capita*6/60
+manque_benefice_6min_low <- (average_time_value_per_capita-1.96*sd_time_value_per_capita)*6/60
+manque_benefice_6min_upp <- (average_time_value_per_capita+1.96*sd_time_value_per_capita)*6/60
 manque_benefice_8min <- average_time_value_per_capita*8/60
+manque_benefice_8min_low <- (average_time_value_per_capita-1.96*sd_time_value_per_capita)*8/60
+manque_benefice_8min_upp <- (average_time_value_per_capita+1.96*sd_time_value_per_capita)*8/60
 
 pourcentage_utilisateur_transport_commun <- 0.106 # https://www.statistiques.developpement-durable.gouv.fr/resultats-detailles-de-lenquete-mobilite-des-personnes-de-2019?rubrique=60&dossier=1345 et https://www.statistiques.developpement-durable.gouv.fr/media/5041/download?inline
 impact_tram_freq_transport_commun <- 0.208-0.025 # effet tram periode recente moins temoin https://journals.openedition.org/rge/3508 https://doi.org/10.4000/rge.3508
+
+com_isochrone <- readRDS("output/com_isochrone.rds")
 
 pourcentage_utilisateur_tram <- pourcentage_utilisateur_transport_commun * impact_tram_freq_transport_commun
 nb_personne_par_zone <- sum(com_isochrone$pop)
 
 manque_benefice_2min_infra_monetaire <- manque_benefice_2min * nb_personne_par_zone * pourcentage_utilisateur_tram
+manque_benefice_2min_infra_monetaire_low <- manque_benefice_2min_low * nb_personne_par_zone * pourcentage_utilisateur_tram
+manque_benefice_2min_infra_monetaire_upp <- manque_benefice_2min_upp * nb_personne_par_zone * pourcentage_utilisateur_tram
 manque_benefice_2min_infra_temps <- 2 * nb_personne_par_zone * pourcentage_utilisateur_tram
+manque_benefice_4min_infra_monetaire <- manque_benefice_4min * nb_personne_par_zone * pourcentage_utilisateur_tram
+manque_benefice_4min_infra_monetaire_low <- manque_benefice_4min_low * nb_personne_par_zone * pourcentage_utilisateur_tram
+manque_benefice_4min_infra_monetaire_upp <- manque_benefice_4min_upp * nb_personne_par_zone * pourcentage_utilisateur_tram
+manque_benefice_4min_infra_temps <- 4 * nb_personne_par_zone * pourcentage_utilisateur_tram
+manque_benefice_6min_infra_monetaire <- manque_benefice_6min * nb_personne_par_zone * pourcentage_utilisateur_tram
+manque_benefice_6min_infra_monetaire_low <- manque_benefice_6min_low * nb_personne_par_zone * pourcentage_utilisateur_tram
+manque_benefice_6min_infra_monetaire_upp <- manque_benefice_6min_upp * nb_personne_par_zone * pourcentage_utilisateur_tram
+manque_benefice_6min_infra_temps <- 6 * nb_personne_par_zone * pourcentage_utilisateur_tram
+manque_benefice_8min_infra_monetaire <- manque_benefice_8min * nb_personne_par_zone * pourcentage_utilisateur_tram
+manque_benefice_8min_infra_monetaire_low <- manque_benefice_8min_low * nb_personne_par_zone * pourcentage_utilisateur_tram
+manque_benefice_8min_infra_monetaire_upp <- manque_benefice_8min_upp * nb_personne_par_zone * pourcentage_utilisateur_tram
+manque_benefice_8min_infra_temps <- 8 * nb_personne_par_zone * pourcentage_utilisateur_tram
+
+
+
 
 ## analyse avec groupe
 
@@ -2369,44 +2427,133 @@ proba_g4 <- nrow(data_soc_dem_short[which(data_soc_dem_short$class==4),])/nrow(d
 
 manque_benefice_2min_paysage <- 2/60*value_travel_time_g1*proba_g1 + 2/60*value_travel_time_g2*proba_g2 +
   (2-wtp_g3_paysage)/60*value_travel_time_g3*proba_g3 + 2/60*value_travel_time_g4*proba_g4
-manque_benefice_2min_acces <- 2/60*value_travel_time_g1*proba_g1 + 2/60*value_travel_time_g2*proba_g2 +
-  (2-wtp_g3_acces)/60*value_travel_time_g3*proba_g3 + (2-wtp_g4_acces)/60*value_travel_time_g4*proba_g4
-manque_benefice_2min_biodiv <- 2/60*value_travel_time_g1*proba_g1 + 2/60*value_travel_time_g2*proba_g2 +
-  (2-wtp_g3_biodiv)/60*value_travel_time_g3*proba_g3 + (2-wtp_g4_biodiv)/60*value_travel_time_g4*proba_g4
-manque_benefice_2min_biome <- 2/60*value_travel_time_g1*proba_g1 + 2/60*value_travel_time_g2*proba_g2 +
-  2/60*value_travel_time_g3*proba_g3 + (2-wtp_g4_biome)/60*value_travel_time_g4*proba_g4
-
+sd_manque_benefice_2min_paysage <- 2/60*sqrt((1/3*sd_income_cap_g1*proba_g1)^2+(1/3*sd_income_cap_g2*proba_g2)^2+(1/3*sd_income_cap_g3*proba_g3)^2+(1/3*sd_income_cap_g4*proba_g4)^2
+                                             -2*cov(data_soc_dem_short$Income_cap[which(data_soc_dem_short$class==3)]/151.67*1/3 ,data_soc_dem_short$wtt_paysage[which(data_soc_dem_short$class==3)]/60)*sqrt(var(data_soc_dem_short$Income_cap[which(data_soc_dem_short$class==3)]/151.67*1/3 ))+(cov(data_soc_dem_short$Income_cap[which(data_soc_dem_short$class==3)]/151.67*1/3 ,data_soc_dem_short$wtt_paysage[which(data_soc_dem_short$class==3)]/60))^2)
+#manque_benefice_2min_paysage_low <- 2/60*value_travel_time_g1_low*proba_g1 + 2/60*value_travel_time_g2_low*proba_g2 +
+#  (2-(wtp_g3_paysage+1.96*sig_g3_paysage))/60*value_travel_time_g3_low*proba_g3 + 2/60*value_travel_time_g4_low*proba_g4
+#manque_benefice_2min_paysage_upp <- 2/60*value_travel_time_g1_upp*proba_g1 + 2/60*value_travel_time_g2_upp*proba_g2 +
+#  (2-(wtp_g3_paysage-1.96*sig_g3_paysage))/60*value_travel_time_g3_upp*proba_g3 + 2/60*value_travel_time_g4_upp*proba_g4
+manque_benefice_2min_paysage_low <- manque_benefice_2min_paysage-1.96*sd_manque_benefice_2min_paysage
+manque_benefice_2min_paysage_upp <- manque_benefice_2min_paysage+1.96*sd_manque_benefice_2min_paysage
 manque_benefice_4min_paysage <- 4/60*value_travel_time_g1*proba_g1 + 4/60*value_travel_time_g2*proba_g2 +
   (4-wtp_g3_paysage)/60*value_travel_time_g3*proba_g3 + 4/60*value_travel_time_g4*proba_g4
-manque_benefice_4min_acces <- 4/60*value_travel_time_g1*proba_g1 + 4/60*value_travel_time_g2*proba_g2 +
-  (4-wtp_g3_acces)/60*value_travel_time_g3*proba_g3 + (4-wtp_g4_acces)/60*value_travel_time_g4*proba_g4
-manque_benefice_4min_biodiv <- 4/60*value_travel_time_g1*proba_g1 + 4/60*value_travel_time_g2*proba_g2 +
-  (4-wtp_g3_biodiv)/60*value_travel_time_g3*proba_g3 + (4-wtp_g4_biodiv)/60*value_travel_time_g4*proba_g4
-manque_benefice_4min_biome <- 4/60*value_travel_time_g1*proba_g1 + 4/60*value_travel_time_g2*proba_g2 +
-  4/60*value_travel_time_g3*proba_g3 + (4-wtp_g4_biome)/60*value_travel_time_g4*proba_g4
-
+manque_benefice_4min_paysage_low <- manque_benefice_4min_paysage-1.96*2*sd_manque_benefice_2min_paysage
+manque_benefice_4min_paysage_upp <- manque_benefice_4min_paysage+1.96*2*sd_manque_benefice_2min_paysage
 manque_benefice_6min_paysage <- 6/60*value_travel_time_g1*proba_g1 + 6/60*value_travel_time_g2*proba_g2 +
   (6-wtp_g3_paysage)/60*value_travel_time_g3*proba_g3 + 6/60*value_travel_time_g4*proba_g4
-manque_benefice_6min_acces <- 6/60*value_travel_time_g1*proba_g1 + 6/60*value_travel_time_g2*proba_g2 +
-  (6-wtp_g3_acces)/60*value_travel_time_g3*proba_g3 + (6-wtp_g4_acces)/60*value_travel_time_g4*proba_g4
-manque_benefice_6min_biodiv <- 6/60*value_travel_time_g1*proba_g1 + 6/60*value_travel_time_g2*proba_g2 +
-  (6-wtp_g3_biodiv)/60*value_travel_time_g3*proba_g3 + (6-wtp_g4_biodiv)/60*value_travel_time_g4*proba_g4
-manque_benefice_6min_biome <- 6/60*value_travel_time_g1*proba_g1 + 6/60*value_travel_time_g2*proba_g2 +
-  6/60*value_travel_time_g3*proba_g3 + (6-wtp_g4_biome)/60*value_travel_time_g4*proba_g4
-
+manque_benefice_6min_paysage_low <- manque_benefice_6min_paysage-1.96*3*sd_manque_benefice_2min_paysage
+manque_benefice_6min_paysage_upp <- manque_benefice_6min_paysage+1.96*3*sd_manque_benefice_2min_paysage
 manque_benefice_8min_paysage <- 8/60*value_travel_time_g1*proba_g1 + 8/60*value_travel_time_g2*proba_g2 +
   (8-wtp_g3_paysage)/60*value_travel_time_g3*proba_g3 + 8/60*value_travel_time_g4*proba_g4
+manque_benefice_8min_paysage_low <- manque_benefice_8min_paysage-1.96*4*sd_manque_benefice_2min_paysage
+manque_benefice_8min_paysage_upp <- manque_benefice_8min_paysage+1.96*4*sd_manque_benefice_2min_paysage
+
+
+manque_benefice_2min_acces <- 2/60*value_travel_time_g1*proba_g1 + 2/60*value_travel_time_g2*proba_g2 +
+  (2-wtp_g3_acces)/60*value_travel_time_g3*proba_g3 + (2-wtp_g4_acces)/60*value_travel_time_g4*proba_g4
+sd_manque_benefice_2min_acces <- 2/60*sqrt((1/3*sd_income_cap_g1*proba_g1)^2+(1/3*sd_income_cap_g2*proba_g2)^2+(1/3*sd_income_cap_g3*proba_g3)^2+(1/3*sd_income_cap_g4*proba_g4)^2
+                                           -2*cov(data_soc_dem_short$Income_cap[which(data_soc_dem_short$class==3)]/151.67*1/3 ,data_soc_dem_short$wtt_acces[which(data_soc_dem_short$class==3)]/60)*sqrt(var(data_soc_dem_short$Income_cap[which(data_soc_dem_short$class==3)]/151.67*1/3 ))+(cov(data_soc_dem_short$Income_cap[which(data_soc_dem_short$class==3)]/151.67*1/3 ,data_soc_dem_short$wtt_acces[which(data_soc_dem_short$class==3)]/60))^2
+                                           -2*cov(data_soc_dem_short$Income_cap[which(data_soc_dem_short$class==4)]/151.67*1/3 ,data_soc_dem_short$wtt_acces[which(data_soc_dem_short$class==4)]/60)*sqrt(var(data_soc_dem_short$Income_cap[which(data_soc_dem_short$class==4)]/151.67*1/3 ))+(cov(data_soc_dem_short$Income_cap[which(data_soc_dem_short$class==4)]/151.67*1/3 ,data_soc_dem_short$wtt_acces[which(data_soc_dem_short$class==4)]/60))^2)
+manque_benefice_2min_acces_low <- manque_benefice_2min_acces-1.96*sd_manque_benefice_2min_acces
+manque_benefice_2min_acces_upp <- manque_benefice_2min_acces+1.96*sd_manque_benefice_2min_acces
+manque_benefice_4min_acces <- 4/60*value_travel_time_g1*proba_g1 + 4/60*value_travel_time_g2*proba_g2 +
+  (4-wtp_g3_acces)/60*value_travel_time_g3*proba_g3 + (4-wtp_g4_acces)/60*value_travel_time_g4*proba_g4
+manque_benefice_4min_acces_low <- manque_benefice_4min_acces-1.96*2*sd_manque_benefice_2min_acces
+manque_benefice_4min_acces_upp <- manque_benefice_4min_acces+1.96*2*sd_manque_benefice_2min_acces
+manque_benefice_6min_acces <- 6/60*value_travel_time_g1*proba_g1 + 6/60*value_travel_time_g2*proba_g2 +
+  (6-wtp_g3_acces)/60*value_travel_time_g3*proba_g3 + (6-wtp_g4_acces)/60*value_travel_time_g4*proba_g4
+manque_benefice_6min_acces_low <- manque_benefice_6min_acces-1.96*3*sd_manque_benefice_2min_acces
+manque_benefice_6min_acces_upp <- manque_benefice_6min_acces+1.96*3*sd_manque_benefice_2min_acces
 manque_benefice_8min_acces <- 8/60*value_travel_time_g1*proba_g1 + 8/60*value_travel_time_g2*proba_g2 +
   (8-wtp_g3_acces)/60*value_travel_time_g3*proba_g3 + (8-wtp_g4_acces)/60*value_travel_time_g4*proba_g4
+manque_benefice_8min_acces_low <- manque_benefice_8min_acces-1.96*4*sd_manque_benefice_2min_acces
+manque_benefice_8min_acces_upp <- manque_benefice_8min_acces+1.96*4*sd_manque_benefice_2min_acces
+
+
+manque_benefice_2min_biodiv <- 2/60*value_travel_time_g1*proba_g1 + 2/60*value_travel_time_g2*proba_g2 +
+  (2-wtp_g3_biodiv)/60*value_travel_time_g3*proba_g3 + (2-wtp_g4_biodiv)/60*value_travel_time_g4*proba_g4
+sd_manque_benefice_2min_biodiv <- 2/60*sqrt((1/3*sd_income_cap_g1*proba_g1)^2+(1/3*sd_income_cap_g2*proba_g2)^2+(1/3*sd_income_cap_g3*proba_g3)^2+(1/3*sd_income_cap_g4*proba_g4)^2
+                                           -2*cov(data_soc_dem_short$Income_cap[which(data_soc_dem_short$class==3)]/151.67*1/3 ,data_soc_dem_short$wtt_biodiv[which(data_soc_dem_short$class==3)]/60)*sqrt(var(data_soc_dem_short$Income_cap[which(data_soc_dem_short$class==3)]/151.67*1/3 ))+(cov(data_soc_dem_short$Income_cap[which(data_soc_dem_short$class==3)]/151.67*1/3 ,data_soc_dem_short$wtt_biodiv[which(data_soc_dem_short$class==3)]/60))^2
+                                           -2*cov(data_soc_dem_short$Income_cap[which(data_soc_dem_short$class==4)]/151.67*1/3 ,data_soc_dem_short$wtt_biodiv[which(data_soc_dem_short$class==4)]/60)*sqrt(var(data_soc_dem_short$Income_cap[which(data_soc_dem_short$class==4)]/151.67*1/3 ))+(cov(data_soc_dem_short$Income_cap[which(data_soc_dem_short$class==4)]/151.67*1/3 ,data_soc_dem_short$wtt_biodiv[which(data_soc_dem_short$class==4)]/60))^2)
+manque_benefice_2min_biodiv_low <- manque_benefice_2min_biodiv-1.96*sd_manque_benefice_2min_biodiv
+manque_benefice_2min_biodiv_upp <- manque_benefice_2min_biodiv+1.96*sd_manque_benefice_2min_biodiv
+manque_benefice_4min_biodiv <- 4/60*value_travel_time_g1*proba_g1 + 4/60*value_travel_time_g2*proba_g2 +
+  (4-wtp_g3_biodiv)/60*value_travel_time_g3*proba_g3 + (4-wtp_g4_biodiv)/60*value_travel_time_g4*proba_g4
+manque_benefice_4min_biodiv_low <- manque_benefice_4min_biodiv-1.96*2*sd_manque_benefice_2min_biodiv
+manque_benefice_4min_biodiv_upp <- manque_benefice_4min_biodiv+1.96*2*sd_manque_benefice_2min_biodiv
+manque_benefice_6min_biodiv <- 6/60*value_travel_time_g1*proba_g1 + 6/60*value_travel_time_g2*proba_g2 +
+  (6-wtp_g3_biodiv)/60*value_travel_time_g3*proba_g3 + (6-wtp_g4_biodiv)/60*value_travel_time_g4*proba_g4
+manque_benefice_6min_biodiv_low <- manque_benefice_6min_biodiv-1.96*3*sd_manque_benefice_2min_biodiv
+manque_benefice_6min_biodiv_upp <- manque_benefice_6min_biodiv+1.96*3*sd_manque_benefice_2min_biodiv
 manque_benefice_8min_biodiv <- 8/60*value_travel_time_g1*proba_g1 + 8/60*value_travel_time_g2*proba_g2 +
   (8-wtp_g3_biodiv)/60*value_travel_time_g3*proba_g3 + (8-wtp_g4_biodiv)/60*value_travel_time_g4*proba_g4
+manque_benefice_8min_biodiv_low <- manque_benefice_8min_biodiv-1.96*4*sd_manque_benefice_2min_biodiv
+manque_benefice_8min_biodiv_upp <- manque_benefice_8min_biodiv+1.96*4*sd_manque_benefice_2min_biodiv
+
+
+manque_benefice_2min_biome <- 2/60*value_travel_time_g1*proba_g1 + 2/60*value_travel_time_g2*proba_g2 +
+  2/60*value_travel_time_g3*proba_g3 + (2-wtp_g4_biome)/60*value_travel_time_g4*proba_g4
+sd_manque_benefice_2min_biome <- 2/60*sqrt((1/3*sd_income_cap_g1*proba_g1)^2+(1/3*sd_income_cap_g2*proba_g2)^2+(1/3*sd_income_cap_g3*proba_g3)^2+(1/3*sd_income_cap_g4*proba_g4)^2
+                                            -2*cov(data_soc_dem_short$Income_cap[which(data_soc_dem_short$class==4)]/151.67*1/3 ,data_soc_dem_short$wtt_biome[which(data_soc_dem_short$class==4)]/60)*sqrt(var(data_soc_dem_short$Income_cap[which(data_soc_dem_short$class==4)]/151.67*1/3 ))+(cov(data_soc_dem_short$Income_cap[which(data_soc_dem_short$class==4)]/151.67*1/3 ,data_soc_dem_short$wtt_biome[which(data_soc_dem_short$class==4)]/60))^2)
+manque_benefice_2min_biome_low <- manque_benefice_2min_biome-1.96*sd_manque_benefice_2min_biome
+manque_benefice_2min_biome_upp <- manque_benefice_2min_biome+1.96*sd_manque_benefice_2min_biome
+manque_benefice_4min_biome <- 4/60*value_travel_time_g1*proba_g1 + 4/60*value_travel_time_g2*proba_g2 +
+  4/60*value_travel_time_g3*proba_g3 + (4-wtp_g4_biome)/60*value_travel_time_g4*proba_g4
+manque_benefice_4min_biome_low <- manque_benefice_4min_biome-1.96*2*sd_manque_benefice_2min_biome
+manque_benefice_4min_biome_upp <- manque_benefice_4min_biome+1.96*2*sd_manque_benefice_2min_biome
+manque_benefice_6min_biome <- 6/60*value_travel_time_g1*proba_g1 + 6/60*value_travel_time_g2*proba_g2 +
+  6/60*value_travel_time_g3*proba_g3 + (6-wtp_g4_biome)/60*value_travel_time_g4*proba_g4
+manque_benefice_6min_biome_low <- manque_benefice_6min_biome-1.96*3*sd_manque_benefice_2min_biome
+manque_benefice_6min_biome_upp <- manque_benefice_6min_biome+1.96*3*sd_manque_benefice_2min_biome
 manque_benefice_8min_biome <- 8/60*value_travel_time_g1*proba_g1 + 8/60*value_travel_time_g2*proba_g2 +
   8/60*value_travel_time_g3*proba_g3 + (8-wtp_g4_biome)/60*value_travel_time_g4*proba_g4
+manque_benefice_8min_biome_low <- manque_benefice_8min_biome-1.96*4*sd_manque_benefice_2min_biome
+manque_benefice_8min_biome_upp <- manque_benefice_8min_biome+1.96*4*sd_manque_benefice_2min_biome
 
 
-manque_benefice_2min_infra_monetaire_paysage <- manque_benefice_2min_paysage * nb_personne_par_zone * pourcentage_utilisateur_tram
+df_manque_benefice <- data.frame(time_increase=rep(c(2,4,6,8),5),
+                                 group = c(rep("1_classic_L_benefit_percapita",4),rep("2_L_benefit_landscape",4),rep("3_L_benefit_nature_use",4),rep("4_L_benefit_biodiversity",4),rep("5_L_benefit_biome",4)),
+                                 value = c(manque_benefice_2min,manque_benefice_4min,manque_benefice_6min,manque_benefice_8min,
+                                           manque_benefice_2min_paysage,manque_benefice_4min_paysage,manque_benefice_6min_paysage,manque_benefice_8min_paysage,
+                                           manque_benefice_2min_acces,manque_benefice_4min_acces,manque_benefice_6min_acces,manque_benefice_8min_acces,
+                                           manque_benefice_2min_biodiv,manque_benefice_4min_biodiv,manque_benefice_6min_biodiv,manque_benefice_8min_biodiv,
+                                           manque_benefice_2min_biome,manque_benefice_4min_biome,manque_benefice_6min_biome,manque_benefice_8min_biome),
+                                 lower = c(manque_benefice_2min_low,manque_benefice_4min_low,manque_benefice_6min_low,manque_benefice_8min_low,
+                                           manque_benefice_2min_paysage_low,manque_benefice_4min_paysage_low,manque_benefice_6min_paysage_low,manque_benefice_8min_paysage_low,
+                                           manque_benefice_2min_acces_low,manque_benefice_4min_acces_low,manque_benefice_6min_acces_low,manque_benefice_8min_acces_low,
+                                           manque_benefice_2min_biodiv_low,manque_benefice_4min_biodiv_low,manque_benefice_6min_biodiv_low,manque_benefice_8min_biodiv_low,
+                                           manque_benefice_2min_biome_low,manque_benefice_4min_biome_low,manque_benefice_6min_biome_low,manque_benefice_8min_biome_low),
+                                 upper = c(manque_benefice_2min_upp,manque_benefice_4min_upp,manque_benefice_6min_upp,manque_benefice_8min_upp,
+                                           manque_benefice_2min_paysage_upp,manque_benefice_4min_paysage_upp,manque_benefice_6min_paysage_upp,manque_benefice_8min_paysage_upp,
+                                           manque_benefice_2min_acces_upp,manque_benefice_4min_acces_upp,manque_benefice_6min_acces_upp,manque_benefice_8min_acces_upp,
+                                           manque_benefice_2min_biodiv_upp,manque_benefice_4min_biodiv_upp,manque_benefice_6min_biodiv_upp,manque_benefice_8min_biodiv_upp,
+                                           manque_benefice_2min_biome_upp,manque_benefice_4min_biome_upp,manque_benefice_6min_biome_upp,manque_benefice_8min_biome_upp))
 
+df_manque_benefice$value_total <- df_manque_benefice$value * nb_personne_par_zone * pourcentage_utilisateur_tram
 
+# saveRDS(df_manque_benefice,"output/df_manque_benefice.rds")
+
+my_lab <- c(expression(L['benefit classical']),
+            expression(L['benefit landscape']), 
+            expression(L['benefit nature use']),
+            expression(L['benefit biodiversity']),
+            expression(L['benefit biome']))
+
+ggplot(df_manque_benefice, aes(x=time_increase, group=group)) +
+  geom_point(aes(y=value, shape=group), position=position_dodge(width=0.4), size=3) + 
+  geom_errorbar(aes(ymin=lower,ymax=upper), position=position_dodge(width=0.4), alpha=0.2, width=0.5, linewidth=0.5) +
+  geom_hline(yintercept = 0, linetype=2) +
+  scale_shape_discrete(name="",labels=c(my_lab[1],my_lab[2],my_lab[3],my_lab[4],my_lab[5])) +
+  xlab("Travel time increase") +
+  scale_y_continuous(
+    name = "Value per capita",
+    sec.axis = sec_axis( trans=~.* nb_personne_par_zone * pourcentage_utilisateur_tram, name="Total value")) +
+  theme_modern(legend.position = c(.2, .9))
+
+ggsave("output/lbenefit.png",
+       width = 8,
+       height = 7,
+       dpi = 400)
 
 
 ###
