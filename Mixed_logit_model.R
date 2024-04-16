@@ -236,9 +236,10 @@ saveRDS(mixl_Temps5,"output/mixl_Temps5.rds")
 
 
 
-test <- data_DCE_numeric[,c("Gender", "Age", "Income", "CSPgroup_inactif", "CSPgroup_plus","CSPgroup_retraite",
-                            "CSPgroup_moins", "class_nat", "survey_id", "journey_duration3","Perso_knowledge_biodiversity","Perso_behaviour_nature",
-                            "main_vehicule_indiv_motor","main_vehicule_indiv_no_motor", "main_vehicule_commun","Education", "Perso_relation_nature")]
+test <- data_DCE_numeric[,c("Gender", "Age", "Income","Education", "CSPgroup_plus","CSPgroup_moins","CSPgroup_inactif","CSPgroup_retraite",
+                             "class_nat", "Perso_knowledge_biodiversity","Perso_behaviour_nature", "Perso_relation_nature",
+                            "journey_duration3","main_vehicule_indiv_motor","main_vehicule_indiv_no_motor", "main_vehicule_commun", "survey_id")]
+
 #calculate correlation between each pairwise combination of variables
 cor_df <- round(cor(na.omit(test)), 2)
 
@@ -251,10 +252,26 @@ ggplot(data = melted_cormat, aes(x=Var1, y=Var2, fill=value)) +
   geom_text(aes(Var2, Var1, label = value), size = 5) +
   scale_fill_gradient2(low = "blue", high = "red",
                        limit = c(-1,1), name="Correlation") +
+  scale_x_discrete(labels=c("Gender", "Age", "Income", "CSPgroup_inactif"="Inactive SPC", "CSPgroup_plus"="Higher SPC","CSPgroup_retraite"="Retired",
+                            "CSPgroup_moins"="Lower SPC", "class_nat"="Habitat naturalness", "survey_id"="Informative framing", "journey_duration3"="Travel time",
+                            "Perso_knowledge_biodiversity"="Declared biodiversity knowledge","Perso_behaviour_nature"="Declared environmental behaviour",
+                            "main_vehicule_indiv_motor"="Individual motorised transport","main_vehicule_indiv_no_motor"="Individual not motorised transport",
+                            "main_vehicule_commun"="Public transport","Education", "Perso_relation_nature"="INS")) +
+  scale_y_discrete(labels=c("Gender", "Age", "Income", "CSPgroup_inactif"="Inactive SPC", "CSPgroup_plus"="Higher SPC","CSPgroup_retraite"="Retired",
+                            "CSPgroup_moins"="Lower SPC", "class_nat"="Habitat naturalness", "survey_id"="Informative framing", "journey_duration3"="Travel time",
+                            "Perso_knowledge_biodiversity"="Declared biodiversity knowledge","Perso_behaviour_nature"="Declared environmental behaviour",
+                            "main_vehicule_indiv_motor"="Individual motorised transport","main_vehicule_indiv_no_motor"="Individual not motorised transport",
+                            "main_vehicule_commun"="Public transport","Education", "Perso_relation_nature"="INS")) +
   theme(axis.title.x = element_blank(),
         axis.title.y = element_blank(),
         panel.background = element_blank(),
-        axis.text.x = element_text(angle = 45, vjust = 1, hjust=1))
+        axis.text.x = element_text(angle = 45, vjust = 1, hjust=1), legend.position = "none")
+
+ggsave("output/correlation_all_variable.png",
+       width = 11,
+       height = 11,
+       dpi = 400)
+
 
 mixl_Temps5t <- gmnl(choice ~ Temps + Paysage + Acces + Biodiversite + Biome + asc | 0 | 0 | Gender + Age + Income + CSPgroup_inactif +
                        CSPgroup_moins + class_nat + survey_id + journey_duration3 +
@@ -386,8 +403,34 @@ saveRDS(mixl_Temps5t5,"mixl_Temps5t5.rds")
 
 
 
-
 mixl_Temps5t6 <- gmnl(choice ~ Temps + Paysage + Acces + Biodiversite + Biome + asc | 0 | 0 | Gender + Age + Income + CSPgroup_inactif +
+                        CSPgroup_moins + class_nat + survey_id + journey_duration3 +
+                        main_vehicule_indiv_motor + Perso_relation_nature + Perso_behaviour_nature,
+                      data = data_DCE_mlogit,
+                      model = "mixl",
+                      panel=TRUE,
+                      ranp = c(Temps = "t",
+                               Paysage = "n",
+                               Acces = "n",
+                               Biodiversite = "n",
+                               Biome1 = "n",
+                               Biome2 = "n",
+                               asc = "n"),
+                      mvar = list(Temps = c("Gender", "Age", "Income","Perso_relation_nature","Perso_behaviour_nature","survey_id","class_nat","CSPgroup_inactif","CSPgroup_moins","main_vehicule_indiv_motor","journey_duration3"),
+                                  Paysage = c("Gender", "Age", "Income","Perso_relation_nature","Perso_behaviour_nature","survey_id","class_nat","CSPgroup_inactif","CSPgroup_moins","main_vehicule_indiv_motor","journey_duration3"),
+                                  Acces = c("Gender", "Age", "Income","Perso_relation_nature","Perso_behaviour_nature","survey_id","class_nat","CSPgroup_inactif","CSPgroup_moins","main_vehicule_indiv_motor","journey_duration3"),
+                                  Biodiversite = c("Gender", "Age", "Income","Perso_relation_nature","Perso_behaviour_nature","survey_id","class_nat","CSPgroup_inactif","CSPgroup_moins","main_vehicule_indiv_motor","journey_duration3"),
+                                  asc = c("Gender", "Age", "Income","Perso_relation_nature","Perso_behaviour_nature","survey_id","class_nat","CSPgroup_inactif","CSPgroup_moins","main_vehicule_indiv_motor","journey_duration3")),
+                      R = 2000)
+
+
+summary(mixl_Temps5t6)
+
+saveRDS(mixl_Temps5t6,"mixl_Temps5t6.rds")
+
+
+
+mixl_Temps5t6_retraite <- gmnl(choice ~ Temps + Paysage + Acces + Biodiversite + Biome + asc | 0 | 0 | Gender + Age + Income + CSPgroup_inactif +
                         CSPgroup_moins + CSPgroup_retraite + class_nat + survey_id + journey_duration3 +
                         main_vehicule_indiv_motor + Perso_relation_nature + Perso_behaviour_nature,
                       data = data_DCE_mlogit,
@@ -408,12 +451,112 @@ mixl_Temps5t6 <- gmnl(choice ~ Temps + Paysage + Acces + Biodiversite + Biome + 
                       R = 2000)
 
 
-summary(mixl_Temps5t6)
+summary(mixl_Temps5t6_retraite)
 
-saveRDS(mixl_Temps5t6,"mixl_Temps5t6.rds")
+saveRDS(mixl_Temps5t6_retraite,"mixl_Temps5t6_retraite.rds")
 
-mixl_Temps <- readRDS("output/mixl_Temps5t6.rds") # R 2000
+
+mixl_Temps5t7 <- gmnl(choice ~ Temps + Paysage + Acces + Biodiversite + Biome + asc | 0 | 0 | Gender + Age + Income + CSPgroup_inactif +
+                        class_nat + survey_id + journey_duration3 +  main_vehicule_indiv_motor + Perso_relation_nature,
+                      data = data_DCE_mlogit,
+                      model = "mixl",
+                      panel=TRUE,
+                      ranp = c(Temps = "t",
+                               Paysage = "n",
+                               Acces = "n",
+                               Biodiversite = "n",
+                               Biome1 = "n",
+                               Biome2 = "n",
+                               asc = "n"),
+                      mvar = list(Temps = c("Gender", "Age", "Income","Perso_relation_nature","survey_id","class_nat","CSPgroup_inactif","main_vehicule_indiv_motor","journey_duration3"),
+                                  Paysage = c("Gender", "Age", "Income","Perso_relation_nature","survey_id","class_nat","CSPgroup_inactif","main_vehicule_indiv_motor","journey_duration3"),
+                                  Acces = c("Gender", "Age", "Income","Perso_relation_nature","survey_id","class_nat","CSPgroup_inactif","main_vehicule_indiv_motor","journey_duration3"),
+                                  Biodiversite = c("Gender", "Age", "Income","Perso_relation_nature","survey_id","class_nat","CSPgroup_inactif","main_vehicule_indiv_motor","journey_duration3"),
+                                  asc = c("Gender", "Age", "Income","Perso_relation_nature","survey_id","class_nat","CSPgroup_inactif","main_vehicule_indiv_motor","journey_duration3")),
+                      R = 60)
+
+
+summary(mixl_Temps5t7)
+
+saveRDS(mixl_Temps5t7,"mixl_Temps5t7.rds")
+
+
+mixl_Temps5t8 <- gmnl(choice ~ Temps + Paysage + Acces + Biodiversite + Biome + asc | 0 | 0 | Gender + Age + Income +
+                        class_nat + survey_id + journey_duration3 +  main_vehicule_indiv_motor + Perso_relation_nature,
+                      data = data_DCE_mlogit,
+                      model = "mixl",
+                      panel=TRUE,
+                      ranp = c(Temps = "t",
+                               Paysage = "n",
+                               Acces = "n",
+                               Biodiversite = "n",
+                               Biome1 = "n",
+                               Biome2 = "n",
+                               asc = "n"),
+                      mvar = list(Temps = c("Gender", "Age", "Income","Perso_relation_nature","survey_id","class_nat","main_vehicule_indiv_motor","journey_duration3"),
+                                  Paysage = c("Gender", "Age", "Income","Perso_relation_nature","survey_id","class_nat","main_vehicule_indiv_motor","journey_duration3"),
+                                  Acces = c("Gender", "Age", "Income","Perso_relation_nature","survey_id","class_nat","main_vehicule_indiv_motor","journey_duration3"),
+                                  Biodiversite = c("Gender", "Age", "Income","Perso_relation_nature","survey_id","class_nat","main_vehicule_indiv_motor","journey_duration3"),
+                                  asc = c("Gender", "Age", "Income","Perso_relation_nature","survey_id","class_nat","main_vehicule_indiv_motor","journey_duration3")),
+                      R = 60)
+
+
+summary(mixl_Temps5t8)
+
+saveRDS(mixl_Temps5t8,"mixl_Temps5t8.rds")
+
+
+mixl_Temps <- readRDS("output/mixl_Temps5t6.rds") # R 2000, smallest AIC
 summary(mixl_Temps)
+
+
+
+
+boxLabels <- names(coef(mixl_Temps))[1:(length(coef(mixl_Temps))-7)]
+df <- data.frame(yAxis = length(boxLabels):1,
+                 Attribute = c("Time", "Landscape","Nature use","Biodiversity","Biome peri-urban","Biome rural","ASC",
+                               rep("Time",11),rep("Landscape",11),rep("Nature use",11),rep("Biodiversity",11),rep("ASC",11)),
+                 Variable = c(rep("Main estimate",7),rep(c("Gender","Age","Income","INS","Environmental behaviour","Informative framing","Habitat naturalness",
+                                  "Inactive","Lower SPC","Motorised personnal transport","Travel time"),5)),
+                 box_estimate_main = coef(mixl_Temps)[1:length(boxLabels)], 
+                 boxCILow = coef(mixl_Temps)[1:length(boxLabels)]-1.96*summary(mixl_Temps)$CoefTable[1:length(boxLabels),2], 
+                 boxCIHigh = coef(mixl_Temps)[1:length(boxLabels)]+1.96*summary(mixl_Temps)$CoefTable[1:length(boxLabels),2],
+                 var = (summary(mixl_Temps)$CoefTable[1:length(boxLabels),2])^2,
+                 signif = ifelse(summary(mixl_Temps)$CoefTable[1:length(boxLabels),4] < 0.05,"yes","no")
+)
+
+df <- df %>% group_by(Attribute) %>% mutate(box_estimate_interaction = box_estimate_main[which(Variable=="Main estimate")]+box_estimate_main,
+                                            sd_interaction = sqrt(var[which(Variable=="Main estimate")]+var))
+
+df[which(df$Variable=="Main estimate"),c("box_estimate_interaction","sd_interaction")] <- NA
+
+#df$CIinteractionHigh <- df$box_estimate_interaction + 1.96*df$sd_interaction
+#df$CIinteractionLow <- df$box_estimate_interaction - 1.96*df$sd_interaction
+df$CIinteractionHigh <- df$box_estimate_interaction + 1.96*sqrt(df$var)
+df$CIinteractionLow <- df$box_estimate_interaction - 1.96*sqrt(df$var)
+
+df <- as.data.frame(df)
+df$Attribute <- factor(df$Attribute, levels = c("Time", "Landscape","Nature use","Biodiversity","Biome peri-urban","Biome rural","ASC"))
+df$Variable <- factor(df$Variable, levels = c("Main estimate","Gender","Age","Income","INS","Environmental behaviour",
+                                                "Inactive","Lower SPC","Motorised personnal transport","Travel time","Habitat naturalness","Informative framing"))
+
+ggplot(df[which(!(df$Attribute %in% c("Biome peri-urban","Biome rural"))),], aes(x=box_estimate_interaction,y = Variable, group=Attribute)) + 
+  geom_vline(data=df[which(!(df$Attribute %in% c("Biome peri-urban","Biome rural")) & df$Variable=="Main estimate"),], aes(xintercept = box_estimate_main), linewidth = .25, linetype = "dotted") + 
+  geom_vline(xintercept = 0, linewidth = .5, linetype="dashed") + 
+  geom_errorbarh(aes(xmax = CIinteractionHigh, xmin = CIinteractionLow), linewidth = .5, height = 
+                   .2, color = "gray50") +
+  geom_errorbarh(data=df[which(!(df$Attribute %in% c("Biome peri-urban","Biome rural")) & df$Variable=="Main estimate"),],aes(xmax = boxCIHigh, xmin = boxCILow), linewidth = .5, height = 
+                   .2, color = "gray50") +
+  geom_point(size = 3.5, aes(color = Attribute, alpha=signif)) + 
+  geom_point(data=df[which(!(df$Attribute %in% c("Biome peri-urban","Biome rural")) & df$Variable=="Main estimate"),],size = 3.5, aes(color = Attribute,x=box_estimate_main,alpha=signif)) +
+  theme_modern() + theme(legend.position = "none") + scale_alpha_discrete(range = c(0.4, 1)) +
+  ylab("") +
+  xlab("Estimate") + facet_grid(. ~ Attribute, scales='free')
+
+ggsave("output/main_result.png",
+       width = 15,
+       height = 7,
+       dpi = 400)
 
 
 # Retrieve the estimated parameters for unconditional distribution

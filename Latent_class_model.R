@@ -1649,7 +1649,7 @@ data_clean_com_nat_analysis$survey_person <- paste0(data_clean_com_nat_analysis$
 subset_data <- data_clean_com_nat_analysis[,c("survey_person","Gender",
                           "Age","Education","Income","CSPgroup",
                           "class_nat","survey_id","journey_duration2","journey_duration3",
-                          "main_vehicule","Perso_relation_nature")]
+                          "main_vehicule","Perso_relation_nature","Nb_adult")]
 
 subset_data$Gender <- as.character(subset_data$Gender)
 subset_data$Gender[which(subset_data$Gender=="Femme")] <- "Woman"
@@ -1657,6 +1657,11 @@ subset_data$Gender[which(subset_data$Gender=="Homme")] <- "Man"
 subset_data$Gender[which(subset_data$Gender=="Préfère ne pas répondre")] <- NA
 subset_data$CSPgroup <- as.character(subset_data$CSPgroup)
 subset_data$CSPgroup[which(subset_data$CSPgroup=="Retraités")] <- "retired"
+
+names(subset_data) <- c("survey_person","Gender",
+                        "Age","Education","Income","SPC",
+                        "class_nat","survey_id","journey_duration2","journey_duration3",
+                        "main_vehicule","INS_scale","Nb_adult")
 
 write.csv(subset_data, "output/data_indiv_publi.csv", row.names = FALSE)
 
@@ -1667,7 +1672,7 @@ subset_data <- data_DCE_numeric[,c("choice","Scenario",
                                    "Paysage","Acces","Biodiversite","Biome")]
 names(subset_data) <- c("choice","Scenario",
                         "survey_person","chid","Time",
-                        "Landscape","Acces","Biodiversity","Biome")
+                        "Landscape","Access","Biodiversity","Biome")
 
 write.csv(subset_data, "output/data_DCE_publi.csv", row.names = FALSE)
 
