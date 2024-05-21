@@ -154,7 +154,22 @@ data_DCE_numeric$Perso_eco_criteria_shopping[which(data_DCE_numeric$Perso_eco_cr
 data_DCE_numeric$Perso_eco_criteria_shopping[which(data_DCE_numeric$Perso_eco_criteria_shopping=="Non")] <- 0
 data_DCE_numeric$Perso_eco_criteria_shopping <- as.numeric(data_DCE_numeric$Perso_eco_criteria_shopping)
 data_DCE_numeric$Perso_behaviour_nature <- data_DCE_numeric$Perso_eco_criteria_shopping + data_DCE_numeric$Perso_nature_activity + data_DCE_numeric$Perso_belong_eco_NGO
-
+data_DCE_numeric$Income2 <- data_DCE_numeric$Income
+data_DCE_numeric$Income2[which(data_DCE_numeric$Income==1)] <- 1200
+data_DCE_numeric$Income2[which(data_DCE_numeric$Income==2)] <- 1350
+data_DCE_numeric$Income2[which(data_DCE_numeric$Income==3)] <- 1650
+data_DCE_numeric$Income2[which(data_DCE_numeric$Income==4)] <- 1950
+data_DCE_numeric$Income2[which(data_DCE_numeric$Income==5)] <- 2350
+data_DCE_numeric$Income2[which(data_DCE_numeric$Income==6)] <- 2850
+data_DCE_numeric$Income2[which(data_DCE_numeric$Income==7)] <- 3300
+data_DCE_numeric$Income2[which(data_DCE_numeric$Income==8)] <- 3850
+data_DCE_numeric$Income2[which(data_DCE_numeric$Income==9)] <- 4800
+data_DCE_numeric$Income2[which(data_DCE_numeric$Income==10)] <- 5400
+data_DCE_numeric$Nb_adult[which(data_DCE_numeric$Nb_adult %in% c(22,20))] <- 2
+data_DCE_numeric$Nb_adult[which(data_DCE_numeric$Nb_adult==0)] <- 1
+data_DCE_numeric$Income_cap <- data_DCE_numeric$Income2/data_DCE_numeric$Nb_adult
+data_DCE_numeric$job_travel <- as.numeric(factor(data_DCE_numeric$most_freq_journey_professionel,
+                                                            levels=c("Non sélectionné","Oui")))
 # saveRDS(data_DCE_numeric,"output/data_DCE_numeric.rds")
 data_DCE_numeric <- readRDS("output/data_DCE_numeric.rds")
 
@@ -1535,6 +1550,20 @@ data_clean_com_nat_analysis$Age <- as.numeric(as.factor(data_clean_com_nat_analy
 data_clean_com_nat_analysis$Income <- as.numeric(factor(data_clean_com_nat_analysis$Income, levels=c("Moins de 1200 €","Entre 1200 et 1500 €","Entre 1500 et 1800 €","Entre 1800 et 2100 €",
                                                                                           "Entre 2100 et 2600 €","Entre 2600 et 3100 €","Entre 3100 et 3500 €","Entre 3500 et 4200 €",
                                                                                           "Entre 4200 et 5400 €","Plus de 5400 €" )))
+data_clean_com_nat_analysis$Income2 <- data_clean_com_nat_analysis$Income
+data_clean_com_nat_analysis$Income2[which(data_clean_com_nat_analysis$Income==1)] <- 1200
+data_clean_com_nat_analysis$Income2[which(data_clean_com_nat_analysis$Income==2)] <- 1350
+data_clean_com_nat_analysis$Income2[which(data_clean_com_nat_analysis$Income==3)] <- 1650
+data_clean_com_nat_analysis$Income2[which(data_clean_com_nat_analysis$Income==4)] <- 1950
+data_clean_com_nat_analysis$Income2[which(data_clean_com_nat_analysis$Income==5)] <- 2350
+data_clean_com_nat_analysis$Income2[which(data_clean_com_nat_analysis$Income==6)] <- 2850
+data_clean_com_nat_analysis$Income2[which(data_clean_com_nat_analysis$Income==7)] <- 3300
+data_clean_com_nat_analysis$Income2[which(data_clean_com_nat_analysis$Income==8)] <- 3850
+data_clean_com_nat_analysis$Income2[which(data_clean_com_nat_analysis$Income==9)] <- 4800
+data_clean_com_nat_analysis$Income2[which(data_clean_com_nat_analysis$Income==10)] <- 5400
+data_clean_com_nat_analysis$Nb_adult[which(data_clean_com_nat_analysis$Nb_adult %in% c(22,20))] <- 2
+data_clean_com_nat_analysis$Nb_adult[which(data_clean_com_nat_analysis$Nb_adult==0)] <- 1
+data_clean_com_nat_analysis$Income_cap <- data_clean_com_nat_analysis$Income2/data_clean_com_nat_analysis$Nb_adult
 data_clean_com_nat_analysis$Education[which(data_clean_com_nat_analysis$Education=="Primaire (certificat d’études)")] <- "Secondaire court (CAP, BEP) ou niveau baccalauréat"
 data_clean_com_nat_analysis$Education <- as.numeric(as.factor(data_clean_com_nat_analysis$Education))
 data_clean_com_nat_analysis$CSPgroup <- as.character(data_clean_com_nat_analysis$CSP)
@@ -1564,7 +1593,22 @@ data_clean_com_nat_analysis$journey_duration3[which(data_clean_com_nat_analysis$
 data_clean_com_nat_analysis$journey_duration3[which(data_clean_com_nat_analysis$journey_duration3>40 & data_clean_com_nat_analysis$journey_duration3<61)] <- 4
 data_clean_com_nat_analysis$journey_duration3[which(data_clean_com_nat_analysis$journey_duration3>60 & data_clean_com_nat_analysis$journey_duration3<91)] <- 5
 data_clean_com_nat_analysis$journey_duration3[which(data_clean_com_nat_analysis$journey_duration3>90)] <- 6
-
+data_clean_com_nat_analysis$job_travel <- as.numeric(factor(data_clean_com_nat_analysis$most_freq_journey_professionel,
+                                                            levels=c("Non sélectionné","Oui")))
+data_clean_com_nat_analysis$Perso_knowledge_biodiversity[which(data_clean_com_nat_analysis$Perso_knowledge_biodiversity=="Limité")] <- 1
+data_clean_com_nat_analysis$Perso_knowledge_biodiversity[which(data_clean_com_nat_analysis$Perso_knowledge_biodiversity=="Moyen")] <- 2
+data_clean_com_nat_analysis$Perso_knowledge_biodiversity[which(data_clean_com_nat_analysis$Perso_knowledge_biodiversity=="Élevé")] <- 3
+data_clean_com_nat_analysis$Perso_knowledge_biodiversity <- as.numeric(data_clean_com_nat_analysis$Perso_knowledge_biodiversity)
+data_clean_com_nat_analysis$Perso_belong_eco_NGO[which(data_clean_com_nat_analysis$Perso_belong_eco_NGO=="Oui")] <- 1
+data_clean_com_nat_analysis$Perso_belong_eco_NGO[which(data_clean_com_nat_analysis$Perso_belong_eco_NGO=="Non")] <- 0
+data_clean_com_nat_analysis$Perso_belong_eco_NGO <- as.numeric(data_clean_com_nat_analysis$Perso_belong_eco_NGO)
+data_clean_com_nat_analysis$Perso_nature_activity[which(data_clean_com_nat_analysis$Perso_nature_activity=="Oui")] <- 1
+data_clean_com_nat_analysis$Perso_nature_activity[which(data_clean_com_nat_analysis$Perso_nature_activity=="Non")] <- 0
+data_clean_com_nat_analysis$Perso_nature_activity <- as.numeric(data_clean_com_nat_analysis$Perso_nature_activity)
+data_clean_com_nat_analysis$Perso_eco_criteria_shopping[which(data_clean_com_nat_analysis$Perso_eco_criteria_shopping=="Oui")] <- 1
+data_clean_com_nat_analysis$Perso_eco_criteria_shopping[which(data_clean_com_nat_analysis$Perso_eco_criteria_shopping=="Non")] <- 0
+data_clean_com_nat_analysis$Perso_eco_criteria_shopping <- as.numeric(data_clean_com_nat_analysis$Perso_eco_criteria_shopping)
+data_clean_com_nat_analysis$Perso_behaviour_nature <- data_clean_com_nat_analysis$Perso_eco_criteria_shopping + data_clean_com_nat_analysis$Perso_nature_activity + data_clean_com_nat_analysis$Perso_belong_eco_NGO
 
 data_clean_com_nat_analysis$survey_person <- paste0(data_clean_com_nat_analysis$survey_id,sep="_",data_clean_com_nat_analysis$id)
 
@@ -1613,6 +1657,20 @@ data_clean_com_nat_analysis$Age <- as.numeric(as.factor(data_clean_com_nat_analy
 data_clean_com_nat_analysis$Income <- as.numeric(factor(data_clean_com_nat_analysis$Income, levels=c("Moins de 1200 €","Entre 1200 et 1500 €","Entre 1500 et 1800 €","Entre 1800 et 2100 €",
                                                                                                      "Entre 2100 et 2600 €","Entre 2600 et 3100 €","Entre 3100 et 3500 €","Entre 3500 et 4200 €",
                                                                                                      "Entre 4200 et 5400 €","Plus de 5400 €" )))
+data_clean_com_nat_analysis$Income2 <- data_clean_com_nat_analysis$Income
+data_clean_com_nat_analysis$Income2[which(data_clean_com_nat_analysis$Income==1)] <- 1200
+data_clean_com_nat_analysis$Income2[which(data_clean_com_nat_analysis$Income==2)] <- 1350
+data_clean_com_nat_analysis$Income2[which(data_clean_com_nat_analysis$Income==3)] <- 1650
+data_clean_com_nat_analysis$Income2[which(data_clean_com_nat_analysis$Income==4)] <- 1950
+data_clean_com_nat_analysis$Income2[which(data_clean_com_nat_analysis$Income==5)] <- 2350
+data_clean_com_nat_analysis$Income2[which(data_clean_com_nat_analysis$Income==6)] <- 2850
+data_clean_com_nat_analysis$Income2[which(data_clean_com_nat_analysis$Income==7)] <- 3300
+data_clean_com_nat_analysis$Income2[which(data_clean_com_nat_analysis$Income==8)] <- 3850
+data_clean_com_nat_analysis$Income2[which(data_clean_com_nat_analysis$Income==9)] <- 4800
+data_clean_com_nat_analysis$Income2[which(data_clean_com_nat_analysis$Income==10)] <- 5400
+data_clean_com_nat_analysis$Nb_adult[which(data_clean_com_nat_analysis$Nb_adult %in% c(22,20))] <- 2
+data_clean_com_nat_analysis$Nb_adult[which(data_clean_com_nat_analysis$Nb_adult==0)] <- 1
+data_clean_com_nat_analysis$Income_cap <- data_clean_com_nat_analysis$Income2/data_clean_com_nat_analysis$Nb_adult
 data_clean_com_nat_analysis$Education[which(data_clean_com_nat_analysis$Education=="Primaire (certificat d’études)")] <- "Secondary short"
 data_clean_com_nat_analysis$Education <- as.numeric(as.factor(data_clean_com_nat_analysis$Education))
 data_clean_com_nat_analysis$CSPgroup <- as.character(data_clean_com_nat_analysis$CSP)
@@ -1642,6 +1700,22 @@ data_clean_com_nat_analysis$journey_duration3[which(data_clean_com_nat_analysis$
 data_clean_com_nat_analysis$journey_duration3[which(data_clean_com_nat_analysis$journey_duration3>40 & data_clean_com_nat_analysis$journey_duration3<61)] <- 4
 data_clean_com_nat_analysis$journey_duration3[which(data_clean_com_nat_analysis$journey_duration3>60 & data_clean_com_nat_analysis$journey_duration3<91)] <- 5
 data_clean_com_nat_analysis$journey_duration3[which(data_clean_com_nat_analysis$journey_duration3>90)] <- 6
+data_clean_com_nat_analysis$job_travel <- as.numeric(factor(data_clean_com_nat_analysis$most_freq_journey_professionel,
+                                                            levels=c("Non sélectionné","Oui")))
+data_clean_com_nat_analysis$Perso_knowledge_biodiversity[which(data_clean_com_nat_analysis$Perso_knowledge_biodiversity=="Limité")] <- 1
+data_clean_com_nat_analysis$Perso_knowledge_biodiversity[which(data_clean_com_nat_analysis$Perso_knowledge_biodiversity=="Moyen")] <- 2
+data_clean_com_nat_analysis$Perso_knowledge_biodiversity[which(data_clean_com_nat_analysis$Perso_knowledge_biodiversity=="Élevé")] <- 3
+data_clean_com_nat_analysis$Perso_knowledge_biodiversity <- as.numeric(data_clean_com_nat_analysis$Perso_knowledge_biodiversity)
+data_clean_com_nat_analysis$Perso_belong_eco_NGO[which(data_clean_com_nat_analysis$Perso_belong_eco_NGO=="Oui")] <- 1
+data_clean_com_nat_analysis$Perso_belong_eco_NGO[which(data_clean_com_nat_analysis$Perso_belong_eco_NGO=="Non")] <- 0
+data_clean_com_nat_analysis$Perso_belong_eco_NGO <- as.numeric(data_clean_com_nat_analysis$Perso_belong_eco_NGO)
+data_clean_com_nat_analysis$Perso_nature_activity[which(data_clean_com_nat_analysis$Perso_nature_activity=="Oui")] <- 1
+data_clean_com_nat_analysis$Perso_nature_activity[which(data_clean_com_nat_analysis$Perso_nature_activity=="Non")] <- 0
+data_clean_com_nat_analysis$Perso_nature_activity <- as.numeric(data_clean_com_nat_analysis$Perso_nature_activity)
+data_clean_com_nat_analysis$Perso_eco_criteria_shopping[which(data_clean_com_nat_analysis$Perso_eco_criteria_shopping=="Oui")] <- 1
+data_clean_com_nat_analysis$Perso_eco_criteria_shopping[which(data_clean_com_nat_analysis$Perso_eco_criteria_shopping=="Non")] <- 0
+data_clean_com_nat_analysis$Perso_eco_criteria_shopping <- as.numeric(data_clean_com_nat_analysis$Perso_eco_criteria_shopping)
+data_clean_com_nat_analysis$Perso_behaviour_nature <- data_clean_com_nat_analysis$Perso_eco_criteria_shopping + data_clean_com_nat_analysis$Perso_nature_activity + data_clean_com_nat_analysis$Perso_belong_eco_NGO
 
 
 data_clean_com_nat_analysis$survey_person <- paste0(data_clean_com_nat_analysis$survey_id,sep="_",data_clean_com_nat_analysis$id)
@@ -1649,7 +1723,7 @@ data_clean_com_nat_analysis$survey_person <- paste0(data_clean_com_nat_analysis$
 subset_data <- data_clean_com_nat_analysis[,c("survey_person","Gender",
                           "Age","Education","Income","CSPgroup",
                           "class_nat","survey_id","journey_duration2","journey_duration3",
-                          "main_vehicule","Perso_relation_nature","Nb_adult")]
+                          "main_vehicule","Perso_relation_nature","Nb_adult","job_travel")]
 
 subset_data$Gender <- as.character(subset_data$Gender)
 subset_data$Gender[which(subset_data$Gender=="Femme")] <- "Woman"
@@ -1661,7 +1735,7 @@ subset_data$CSPgroup[which(subset_data$CSPgroup=="Retraités")] <- "retired"
 names(subset_data) <- c("survey_person","Gender",
                         "Age","Education","Income","SPC",
                         "class_nat","survey_id","journey_duration2","journey_duration3",
-                        "main_vehicule","INS_scale","Nb_adult")
+                        "main_vehicule","INS_scale","Nb_adult","job_travel")
 
 write.csv(subset_data, "output/data_indiv_publi.csv", row.names = FALSE)
 
@@ -1945,13 +2019,15 @@ assoc(head(dt, 5), shade = TRUE, las=3)
 
 
 res_lc4 <- na.omit(res_lc4[,c("class","q1","q2","q3","q4","Gender",
-                      "Age","Education","Income","CSPgroup",
+                      "Age","Education","Income","Income_cap","CSPgroup",
                       "class_nat","survey_id","journey_duration2","journey_duration3",
-                      "main_vehicule","Perso_relation_nature","Nb_adult",
+                      "main_vehicule","Perso_relation_nature","Perso_behaviour_nature","Perso_knowledge_biodiversity","Nb_adult","job_travel",
                       "wtt_paysage","wtt_acces","wtt_biodiv","wtt_biome")])
-#res_lc4$q1b <- ifelse(res_lc4$class==1,1,0)
-#res_lc4$q2b <- ifelse(res_lc4$class==2,1,0)
-#res_lc4$q3b <- ifelse(res_lc4$class==3,1,0)
+res_lc4$q1b <- ifelse(res_lc4$class==1,1,0)
+res_lc4$q2b <- ifelse(res_lc4$class==2,1,0)
+res_lc4$q3b <- ifelse(res_lc4$class==3,1,0)
+res_lc4$q4b <- ifelse(res_lc4$class==4,1,0)
+
 
 res_lc4$Nb_adult[which(res_lc4$Nb_adult==22)] <- 2
 res_lc4$Nb_adult[which(res_lc4$Nb_adult==0)] <- 1
@@ -1964,8 +2040,9 @@ res_lc4$Income3 <- res_lc4$Income*res_lc4$Income
 
 ### 3. Analyse covariate effects
 
-lm_lc4_q1 <- glm(q1 ~ Gender + Age + factor(Education) + Income + 
-                   CSPgroup + factor(class_nat) + survey_id + journey_duration2 + main_vehicule + Perso_relation_nature,
+lm_lc4_q1 <- glm(q1b ~ Gender + Age + factor(Education) + Income + 
+                   factor(class_nat) + job_travel + journey_duration3 +
+                   Perso_relation_nature + Perso_behaviour_nature + Perso_knowledge_biodiversity,
                  family="binomial",data=res_lc4)
 summary(lm_lc4_q1)
 M1.step <- step(lm_lc4_q1)
@@ -1993,8 +2070,9 @@ abline(h=0, lty=2)
 plot(x=res_lc4$Perso_relation_nature, y=E2, xlab="INS scale", ylab="Pearson residuals")
 abline(h=0, lty=2)
 
-lm_lc4_q2 <- glm(q2 ~ Gender + Age + factor(Education) + Income + 
-                   CSPgroup + factor(class_nat) + survey_id + journey_duration2 + main_vehicule + Perso_relation_nature, 
+lm_lc4_q2 <- glm(q2b ~ Gender + Age + factor(Education) + Income + 
+                   factor(class_nat) + job_travel + journey_duration3 +
+                   Perso_relation_nature + Perso_behaviour_nature + Perso_knowledge_biodiversity,
                  family="binomial",data=res_lc4)
 summary(lm_lc4_q2)
 M2.step <- step(lm_lc4_q2)
@@ -2004,8 +2082,9 @@ glm.diag.plots(M2.step,glm.diag(M2.step))
 with(summary(M2.step), 1 - deviance/null.deviance)
 
 
-lm_lc4_q3 <- glm(q3 ~ Gender + Age + factor(Education) + Income + 
-                   CSPgroup + factor(class_nat) + survey_id + journey_duration2 + main_vehicule + Perso_relation_nature, 
+lm_lc4_q3 <- glm(q3b ~ Gender + Age + factor(Education) + Income + 
+                   factor(class_nat) +  job_travel + journey_duration3 +
+                   Perso_relation_nature + Perso_behaviour_nature + Perso_knowledge_biodiversity,
                  family="binomial",data=res_lc4)
 summary(lm_lc4_q3)
 M3.step <- step(lm_lc4_q3)
@@ -2014,7 +2093,7 @@ M3.step <- step(lm_lc4_q3)
 glm.diag.plots(M3.step,glm.diag(M3.step))
 with(summary(M3.step), 1 - deviance/null.deviance)
 
-lm_lc4_q2 <- glm(q2 ~ Gender + Age + factor(Education) + Income + 
+lm_lc4_q2 <- glm(q2b ~ Gender + Age + factor(Education) + Income + 
                    CSPgroup + factor(class_nat) + survey_id + journey_duration2 + main_vehicule + Perso_relation_nature, 
                  family="binomial",data=res_lc4)
 summary(lm_lc4_q2)
@@ -2025,8 +2104,9 @@ glm.diag.plots(M2.step,glm.diag(M2.step))
 with(summary(M2.step), 1 - deviance/null.deviance)
 
 
-lm_lc4_q4 <- glm(q4 ~ Gender + Age + factor(Education) + Income + 
-                   CSPgroup + factor(class_nat) + survey_id + journey_duration2 + main_vehicule + Perso_relation_nature, 
+lm_lc4_q4 <- glm(q4b ~ Gender + Age + factor(Education) + Income + 
+                   factor(class_nat) + job_travel + journey_duration3 +
+                   Perso_relation_nature + Perso_behaviour_nature + Perso_knowledge_biodiversity,
                  family="binomial",data=res_lc4)
 summary(lm_lc4_q4)
 M4.step <- step(lm_lc4_q4)
@@ -2039,23 +2119,24 @@ with(summary(M4.step), 1 - deviance/null.deviance)
 ### plot odds
 
 
-boxLabels = c("Income","Naturalness -","Naturalness +","INS")
+boxLabels <- c("Age","Income","Naturalness -","Naturalness +","Communting",
+              "INS","Env. behaviour")
 df <- data.frame(yAxis = length(boxLabels):1, 
                  boxOdds = exp(coef(M1.step)[-1]), 
-                 boxCILow = exp(coef(M1.step)[-1]-1.96*summary(M1.step)$coefficients[2:5,2]), 
-                 boxCIHigh = exp(coef(M1.step)[-1]+1.96*summary(M1.step)$coefficients[2:5,2])
-)
-
+                 boxCILow = exp(coef(M1.step)[-1]-1.96*summary(M1.step)$coefficients[2:(length(boxLabels)+1),2]), 
+                 boxCIHigh = exp(coef(M1.step)[-1]+1.96*summary(M1.step)$coefficients[2:(length(boxLabels)+1),2]))
+df$boxLabels <- factor(boxLabels, levels = c("Age","Income","Naturalness -","Naturalness +","Communting",
+                                             "INS","Env. behaviour"))
 
 ggplot(df, aes(x = boxOdds, y = boxLabels)) + 
     geom_vline(aes(xintercept = 1), size = .25, linetype = "dashed") + 
     geom_errorbarh(aes(xmax = boxCIHigh, xmin = boxCILow), size = .5, height = 
                      .2, color = "gray50") +
     geom_point(size = 3.5, color = "#00bfc4ff") +
-    theme_modern()+
+    theme_modern() + xlim(c(0,5)) +
     ylab("") +
     xlab("Odds ratio") +
-    annotate(geom = "text", y =1.1, x = 1, 
+    annotate(geom = "text", y =0.5, x = 1, 
              label = paste0("McFadden R² = ", round(with(summary(M1.step), 1 - deviance/null.deviance),2)), size = 3.5, hjust = 0)
 
 ggsave("output/model_odd1.png",
@@ -2064,12 +2145,13 @@ ggsave("output/model_odd1.png",
        dpi = 400)
 
 
-boxLabels = c("Gender","Age","Framing","INS")
+boxLabels <- c("Gender","Age","INS")
 df <- data.frame(yAxis = length(boxLabels):1, 
                  boxOdds = exp(coef(M2.step)[-1]), 
-                 boxCILow = exp(coef(M2.step)[-1]-1.96*summary(M2.step)$coefficients[2:5,2]), 
-                 boxCIHigh = exp(coef(M2.step)[-1]+1.96*summary(M2.step)$coefficients[2:5,2])
+                 boxCILow = exp(coef(M2.step)[-1]-1.96*summary(M2.step)$coefficients[2:(length(boxLabels)+1),2]), 
+                 boxCIHigh = exp(coef(M2.step)[-1]+1.96*summary(M2.step)$coefficients[2:(length(boxLabels)+1),2])
 )
+df$boxLabels <- factor(boxLabels, levels = c("Gender","Age","INS"))
 
 
 ggplot(df, aes(x = boxOdds, y = boxLabels)) + 
@@ -2080,7 +2162,7 @@ ggplot(df, aes(x = boxOdds, y = boxLabels)) +
   theme_modern()+
   ylab("") +
   xlab("Odds ratio") +
-  annotate(geom = "text", y =1.5, x = 1, 
+  annotate(geom = "text", y =0.5, x = 1, 
            label = paste0("McFadden R² = ", round(with(summary(M2.step), 1 - deviance/null.deviance),2)), size = 3.5, hjust = 0)
 
 ggsave("output/model_odd2.png",
@@ -2088,13 +2170,13 @@ ggsave("output/model_odd2.png",
        height = 6,
        dpi = 400)
 
-boxLabels = c("Gender","Age","Naturalness -","Naturalness +","INS")
+boxLabels <- c("Gender","Age","Income","Naturalness -","Naturalness +","INS","Nat. knowledge")
 df <- data.frame(yAxis = length(boxLabels):1, 
                  boxOdds = exp(coef(M3.step)[-1]), 
-                 boxCILow = exp(coef(M3.step)[-1]-1.96*summary(M3.step)$coefficients[2:6,2]), 
-                 boxCIHigh = exp(coef(M3.step)[-1]+1.96*summary(M3.step)$coefficients[2:6,2])
+                 boxCILow = exp(coef(M3.step)[-1]-1.96*summary(M3.step)$coefficients[2:(length(boxLabels)+1),2]), 
+                 boxCIHigh = exp(coef(M3.step)[-1]+1.96*summary(M3.step)$coefficients[2:(length(boxLabels)+1),2])
 )
-
+df$boxLabels <- factor(boxLabels, levels = c("Gender","Age","Income","Naturalness -","Naturalness +","INS","Nat. knowledge"))
 
 ggplot(df, aes(x = boxOdds, y = boxLabels)) + 
   geom_vline(aes(xintercept = 1), size = .25, linetype = "dashed") + 
@@ -2104,7 +2186,7 @@ ggplot(df, aes(x = boxOdds, y = boxLabels)) +
   theme_modern()+
   ylab("") +
   xlab("Odds ratio") +
-  annotate(geom = "text", y =0.6, x = 1, 
+  annotate(geom = "text", y =0.5, x = 1, 
            label = paste0("McFadden R² = ", round(with(summary(M3.step), 1 - deviance/null.deviance),2)), size = 3.5, hjust = 0)
 
 ggsave("output/model_odd3.png",
@@ -2113,13 +2195,13 @@ ggsave("output/model_odd3.png",
        dpi = 400)
 
 
-boxLabels = c("Framing","INS")
+boxLabels <- c("Income","INS","Env. behaviour")
 df <- data.frame(yAxis = length(boxLabels):1, 
                  boxOdds = exp(coef(M4.step)[-1]), 
-                 boxCILow = exp(coef(M4.step)[-1]-1.96*summary(M4.step)$coefficients[2:3,2]), 
-                 boxCIHigh = exp(coef(M4.step)[-1]+1.96*summary(M4.step)$coefficients[2:3,2])
+                 boxCILow = exp(coef(M4.step)[-1]-1.96*summary(M4.step)$coefficients[2:(length(boxLabels)+1),2]), 
+                 boxCIHigh = exp(coef(M4.step)[-1]+1.96*summary(M4.step)$coefficients[2:(length(boxLabels)+1),2])
 )
-
+df$boxLabels <- factor(boxLabels, levels = c("Income","INS","Env. behaviour"))
 
 ggplot(df, aes(x = boxOdds, y = boxLabels)) + 
   geom_vline(aes(xintercept = 1), size = .25, linetype = "dashed") + 
