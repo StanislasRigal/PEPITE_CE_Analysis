@@ -506,24 +506,462 @@ summary(mixl_Temps5t8)
 saveRDS(mixl_Temps5t8,"mixl_Temps5t8.rds")
 
 
-mixl_Temps <- readRDS("output/mixl_Temps5t6.rds") # R 2000, smallest AIC
+# entier
+
+mixl_Temps_ak <- gmnl(choice ~ Temps + Paysage + Acces + Biodiversite + Biome + asc | 0 | 0 | Gender + Age + Income_cap + class_nat + survey_id +
+                        job_travel + Perso_relation_nature + Perso_behaviour_nature + Perso_knowledge_biodiversity,
+                      data = data_DCE_mlogit,
+                      model = "mixl",
+                      panel=TRUE,
+                      ranp = c(Temps = "t",
+                               Paysage = "n",
+                               Acces = "n",
+                               Biodiversite = "n",
+                               Biome1 = "n",
+                               Biome2 = "n",
+                               asc = "n"),
+                      mvar = list(Temps = c("Gender", "Age", "Income_cap","Perso_relation_nature","Perso_behaviour_nature","Perso_knowledge_biodiversity","survey_id","class_nat","job_travel"),
+                                  Paysage = c("Gender", "Age", "Income_cap","Perso_relation_nature","Perso_behaviour_nature","Perso_knowledge_biodiversity","survey_id","class_nat","job_travel"),
+                                  Acces = c("Gender", "Age", "Income_cap","Perso_relation_nature","Perso_behaviour_nature","Perso_knowledge_biodiversity","survey_id","class_nat","job_travel"),
+                                  Biodiversite = c("Gender", "Age", "Income_cap","Perso_relation_nature","Perso_behaviour_nature","Perso_knowledge_biodiversity","survey_id","class_nat","job_travel"),
+                                  asc = c("Gender", "Age", "Income_cap","Perso_relation_nature","Perso_behaviour_nature","Perso_knowledge_biodiversity","survey_id","class_nat","job_travel")),
+                      R = 60)
+
+
+summary(mixl_Temps_ak)
+
+saveRDS(mixl_Temps_ak,"mixl_Temps_ak.rds")
+
+# on retire une interaction par attribut
+
+mixl_Temps_al <- gmnl(choice ~ Temps + Paysage + Acces + Biodiversite + Biome + asc | 0 | 0 | Gender + Age + Income_cap + class_nat + survey_id +
+                        job_travel + Perso_relation_nature + Perso_behaviour_nature + Perso_knowledge_biodiversity,
+                      data = data_DCE_mlogit,
+                      model = "mixl",
+                      panel=TRUE,
+                      ranp = c(Temps = "t",
+                               Paysage = "n",
+                               Acces = "n",
+                               Biodiversite = "n",
+                               Biome1 = "n",
+                               Biome2 = "n",
+                               asc = "n"),
+                      mvar = list(Temps = c("Gender", "Age", "Income_cap","Perso_relation_nature","Perso_behaviour_nature","Perso_knowledge_biodiversity","class_nat","job_travel"),
+                                  Paysage = c("Gender", "Age", "Income_cap","Perso_relation_nature","Perso_behaviour_nature","Perso_knowledge_biodiversity","survey_id","job_travel"),
+                                  Acces = c("Gender", "Age", "Income_cap","Perso_behaviour_nature","Perso_knowledge_biodiversity","survey_id","class_nat","job_travel"),
+                                  Biodiversite = c("Gender", "Age","Perso_relation_nature","Perso_behaviour_nature","Perso_knowledge_biodiversity","survey_id","class_nat","job_travel"),
+                                  asc = c("Age", "Income_cap","Perso_relation_nature","Perso_behaviour_nature","Perso_knowledge_biodiversity","survey_id","class_nat","job_travel")),
+                      R = 60)
+
+
+summary(mixl_Temps_al)
+
+saveRDS(mixl_Temps_al,"mixl_Temps_al.rds")
+
+
+
+mixl_Temps_am <- gmnl(choice ~ Temps + Paysage + Acces + Biodiversite + Biome + asc | 0 | 0 | Gender + Age + Income_cap + class_nat + survey_id +
+                        job_travel + Perso_relation_nature + Perso_behaviour_nature + Perso_knowledge_biodiversity,
+                      data = data_DCE_mlogit,
+                      model = "mixl",
+                      panel=TRUE,
+                      ranp = c(Temps = "t",
+                               Paysage = "n",
+                               Acces = "n",
+                               Biodiversite = "n",
+                               Biome1 = "n",
+                               Biome2 = "n",
+                               asc = "n"),
+                      mvar = list(Temps = c("Gender", "Age", "Income_cap","Perso_relation_nature","Perso_behaviour_nature","class_nat","job_travel"),
+                                  Paysage = c("Gender", "Age", "Income_cap","Perso_relation_nature","Perso_behaviour_nature","Perso_knowledge_biodiversity","job_travel"),
+                                  Acces = c("Gender", "Age", "Income_cap","Perso_knowledge_biodiversity","survey_id","class_nat","job_travel"),
+                                  Biodiversite = c("Gender", "Age","Perso_behaviour_nature","Perso_knowledge_biodiversity","survey_id","class_nat","job_travel"),
+                                  asc = c("Income_cap","Perso_relation_nature","Perso_behaviour_nature","Perso_knowledge_biodiversity","survey_id","class_nat","job_travel")),
+                      R = 60)
+
+
+summary(mixl_Temps_am)
+
+saveRDS(mixl_Temps_am,"mixl_Temps_am.rds")
+
+
+mixl_Temps_an <- gmnl(choice ~ Temps + Paysage + Acces + Biodiversite + Biome + asc | 0 | 0 | Gender + Age + Income_cap + class_nat + survey_id +
+                        job_travel + Perso_relation_nature + Perso_behaviour_nature + Perso_knowledge_biodiversity,
+                      data = data_DCE_mlogit,
+                      model = "mixl",
+                      panel=TRUE,
+                      ranp = c(Temps = "t",
+                               Paysage = "n",
+                               Acces = "n",
+                               Biodiversite = "n",
+                               Biome1 = "n",
+                               Biome2 = "n",
+                               asc = "n"),
+                      mvar = list(Temps = c("Gender", "Age", "Income_cap","Perso_relation_nature","Perso_behaviour_nature","class_nat"),
+                                  Paysage = c("Gender", "Age", "Income_cap","Perso_relation_nature","Perso_behaviour_nature","job_travel"),
+                                  Acces = c("Gender", "Age", "Income_cap","survey_id","class_nat","job_travel"),
+                                  Biodiversite = c("Gender", "Age","Perso_knowledge_biodiversity","survey_id","class_nat","job_travel"),
+                                  asc = c("Income_cap","Perso_relation_nature","Perso_knowledge_biodiversity","survey_id","class_nat","job_travel")),
+                      R = 60)
+
+
+summary(mixl_Temps_an)
+
+saveRDS(mixl_Temps_an,"mixl_Temps_an.rds")
+
+mixl_Temps_ao <- gmnl(choice ~ Temps + Paysage + Acces + Biodiversite + Biome + asc | 0 | 0 | Gender + Age + Income_cap + class_nat + survey_id +
+                        job_travel + Perso_relation_nature + Perso_behaviour_nature + Perso_knowledge_biodiversity,
+                      data = data_DCE_mlogit,
+                      model = "mixl",
+                      panel=TRUE,
+                      ranp = c(Temps = "t",
+                               Paysage = "n",
+                               Acces = "n",
+                               Biodiversite = "n",
+                               Biome1 = "n",
+                               Biome2 = "n",
+                               asc = "n"),
+                      mvar = list(Temps = c("Gender", "Age", "Income_cap","Perso_relation_nature","class_nat"),
+                                  Paysage = c("Gender", "Age", "Income_cap","Perso_relation_nature","job_travel"),
+                                  Acces = c("Gender", "Age","survey_id","class_nat","job_travel"),
+                                  Biodiversite = c("Gender", "Age","survey_id","class_nat","job_travel"),
+                                  asc = c("Income_cap","Perso_relation_nature","survey_id","class_nat","job_travel")),
+                      R = 60)
+
+
+summary(mixl_Temps_ao)
+
+saveRDS(mixl_Temps_ao,"mixl_Temps_ao.rds")
+
+mixl_Temps_ap <- gmnl(choice ~ Temps + Paysage + Acces + Biodiversite + Biome + asc | 0 | 0 | Gender + Age + Income_cap + class_nat + survey_id +
+                        job_travel + Perso_relation_nature + Perso_behaviour_nature + Perso_knowledge_biodiversity,
+                      data = data_DCE_mlogit,
+                      model = "mixl",
+                      panel=TRUE,
+                      ranp = c(Temps = "t",
+                               Paysage = "n",
+                               Acces = "n",
+                               Biodiversite = "n",
+                               Biome1 = "n",
+                               Biome2 = "n",
+                               asc = "n"),
+                      mvar = list(Temps = c("Gender", "Age", "Income_cap","Perso_relation_nature"),
+                                  Paysage = c("Gender", "Age", "Income_cap","Perso_relation_nature"),
+                                  Acces = c("Gender", "Age","class_nat","job_travel"),
+                                  Biodiversite = c("Gender", "Age","class_nat","job_travel"),
+                                  asc = c("Income_cap","Perso_relation_nature","survey_id","job_travel")),
+                      R = 60)
+
+
+summary(mixl_Temps_ap)
+
+saveRDS(mixl_Temps_ap,"mixl_Temps_ap.rds")
+
+
+
+mixl_Temps_aq <- gmnl(choice ~ Temps + Paysage + Acces + Biodiversite + Biome + asc | 0 | 0 | Gender + Age + Income_cap + class_nat + survey_id +
+                        job_travel + Perso_relation_nature + Perso_behaviour_nature + Perso_knowledge_biodiversity,
+                      data = data_DCE_mlogit,
+                      model = "mixl",
+                      panel=TRUE,
+                      ranp = c(Temps = "t",
+                               Paysage = "n",
+                               Acces = "n",
+                               Biodiversite = "n",
+                               Biome1 = "n",
+                               Biome2 = "n",
+                               asc = "n"),
+                      mvar = list(Temps = c("Gender", "Age", "Income_cap"),
+                                  Paysage = c("Gender", "Age", "Income_cap"),
+                                  Acces = c("Gender", "Age","job_travel"),
+                                  Biodiversite = c("Gender", "Age","job_travel"),
+                                  asc = c("Income_cap","Perso_relation_nature","job_travel")),
+                      R = 60)
+
+
+summary(mixl_Temps_aq)
+
+saveRDS(mixl_Temps_aq,"mixl_Temps_aq.rds")
+
+
+mixl_Temps_ar <- gmnl(choice ~ Temps + Paysage + Acces + Biodiversite + Biome + asc | 0 | 0 | Gender + Age + Income_cap + class_nat + survey_id +
+                        job_travel + Perso_relation_nature + Perso_behaviour_nature + Perso_knowledge_biodiversity,
+                      data = data_DCE_mlogit,
+                      model = "mixl",
+                      panel=TRUE,
+                      ranp = c(Temps = "t",
+                               Paysage = "n",
+                               Acces = "n",
+                               Biodiversite = "n",
+                               Biome1 = "n",
+                               Biome2 = "n",
+                               asc = "n"),
+                      mvar = list(Temps = c("Gender", "Age"),
+                                  Paysage = c("Gender", "Age"),
+                                  Acces = c("Gender", "Age","job_travel"),
+                                  Biodiversite = c("Gender", "Age"),
+                                  asc = c("Perso_relation_nature","job_travel")),
+                      R = 60)
+
+
+summary(mixl_Temps_ar)
+
+saveRDS(mixl_Temps_ar,"mixl_Temps_ar.rds")
+
+
+mixl_Temps_as <- gmnl(choice ~ Temps + Paysage + Acces + Biodiversite + Biome + asc | 0 | 0 | Gender + Age + Income_cap + class_nat + survey_id +
+                        job_travel + Perso_relation_nature + Perso_behaviour_nature + Perso_knowledge_biodiversity,
+                      data = data_DCE_mlogit,
+                      model = "mixl",
+                      panel=TRUE,
+                      ranp = c(Temps = "t",
+                               Paysage = "n",
+                               Acces = "n",
+                               Biodiversite = "n",
+                               Biome1 = "n",
+                               Biome2 = "n",
+                               asc = "n"),
+                      mvar = list(Temps = c("Gender", "Age"),
+                                  Paysage = c("Gender", "Age"),
+                                  Acces = c("Gender", "Age","job_travel"),
+                                  Biodiversite = c("Age"),
+                                  asc = c("Perso_relation_nature","job_travel")),
+                      R = 60)
+
+
+summary(mixl_Temps_as)
+
+saveRDS(mixl_Temps_as,"mixl_Temps_as.rds")
+
+# mixl_Temps_ar le meilleur AIC BIC
+
+AIC_BIC_mixl <- data.frame(model = paste0("M",1:9),
+                           AIC = c(AIC(mixl_Temps_ak),AIC(mixl_Temps_al),AIC(mixl_Temps_am),
+                                   AIC(mixl_Temps_an),AIC(mixl_Temps_ao),AIC(mixl_Temps_ap),
+                                   AIC(mixl_Temps_aq),AIC(mixl_Temps_ar),AIC(mixl_Temps_as)),
+                           BIC = c(BIC(mixl_Temps_ak),BIC(mixl_Temps_al),BIC(mixl_Temps_am),
+                                   BIC(mixl_Temps_an),BIC(mixl_Temps_ao),BIC(mixl_Temps_ap),
+                                   BIC(mixl_Temps_aq),BIC(mixl_Temps_ar),BIC(mixl_Temps_as)))
+
+ggplot(AIC_BIC_mixl, aes(x=model)) +
+  geom_point(aes(y=AIC), col="grey") +
+  geom_point(aes(y=BIC-200)) + 
+  scale_y_continuous(
+    name = "AIC",
+    sec.axis = sec_axis( trans=~.-200, name="BIC")
+  ) +
+  theme_modern()
+
+
+
+
+mixl_Temps_at <- gmnl(choice ~ Temps + Paysage + Acces + Biodiversite + Biome + asc | 0 | 0 | Gender + Age + Income_cap + class_nat + survey_id +
+                        job_travel + Perso_relation_nature + Perso_behaviour_nature + Perso_knowledge_biodiversity,
+                      data = data_DCE_mlogit,
+                      model = "mixl",
+                      panel=TRUE,
+                      ranp = c(Temps = "t",
+                               Paysage = "n",
+                               Acces = "n",
+                               Biodiversite = "n",
+                               Biome1 = "n",
+                               Biome2 = "n",
+                               asc = "n"),
+                      mvar = list(Temps = c("Gender", "Age"),
+                                  Paysage = c("Gender", "Age"),
+                                  Acces = c("Gender", "Age","job_travel"),
+                                  Biodiversite = c("Gender", "Age"),
+                                  asc = c("Perso_relation_nature","job_travel","survey_id")),
+                      R = 60)
+
+
+summary(mixl_Temps_at)
+
+saveRDS(mixl_Temps_at,"mixl_Temps_at.rds")
+
+
+
+
+mixl_Temps_at2000 <- gmnl(choice ~ Temps + Paysage + Acces + Biodiversite + Biome + asc | 0 | 0 | Gender + Age + Income_cap + class_nat + survey_id +
+                            job_travel + Perso_relation_nature + Perso_behaviour_nature + Perso_knowledge_biodiversity,
+                          data = data_DCE_mlogit,
+                          model = "mixl",
+                          panel=TRUE,
+                          ranp = c(Temps = "t",
+                                   Paysage = "n",
+                                   Acces = "n",
+                                   Biodiversite = "n",
+                                   Biome1 = "n",
+                                   Biome2 = "n",
+                                   asc = "n"),
+                          mvar = list(Temps = c("Gender", "Age"),
+                                      Paysage = c("Gender", "Age"),
+                                      Acces = c("Gender", "Age","job_travel"),
+                                      Biodiversite = c("Gender", "Age"),
+                                      asc = c("Perso_relation_nature","job_travel","survey_id")),
+                          R = 2000)
+
+
+summary(mixl_Temps_at2000)
+
+saveRDS(mixl_Temps_at2000,"mixl_Temps_at2000.rds")
+
+
+mixl_Temps_au <- gmnl(choice ~ Temps + Paysage + Acces + Biodiversite + Biome + asc | 0 | 0 | Gender + Age + Income_cap + class_nat + survey_id +
+                        job_travel + Perso_relation_nature + Perso_behaviour_nature + Perso_knowledge_biodiversity,
+                      data = data_DCE_mlogit,
+                      model = "mixl",
+                      panel=TRUE,
+                      ranp = c(Temps = "t",
+                               Paysage = "n",
+                               Acces = "n",
+                               Biodiversite = "n",
+                               Biome1 = "n",
+                               Biome2 = "n",
+                               asc = "n"),
+                      mvar = list(Temps = c("Gender", "Age"),
+                                  Paysage = c("Gender", "Age"),
+                                  Acces = c("Gender", "Age","job_travel"),
+                                  Biodiversite = c("Gender", "Age"),
+                                  asc = c("Perso_relation_nature","survey_id")),
+                      R = 60)
+
+
+summary(mixl_Temps_au)
+
+saveRDS(mixl_Temps_au,"mixl_Temps_au.rds")
+
+mixl_Temps_au2000 <- gmnl(choice ~ Temps + Paysage + Acces + Biodiversite + Biome + asc | 0 | 0 | Gender + Age + Income_cap + class_nat + survey_id +
+                            job_travel + Perso_relation_nature + Perso_behaviour_nature + Perso_knowledge_biodiversity,
+                          data = data_DCE_mlogit,
+                          model = "mixl",
+                          panel=TRUE,
+                          ranp = c(Temps = "t",
+                                   Paysage = "n",
+                                   Acces = "n",
+                                   Biodiversite = "n",
+                                   Biome1 = "n",
+                                   Biome2 = "n",
+                                   asc = "n"),
+                          mvar = list(Temps = c("Gender", "Age"),
+                                      Paysage = c("Gender", "Age"),
+                                      Acces = c("Gender", "Age","job_travel"),
+                                      Biodiversite = c("Gender", "Age"),
+                                      asc = c("Perso_relation_nature","survey_id")),
+                          R = 2000)
+
+
+summary(mixl_Temps_au2000)
+
+saveRDS(mixl_Temps_au2000,"mixl_Temps_au2000.rds")
+
+
+mixl_Temps_av <- gmnl(choice ~ Temps + Paysage + Acces + Biodiversite + Biome + asc | 0 | 0 | Gender + Age + Income_cap + class_nat + survey_id +
+                        job_travel + Perso_relation_nature + Perso_behaviour_nature + Perso_knowledge_biodiversity,
+                      data = data_DCE_mlogit,
+                      model = "mixl",
+                      panel=TRUE,
+                      ranp = c(Temps = "t",
+                               Paysage = "n",
+                               Acces = "n",
+                               Biodiversite = "n",
+                               Biome1 = "n",
+                               Biome2 = "n",
+                               asc = "n"),
+                      mvar = list(Temps = c("Gender", "Age"),
+                                  Paysage = c("Gender", "Age"),
+                                  Acces = c("Gender", "Age"),
+                                  Biodiversite = c("Gender", "Age","Perso_relation_nature"),
+                                  asc = c("Perso_relation_nature","job_travel","survey_id")),
+                      R = 60)
+
+
+summary(mixl_Temps_av)
+
+saveRDS(mixl_Temps_av,"mixl_Temps_av.rds")
+
+
+mixl_Temps_av2000 <- gmnl(choice ~ Temps + Paysage + Acces + Biodiversite + Biome + asc | 0 | 0 | Gender + Age + Income_cap + class_nat + survey_id +
+                            job_travel + Perso_relation_nature + Perso_behaviour_nature + Perso_knowledge_biodiversity,
+                          data = data_DCE_mlogit,
+                          model = "mixl",
+                          panel=TRUE,
+                          ranp = c(Temps = "t",
+                                   Paysage = "n",
+                                   Acces = "n",
+                                   Biodiversite = "n",
+                                   Biome1 = "n",
+                                   Biome2 = "n",
+                                   asc = "n"),
+                          mvar = list(Temps = c("Gender", "Age"),
+                                      Paysage = c("Gender", "Age"),
+                                      Acces = c("Gender", "Age"),
+                                      Biodiversite = c("Gender", "Age","Perso_relation_nature"),
+                                      asc = c("Perso_relation_nature","job_travel","survey_id")),
+                          R = 2000)
+
+
+summary(mixl_Temps_av2000)
+
+saveRDS(mixl_Temps_av2000,"mixl_Temps_av2000.rds")
+
+
+AIC_BIC_mixl2 <- data.frame(model = factor(paste0("M",1:12), levels=paste0("M",1:12)),
+                           AIC = c(AIC(mixl_Temps_ak),AIC(mixl_Temps_al),AIC(mixl_Temps_am),
+                                   AIC(mixl_Temps_an),AIC(mixl_Temps_ao),AIC(mixl_Temps_ap),
+                                   AIC(mixl_Temps_aq),AIC(mixl_Temps_ar),AIC(mixl_Temps_as),
+                                   AIC(mixl_Temps_at),AIC(mixl_Temps_au),AIC(mixl_Temps_av)),
+                           BIC = c(BIC(mixl_Temps_ak),BIC(mixl_Temps_al),BIC(mixl_Temps_am),
+                                   BIC(mixl_Temps_an),BIC(mixl_Temps_ao),BIC(mixl_Temps_ap),
+                                   BIC(mixl_Temps_aq),BIC(mixl_Temps_ar),BIC(mixl_Temps_as),
+                                   BIC(mixl_Temps_at),BIC(mixl_Temps_au),BIC(mixl_Temps_av)))
+
+ggplot(AIC_BIC_mixl2, aes(x=model)) +
+  geom_point(aes(y=AIC), col="grey") +
+  geom_point(aes(y=BIC-200)) + 
+  scale_y_continuous(
+    name = "AIC",
+    sec.axis = sec_axis( trans=~.-200, name="BIC")
+  ) +
+  theme_modern()
+
+ggsave("output/model_selection.png",
+       width = 7,
+       height = 7,
+       dpi = 400)
+
+
+
+mixl_Temps <- readRDS("output/mixl_Temps_av2000.rds") # R 2000, smallest AIC
 summary(mixl_Temps)
 
 
 
 
 boxLabels <- names(coef(mixl_Temps))[1:(length(coef(mixl_Temps))-7)]
+#df <- data.frame(yAxis = length(boxLabels):1,
+#                 Attribute = c("Time", "Landscape","Nature use","Biodiversity","Biome peri-urban","Biome rural","ASC",
+#                               rep("Time",11),rep("Landscape",11),rep("Nature use",11),rep("Biodiversity",11),rep("ASC",11)),
+#                 Variable = c(rep("Main estimate",7),rep(c("Gender","Age","Income","INS","Environmental behaviour","Informative framing","Habitat naturalness",
+#                                "Inactive","Lower SPC","Motorised personnal transport","Travel time"),5)),
+#                 box_estimate_main = coef(mixl_Temps)[1:length(boxLabels)], 
+#                 boxCILow = coef(mixl_Temps)[1:length(boxLabels)]-1.96*summary(mixl_Temps)$CoefTable[1:length(boxLabels),2], 
+#                 boxCIHigh = coef(mixl_Temps)[1:length(boxLabels)]+1.96*summary(mixl_Temps)$CoefTable[1:length(boxLabels),2],
+#                 var = (summary(mixl_Temps)$CoefTable[1:length(boxLabels),2])^2,
+#                 signif = ifelse(summary(mixl_Temps)$CoefTable[1:length(boxLabels),4] < 0.05,"yes","no")
+#)
+
 df <- data.frame(yAxis = length(boxLabels):1,
                  Attribute = c("Time", "Landscape","Nature use","Biodiversity","Biome peri-urban","Biome rural","ASC",
-                               rep("Time",11),rep("Landscape",11),rep("Nature use",11),rep("Biodiversity",11),rep("ASC",11)),
-                 Variable = c(rep("Main estimate",7),rep(c("Gender","Age","Income","INS","Environmental behaviour","Informative framing","Habitat naturalness",
-                                  "Inactive","Lower SPC","Motorised personnal transport","Travel time"),5)),
+                               rep("Time",2),rep("Landscape",2),rep("Nature use",2),rep("Biodiversity",3),rep("ASC",3)),
+                 Variable = c(rep("Main estimate",7),rep(c("Gender","Age"),4),"INS",
+                              "INS","Commuting","Informative framing"),
                  box_estimate_main = coef(mixl_Temps)[1:length(boxLabels)], 
                  boxCILow = coef(mixl_Temps)[1:length(boxLabels)]-1.96*summary(mixl_Temps)$CoefTable[1:length(boxLabels),2], 
                  boxCIHigh = coef(mixl_Temps)[1:length(boxLabels)]+1.96*summary(mixl_Temps)$CoefTable[1:length(boxLabels),2],
                  var = (summary(mixl_Temps)$CoefTable[1:length(boxLabels),2])^2,
                  signif = ifelse(summary(mixl_Temps)$CoefTable[1:length(boxLabels),4] < 0.05,"yes","no")
-)
+                 )
 
 df <- df %>% group_by(Attribute) %>% mutate(box_estimate_interaction = box_estimate_main[which(Variable=="Main estimate")]+box_estimate_main,
                                             sd_interaction = sqrt(var[which(Variable=="Main estimate")]+var))
@@ -537,8 +975,7 @@ df$CIinteractionLow <- df$box_estimate_interaction - 1.96*sqrt(df$var)
 
 df <- as.data.frame(df)
 df$Attribute <- factor(df$Attribute, levels = c("Time", "Landscape","Nature use","Biodiversity","Biome peri-urban","Biome rural","ASC"))
-df$Variable <- factor(df$Variable, levels = c("Main estimate","Gender","Age","Income","INS","Environmental behaviour",
-                                                "Inactive","Lower SPC","Motorised personnal transport","Travel time","Habitat naturalness","Informative framing"))
+df$Variable <- factor(df$Variable, levels = c("Main estimate","Gender","Age","INS","Commuting","Informative framing"))
 
 ggplot(df[which(!(df$Attribute %in% c("Biome peri-urban","Biome rural"))),], aes(x=box_estimate_interaction,y = Variable, group=Attribute)) + 
   geom_vline(data=df[which(!(df$Attribute %in% c("Biome peri-urban","Biome rural")) & df$Variable=="Main estimate"),], aes(xintercept = box_estimate_main), linewidth = .25, linetype = "dotted") + 
@@ -692,9 +1129,18 @@ ggsave("output/distrib_asc.png",
 
 
 # willingness to accept time
-wtp.gmnl(mixl_Temps, wrt = "Temps")
+wtp_model <- wtp.gmnl(mixl_Temps, wrt = "Temps")
 
-
+wtp_landscape <- wtp_model[1,1]+wtp_model[9,1]+wtp_model[10,1]
+sd_wtp_landscape <- sqrt(wtp_model[1,2]^2+wtp_model[9,2]^2+wtp_model[10,2]^2)
+wtp_natureuse <- wtp_model[2,1]+wtp_model[11,1]+wtp_model[12,1]
+sd_wtp_natureuse <- sqrt(wtp_model[2,2]^2+wtp_model[11,2]^2+wtp_model[12,2]^2)
+wtp_biodiversity <- wtp_model[3,1]+wtp_model[13,1]+wtp_model[14,1]+wtp_model[15,1]
+sd_wtp_biodiversity <- sqrt(wtp_model[3,2]^2+wtp_model[13,2]^2+wtp_model[14,2]^2+wtp_model[15,2]^2)
+wtp_biome1 <- wtp_model[4,1]
+sd_wtp_biome1 <- wtp_model[4,2]
+wtp_biome2 <- wtp_model[5,1]
+sd_wtp_biome2 <- wtp_model[5,2]
 
 
 
