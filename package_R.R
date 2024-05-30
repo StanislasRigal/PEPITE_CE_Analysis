@@ -1,6 +1,6 @@
 # packages
 
-library(apollo)
+#library(apollo)
 library(reshape2)
 library(osrm)
 library(leaflet)
@@ -37,4 +37,10 @@ source('lc_helpers.r')
 
 library(DescTools)
 library(EnvStats)
+
+library(foreign) 
+library(lavaan)
+library(ordinal)
+library(mvord)
+
 
