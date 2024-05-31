@@ -41,6 +41,17 @@ NEP_result_ind$NEP_scale2 <- apply(NEP_result[,c(2,4,5,11,14,15)], 1, sum)/6 # w
 
 NEP_result_ind$id <- 1:nrow(NEP_result_ind)
 
+ggplot(NEP_result_ind, aes(x=NEP_scale2)) + 
+  geom_histogram(binwidth=0.2, fill="#69b3a2", color="#e9ecef", alpha=0.9) +
+  xlab("Participant's NEP") + ylab("Number") +
+  theme_modern()
+
+
+ggsave("output/NEPS.png",
+       width = 8,
+       height = 6,
+       dpi = 400)
+
 # NEP aggregated
 
 NEP_aggregated <- as.matrix(round(table(NEP_result_long[,c("NEP","value")])/26, 2))
@@ -91,7 +102,7 @@ personal_pref_long <- merge(personal_pref_long,NEP_result_ind[,c("NEP_scale","NE
 
 # cumulative link model
 
-personal_pref_clm <- ordinal::clm(value ~ before_after,
+personal_pref_clm <- ordinal::clm(value ~ before_after + NEP_scale2,
                                   data = personal_pref_long[which(personal_pref_long$id %in% c(1:18)),])  
 summary(personal_pref_clm)
 
@@ -101,32 +112,32 @@ summary(personal_pref_clm2)
 
 
 
-personal_pref_walk_clm <- ordinal::clm(value ~ before_after,
+personal_pref_walk_clm <- ordinal::clm(value ~ before_after + NEP_scale2,
                                   data = personal_pref_long[which(personal_pref_long$usage=="Walk" &
                                                                     personal_pref_long$id %in% c(1:18)),])  
 summary(personal_pref_walk_clm)  
 
-personal_pref_nautical_activity_clm <- ordinal::clm(value ~ before_after,
+personal_pref_nautical_activity_clm <- ordinal::clm(value ~ before_after + NEP_scale2,
                                        data = personal_pref_long[which(personal_pref_long$usage=="Nautical_activity" &
                                                                          personal_pref_long$id %in% c(1:18)),])  
 summary(personal_pref_nautical_activity_clm)  
 
-personal_pref_tourism_clm <- ordinal::clm(value ~ before_after,
+personal_pref_tourism_clm <- ordinal::clm(value ~ before_after + NEP_scale2,
                                        data = personal_pref_long[which(personal_pref_long$usage=="Tourism" &
                                                                          personal_pref_long$id %in% c(1:18)),])  
 summary(personal_pref_tourism_clm)
 
-personal_pref_freight_clm <- ordinal::clm(value ~ before_after,
+personal_pref_freight_clm <- ordinal::clm(value ~ before_after + NEP_scale2,
                                           data = personal_pref_long[which(personal_pref_long$usage=="Freight" &
                                                                             personal_pref_long$id %in% c(1:18)),])  
 summary(personal_pref_freight_clm)
 
-personal_pref_hydraulic_dynamic_clm <- ordinal::clm(value ~ before_after,
+personal_pref_hydraulic_dynamic_clm <- ordinal::clm(value ~ before_after + NEP_scale2,
                                           data = personal_pref_long[which(personal_pref_long$usage=="Hydraulic_dynamic" &
                                                                             personal_pref_long$id %in% c(1:18)),])  
 summary(personal_pref_hydraulic_dynamic_clm)
 
-personal_pref_biodiversity_clm <- ordinal::clm(value ~ before_after,
+personal_pref_biodiversity_clm <- ordinal::clm(value ~ before_after + NEP_scale2,
                                           data = personal_pref_long[which(personal_pref_long$usage=="Biodiversity" &
                                                                             personal_pref_long$id %in% c(1:18)),])  
 summary(personal_pref_biodiversity_clm)
@@ -231,14 +242,9 @@ personal_pref_short$Nautical_activity <- factor(personal_pref_short$Nautical_act
 personal_pref_short$Tourism <- factor(personal_pref_short$Tourism, levels = c("Not important at all","Not important","Neutral","Important","Very important"))
 personal_pref_short$Walk <- factor(personal_pref_short$Walk, levels = c("Not important at all","Not important","Neutral","Important","Very important"))
 
-mod_bivariate <- mvord(formula = MMO2(Biodiversity,Freight,Hydraulic_dynamic, Nautical_activity, Tourism,Walk) ~ 0 + before_after + NEP_scale2,
+mod_bivariate <- mvord(formula = MMO2(Biodiversity, Nautical_activity, Tourism, Freight, Walk) ~ 0 + before_after + NEP_scale2,
                        link = mvlogit(df = 8L),
                        data = personal_pref_short[which(personal_pref_short$id %in% c(1:18)),])
-summary(mod_bivariate)
-
-mod_bivariate <- mvord(formula = MMO(usage) ~ 0 + before_after + NEP_scale2,
-                       link = mvlogit(df = 8L),
-                       data = personal_pref_long[which(personal_pref_long$id %in% c(1:18)),])
 summary(mod_bivariate)
 
 
@@ -252,10 +258,277 @@ pref_usage$convergence
 pref_usage_pr_walk <- clm(value ~ usage_fac,
                   data = personal_pref_long[which(personal_pref_long$id %in% c(1:18)),])
 summary(pref_usage_pr_walk)
+pref_plot <- as.data.frame(summary(pref_usage_pr_walk)$coefficients[5:9,])
+pref_plot$Usage <- gsub("usage_fac","",row.names(pref_plot))
+pref_plot$Usage <- gsub("_"," ",pref_plot$Usage)
+pref_plot$Usage <- factor(pref_plot$Usage, levels=c("Biodiversity","Hydraulic dynamic","Nautical activity","Tourism","Freight"))
 
 pref_usage2 <- clm(value ~ usage + before_after + NEP_scale2,
                   data = personal_pref_long[which(personal_pref_long$id %in% c(1:18)),])
 summary(pref_usage2)
 
-ggplot()
+ggplot(pref_plot, aes(color=Usage, x=Usage)) +
+  geom_point(aes(y=Estimate), size=4) +
+  geom_errorbar(aes(ymin=Estimate - 1.96*`Std. Error`, ymax=Estimate + 1.96*`Std. Error`),width = 0.2) +
+  theme_modern() + scale_color_viridis_d()+
+  geom_hline(yintercept = 0, linetype="dashed") +
+  theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1),
+        legend.position = "none")
+
+
+# preference territory now
+
+territory_pref <- survey_result[,c("Walk_now_amont","Nautical_activity_now_amont","Tourism_now_amont",
+                                  "Freight_now_amont","Hydraulic_dynamic_now_amont","Biodiversity_now_amont",
+                                  "Walk_now_aval","Nautical_activity_now_aval","Tourism_now_aval",
+                                  "Freight_now_aval","Hydraulic_dynamic_now_aval","Biodiversity_now_aval")]
+
+territory_pref[is.na(territory_pref)] <- 0
+territory_pref[territory_pref==-2] <- "Not important at all"
+territory_pref[territory_pref==-1] <- "Not important"
+territory_pref[territory_pref==0] <- "Neutral"
+territory_pref[territory_pref==1] <- "Important"
+territory_pref[territory_pref==2] <- "Very important"
+territory_pref$id <- 1:nrow(territory_pref)
+
+territory_pref_long <- melt(territory_pref, id.vars = "id")
+territory_pref_long$before_after <- ifelse(grepl('aval', territory_pref_long$variable, fixed=TRUE),1,0)
+territory_pref_long$usage <- stringr::str_remove(territory_pref_long$variable,"_now_aval")
+territory_pref_long$usage <- stringr::str_remove(territory_pref_long$usage,"_now_amont")
+territory_pref_long$value2 <- territory_pref_long$value
+territory_pref_long$value_binary <- ifelse(territory_pref_long$value=="Very important",1,0)
+territory_pref_long$value <- factor(territory_pref_long$value, levels = c("Not important at all","Not important","Neutral",
+                                                                        "Important","Very important"))
+territory_pref_long$value2[which(territory_pref_long$value2=="Not important at all")] <- "Not important"
+territory_pref_long$value2[which(territory_pref_long$value2=="Neutral")] <- "Not important"
+territory_pref_long$value2 <- factor(territory_pref_long$value2, levels = c("Not important","Important","Very important"))
+territory_pref_long$usage_fac <- factor(territory_pref_long$usage, levels = c("Walk","Nautical_activity","Biodiversity","Hydraulic_dynamic","Tourism","Freight"))
+
+territory_pref_long <- merge(territory_pref_long,NEP_result_ind[,c("NEP_scale","NEP_scale2","id")], by="id", all.x=T)
+
+
+territory_pref_usage_pr_walk <- clm(value ~ usage_fac,
+                          data = territory_pref_long[which(territory_pref_long$id %in% c(1:18)),])
+summary(territory_pref_usage_pr_walk)
+territory_pref_plot <- as.data.frame(summary(territory_pref_usage_pr_walk)$coefficients[5:9,])
+territory_pref_plot$Usage <- gsub("usage_fac","",row.names(territory_pref_plot))
+territory_pref_plot$Usage <- gsub("_"," ",territory_pref_plot$Usage)
+territory_pref_plot$Usage <- factor(territory_pref_plot$Usage, levels=c("Biodiversity","Hydraulic dynamic","Nautical activity","Tourism","Freight"))
+
+pref_plot2 <- rbind(pref_plot,territory_pref_plot)
+pref_plot2$Scale <- c(rep("Personal",5),rep("Territory",5))
+
+ggplot(pref_plot2, aes(color=Scale, x=Usage)) +
+  geom_point(aes(y=Estimate, group=Scale), size=4) +
+  geom_errorbar(aes(ymin=Estimate - 1.96*`Std. Error`, ymax=Estimate + 1.96*`Std. Error`),width = 0.2) +
+  theme_modern() + scale_color_viridis_d()+
+  geom_hline(yintercept = 0, linetype="dashed") +
+  theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1),
+        legend.position = "none")
+
+territory_pref_walk_clm <- ordinal::clm(value ~ before_after + NEP_scale2,
+                                       data = territory_pref_long[which(territory_pref_long$usage=="Walk" &
+                                                                         territory_pref_long$id %in% c(1:18)),])  
+summary(territory_pref_walk_clm)  
+
+territory_pref_nautical_activity_clm <- ordinal::clm(value ~ before_after + NEP_scale2,
+                                                    data = territory_pref_long[which(territory_pref_long$usage=="Nautical_activity" &
+                                                                                      territory_pref_long$id %in% c(1:18)),])  
+summary(territory_pref_nautical_activity_clm)  
+
+territory_pref_tourism_clm <- ordinal::clm(value ~ before_after + NEP_scale2,
+                                          data = territory_pref_long[which(territory_pref_long$usage=="Tourism" &
+                                                                            territory_pref_long$id %in% c(1:18)),])  
+summary(territory_pref_tourism_clm)
+
+territory_pref_freight_clm <- ordinal::clm(value ~ before_after + NEP_scale2,
+                                          data = territory_pref_long[which(territory_pref_long$usage=="Freight" &
+                                                                            territory_pref_long$id %in% c(1:18)),])  
+summary(territory_pref_freight_clm)
+
+territory_pref_hydraulic_dynamic_clm <- ordinal::clm(value ~ before_after + NEP_scale2,
+                                                    data = territory_pref_long[which(territory_pref_long$usage=="Hydraulic_dynamic" &
+                                                                                      territory_pref_long$id %in% c(1:18)),])  
+summary(territory_pref_hydraulic_dynamic_clm)
+
+territory_pref_biodiversity_clm <- ordinal::clm(value ~ before_after + NEP_scale2,
+                                               data = territory_pref_long[which(territory_pref_long$usage=="Biodiversity" &
+                                                                                 territory_pref_long$id %in% c(1:18)),])  
+summary(territory_pref_biodiversity_clm)
+
+
+fisher.test(table(territory_pref_long$value[which(territory_pref_long$usage=="Biodiversity" & territory_pref_long$id %in% c(1:18))],
+                  territory_pref_long$before_after[which(territory_pref_long$usage=="Biodiversity" & territory_pref_long$id %in% c(1:18))]))
+
+
+
+# preference territory future
+
+territory_future_pref <- survey_result[,c("Walk_future_amont","Nautical_activity_future_amont","Tourism_future_amont",
+                                   "Freight_future_amont","Hydraulic_dynamic_future_amont","Biodiversity_future_amont",
+                                   "Walk_future_aval","Nautical_activity_future_aval","Tourism_future_aval",
+                                   "Freight_future_aval","Hydraulic_dynamic_future_aval","Biodiversity_future_aval")]
+
+territory_future_pref[is.na(territory_future_pref)] <- 0
+territory_future_pref[territory_future_pref==-2] <- "Not important at all"
+territory_future_pref[territory_future_pref==-1] <- "Not important"
+territory_future_pref[territory_future_pref==0] <- "Neutral"
+territory_future_pref[territory_future_pref==1] <- "Important"
+territory_future_pref[territory_future_pref==2] <- "Very important"
+territory_future_pref$id <- 1:nrow(territory_future_pref)
+
+territory_future_pref_long <- melt(territory_future_pref, id.vars = "id")
+territory_future_pref_long$before_after <- ifelse(grepl('aval', territory_future_pref_long$variable, fixed=TRUE),1,0)
+territory_future_pref_long$usage <- stringr::str_remove(territory_future_pref_long$variable,"_future_aval")
+territory_future_pref_long$usage <- stringr::str_remove(territory_future_pref_long$usage,"_future_amont")
+territory_future_pref_long$value2 <- territory_future_pref_long$value
+territory_future_pref_long$value_binary <- ifelse(territory_future_pref_long$value=="Very important",1,0)
+territory_future_pref_long$value <- factor(territory_future_pref_long$value, levels = c("Not important at all","Not important","Neutral",
+                                                                          "Important","Very important"))
+territory_future_pref_long$value2[which(territory_future_pref_long$value2=="Not important at all")] <- "Not important"
+territory_future_pref_long$value2[which(territory_future_pref_long$value2=="Neutral")] <- "Not important"
+territory_future_pref_long$value2 <- factor(territory_future_pref_long$value2, levels = c("Not important","Important","Very important"))
+territory_future_pref_long$usage_fac <- factor(territory_future_pref_long$usage, levels = c("Walk","Nautical_activity","Biodiversity","Hydraulic_dynamic","Tourism","Freight"))
+
+territory_future_pref_long <- merge(territory_future_pref_long,NEP_result_ind[,c("NEP_scale","NEP_scale2","id")], by="id", all.x=T)
+
+
+territory_future_pref_usage_pr_walk <- clm(value ~ usage_fac,
+                                    data = territory_future_pref_long[which(territory_future_pref_long$id %in% c(1:18)),])
+summary(territory_future_pref_usage_pr_walk)
+territory_future_pref_plot <- as.data.frame(summary(territory_future_pref_usage_pr_walk)$coefficients[5:9,])
+territory_future_pref_plot$Usage <- gsub("usage_fac","",row.names(territory_future_pref_plot))
+territory_future_pref_plot$Usage <- gsub("_"," ",territory_future_pref_plot$Usage)
+territory_future_pref_plot$Usage <- factor(territory_future_pref_plot$Usage, levels=c("Biodiversity","Hydraulic dynamic","Nautical activity","Tourism","Freight"))
+
+pref_plot3 <- rbind(pref_plot,territory_pref_plot,territory_future_pref_plot)
+pref_plot3$Scale <- c(rep("Personal",5),rep("Territory",5),rep("Territory future",5))
+
+ggplot(pref_plot3, aes(color=Scale, x=Usage)) +
+  geom_point(aes(y=Estimate, group=Scale), size=4) +
+  geom_errorbar(aes(ymin=Estimate - 1.96*`Std. Error`, ymax=Estimate + 1.96*`Std. Error`),width = 0.2) +
+  theme_modern() + scale_color_viridis_d()+
+  geom_hline(yintercept = 0, linetype="dashed") +
+  theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1),
+        legend.position = "none")
+
+
+territory_future_pref_walk_clm <- ordinal::clm(value ~ before_after + NEP_scale2,
+                                        data = territory_future_pref_long[which(territory_future_pref_long$usage=="Walk" &
+                                                                           territory_future_pref_long$id %in% c(1:18)),])  
+summary(territory_future_pref_walk_clm)  
+
+territory_future_pref_nautical_activity_clm <- ordinal::clm(value ~ before_after + NEP_scale2,
+                                                     data = territory_future_pref_long[which(territory_future_pref_long$usage=="Nautical_activity" &
+                                                                                        territory_future_pref_long$id %in% c(1:18)),])  
+summary(territory_future_pref_nautical_activity_clm)  
+
+territory_future_pref_tourism_clm <- ordinal::clm(value ~ before_after + NEP_scale2,
+                                           data = territory_future_pref_long[which(territory_future_pref_long$usage=="Tourism" &
+                                                                              territory_future_pref_long$id %in% c(1:18)),])  
+summary(territory_future_pref_tourism_clm)
+
+territory_future_pref_freight_clm <- ordinal::clm(value ~ before_after + NEP_scale2,
+                                           data = territory_future_pref_long[which(territory_future_pref_long$usage=="Freight" &
+                                                                              territory_future_pref_long$id %in% c(1:18)),])  
+summary(territory_future_pref_freight_clm)
+
+territory_future_pref_hydraulic_dynamic_clm <- ordinal::clm(value ~ before_after + NEP_scale2,
+                                                     data = territory_future_pref_long[which(territory_future_pref_long$usage=="Hydraulic_dynamic" &
+                                                                                        territory_future_pref_long$id %in% c(1:18)),])  
+summary(territory_future_pref_hydraulic_dynamic_clm)
+
+territory_future_pref_biodiversity_clm <- ordinal::clm(value ~ before_after + NEP_scale2,
+                                                data = territory_future_pref_long[which(territory_future_pref_long$usage=="Biodiversity" &
+                                                                                   territory_future_pref_long$id %in% c(1:18)),])  
+summary(territory_future_pref_biodiversity_clm)
+
+
+fisher.test(table(territory_future_pref_long$value[which(territory_future_pref_long$usage=="Biodiversity" & territory_future_pref_long$id %in% c(1:18))],
+                  territory_future_pref_long$before_after[which(territory_future_pref_long$usage=="Biodiversity" & territory_future_pref_long$id %in% c(1:18))]))
+
+
+
+
+all_pref_long <- rbind(personal_pref_long,territory_pref_long,territory_future_pref_long)
+all_pref_long$Scale <-  c(rep("Personal",nrow(personal_pref_long)),
+                          rep("Territory",nrow(territory_pref_long)),
+                          rep("Territory future",nrow(territory_future_pref_long)))
+all_pref_usage_pr_walk <- clm(value ~ usage_fac + Scale + before_after + NEP_scale2,
+                              data = all_pref_long[which(all_pref_long$id %in% c(1:18)),])
+all_pref_usage_pr_walk <- clm(value ~ usage_fac+usage_fac:before_after + Scale + NEP_scale2,
+                              data = all_pref_long[which(all_pref_long$id %in% c(1:18)),])
+summary(all_pref_usage_pr_walk)
+all_pref_plot <- as.data.frame(summary(all_pref_usage_pr_walk)$coefficients[5:9,])
+all_pref_plot$Usage <- gsub("usage_fac","",row.names(all_pref_plot))
+all_pref_plot$Usage <- gsub("_"," ",all_pref_plot$Usage)
+all_pref_plot$Usage <- factor(all_pref_plot$Usage, levels=c("Biodiversity","Hydraulic dynamic","Nautical activity","Tourism","Freight"))
+all_pref_plot$Scale <- "after"
+
+all_pref_plot$corrected_estimate <- all_pref_plot$Estimate
+all_pref_plot$corrected_estimate[which(all_pref_plot$Usage=="Nautical activity")] <- all_pref_plot$Estimate[which(all_pref_plot$Usage=="Nautical activity")] + summary(all_pref_usage_pr_walk)$coef[14,1]
+all_pref_plot$corrected_estimate[which(all_pref_plot$Usage=="Biodiversity")] <- all_pref_plot$Estimate[which(all_pref_plot$Usage=="Biodiversity")] + summary(all_pref_usage_pr_walk)$coef[15,1]
+all_pref_plot$corrected_estimate[which(all_pref_plot$Usage=="Hydraulic dynamic")] <- all_pref_plot$Estimate[which(all_pref_plot$Usage=="Hydraulic dynamic")] + summary(all_pref_usage_pr_walk)$coef[16,1]
+all_pref_plot$corrected_estimate[which(all_pref_plot$Usage=="Tourism")] <- all_pref_plot$Estimate[which(all_pref_plot$Usage=="Tourism")] + summary(all_pref_usage_pr_walk)$coef[17,1]
+all_pref_plot$corrected_estimate[which(all_pref_plot$Usage=="Freight")] <- all_pref_plot$Estimate[which(all_pref_plot$Usage=="Freight")] + summary(all_pref_usage_pr_walk)$coef[18,1]
+
+all_pref_plot$corrected_sd <- all_pref_plot$`Std. Error`
+all_pref_plot$corrected_sd[which(all_pref_plot$Usage=="Nautical activity")] <- sqrt(all_pref_plot$`Std. Error`[which(all_pref_plot$Usage=="Nautical activity")]^2 + summary(all_pref_usage_pr_walk)$coef[14,2]^2)
+all_pref_plot$corrected_sd[which(all_pref_plot$Usage=="Biodiversity")] <- sqrt(all_pref_plot$`Std. Error`[which(all_pref_plot$Usage=="Biodiversity")]^2 + summary(all_pref_usage_pr_walk)$coef[15,2]^2)
+all_pref_plot$corrected_sd[which(all_pref_plot$Usage=="Hydraulic dynamic")] <- sqrt(all_pref_plot$`Std. Error`[which(all_pref_plot$Usage=="Hydraulic dynamic")]^2 + summary(all_pref_usage_pr_walk)$coef[16,2]^2)
+all_pref_plot$corrected_sd[which(all_pref_plot$Usage=="Tourism")] <- sqrt(all_pref_plot$`Std. Error`[which(all_pref_plot$Usage=="Tourism")]^2 + summary(all_pref_usage_pr_walk)$coef[17,2]^2)
+all_pref_plot$corrected_sd[which(all_pref_plot$Usage=="Freight")] <- sqrt(all_pref_plot$`Std. Error`[which(all_pref_plot$Usage=="Freight")]^2 + summary(all_pref_usage_pr_walk)$coef[18,2]^2)
+
+all_pref_plot_before <- all_pref_plot
+all_pref_plot_before$corrected_estimate <- all_pref_plot_before$Estimate
+all_pref_plot_before$corrected_sd <- all_pref_plot_before$`Std. Error`
+all_pref_plot_before$Scale <- "before"
+
+pref_plot3$corrected_estimate <- pref_plot3$Estimate
+pref_plot3$corrected_estimate[which(pref_plot3$Scale=="Territory")] <- pref_plot3$Estimate[which(pref_plot3$Scale=="Territory")] + summary(all_pref_usage_pr_walk)$coef[10,1]
+pref_plot3$corrected_estimate[which(pref_plot3$Scale=="Territory future")] <- pref_plot3$Estimate[which(pref_plot3$Scale=="Territory future")] + summary(all_pref_usage_pr_walk)$coef[11,1]
+
+pref_plot3$corrected_sd <- pref_plot3$`Std. Error`
+pref_plot3$corrected_sd[which(pref_plot3$Scale=="Territory")] <- sqrt(pref_plot3$`Std. Error`[which(pref_plot3$Scale=="Territory")]^2 + summary(all_pref_usage_pr_walk)$coef[10,2]^2)
+pref_plot3$corrected_sd[which(pref_plot3$Scale=="Territory future")] <- sqrt(pref_plot3$`Std. Error`[which(pref_plot3$Scale=="Territory future")]^2 + summary(all_pref_usage_pr_walk)$coef[11,2]^2)
+
+
+ggplot(pref_plot3, aes(color=Scale, x=Usage)) +
+  geom_point(aes(y=corrected_estimate, group=Scale), size=4, position = position_dodge(width=0.5)) +
+  geom_errorbar(aes(ymin=corrected_estimate - 1.96*`Std. Error`, ymax=corrected_estimate + 1.96*`Std. Error`),width = 0.2, position = position_dodge(width=0.5)) +
+  theme_modern() + scale_color_viridis_d()+
+  geom_hline(yintercept = 0, linetype="dashed") + ylab("Estimates") +
+  theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1),
+        legend.title = element_blank())
+
+pref_plot4 <- rbind(pref_plot3,all_pref_plot_before,all_pref_plot)
+pref_plot4$Scale <- factor(pref_plot4$Scale,levels = c("Personal","Territory","Territory future","before","after"))
+
+ggplot(droplevels(pref_plot4[which(pref_plot4$Scale %in% c("Personal","Territory","Territory future")),]),aes(color=Scale, x=Usage)) +
+  geom_point(aes(y=corrected_estimate, group=Scale), size=4, position = position_dodge(width=0.5)) +
+  geom_errorbar(aes(ymin=corrected_estimate - 1.96*`Std. Error`, ymax=corrected_estimate + 1.96*`Std. Error`),width = 0.2, position = position_dodge(width=0.5)) +
+  theme_modern() + scale_color_viridis_d()+
+  geom_hline(yintercept = 0, linetype="dashed") + ylab("Estimates") +
+  theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1),
+        legend.title = element_blank(), )
+
+ggsave("output/ranking1.png",
+       width = 10,
+       height = 6,
+       dpi = 400)
+
+ggplot(droplevels(pref_plot4[which(pref_plot4$Scale %in% c("before","after")),]),aes(shape=Scale, x=Usage)) +
+  geom_point(aes(y=corrected_estimate, group=Scale), size=4, position = position_dodge(width=0.4)) +
+  geom_errorbar(aes(ymin=corrected_estimate - 1.96*`Std. Error`, ymax=corrected_estimate + 1.96*`Std. Error`),width = 0.2, position = position_dodge(width=0.4)) +
+  theme_modern() + scale_shape_manual(values = c("before"=0,"after"=2)) +
+  geom_hline(yintercept = 0, linetype="dashed") + ylab("Estimates") +
+  theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1),
+        legend.title = element_blank())
+
+ggsave("output/ranking2.png",
+       width = 8,
+       height = 6,
+       dpi = 400)
+
+
 
