@@ -1131,15 +1131,15 @@ ggsave("output/distrib_asc.png",
 # willingness to accept time
 wtp_model <- wtp.gmnl(mixl_Temps, wrt = "Temps")
 
-wtp_landscape <- wtp_model[1,1]+wtp_model[9,1]+wtp_model[10,1]
-sd_wtp_landscape <- sqrt(wtp_model[1,2]^2+wtp_model[9,2]^2+wtp_model[10,2]^2)
-wtp_natureuse <- wtp_model[2,1]+wtp_model[11,1]+wtp_model[12,1]
-sd_wtp_natureuse <- sqrt(wtp_model[2,2]^2+wtp_model[11,2]^2+wtp_model[12,2]^2)
-wtp_biodiversity <- wtp_model[3,1]+wtp_model[13,1]+wtp_model[14,1]+wtp_model[15,1]
-sd_wtp_biodiversity <- sqrt(wtp_model[3,2]^2+wtp_model[13,2]^2+wtp_model[14,2]^2+wtp_model[15,2]^2)
-wtp_biome1 <- wtp_model[4,1]
+wtp_landscape <- -wtp_model[1,1]
+sd_wtp_landscape <- wtp_model[1,2]
+wtp_natureuse <- -wtp_model[2,1]
+sd_wtp_natureuse <- wtp_model[2,2]
+wtp_biodiversity <- -wtp_model[3,1]
+sd_wtp_biodiversity <- wtp_model[3,2]
+wtp_biome1 <- -wtp_model[4,1]
 sd_wtp_biome1 <- wtp_model[4,2]
-wtp_biome2 <- wtp_model[5,1]
+wtp_biome2 <- -wtp_model[5,1]
 sd_wtp_biome2 <- wtp_model[5,2]
 
 
@@ -1560,4 +1560,84 @@ ggplot() +
   ylab("f(x)") + # Label the y axis
   xlab(expression(beta[n][Biome])) + # Label the x axis
   ggtitle("Conditional distribution for Biome parameter")
+
+
+
+
+
+
+### add additional data on pollution, biogeography and nb of existing tram line
+
+#### pollution https://www.strategie.gouv.fr/publications/inegalites-environnementales-sociales-se-superposent
+
+
+commune_liste_poste <- read.csv("raw_data/laposte_hexasmal.csv",header=TRUE, sep = ";", colClasses = rep("character",6))
+commune_liste_poste$com_code <- paste0(commune_liste_poste$nom_de_la_commune,spe=" - ",commune_liste_poste$code_postal)
+
+commune_liste_sub <- commune_liste_poste[which(commune_liste_poste$com_code %in% unique(data_DCE_numeric$post_code_home)),]
+
+
+data_pollution <- read.csv2("raw_data/na_112_donnees_brutes.csv")
+data_pollution$Code.insee <- stringr::str_pad(data_pollution$Code.insee, 5, pad = "0")
+data_pollution <- data_pollution[which(data_pollution$Code.insee!="00000"),]
+
+data_external <- merge(commune_liste_sub,data_pollution,
+                       by.x="code_commune_insee", by.y="Code.insee", all.x=TRUE)
+
+#### biogeographic area https://www.eea.europa.eu/en/datahub/datahubitem-view/11db8d14-f167-4cd5-9205-95638dfd9618
+
+data_biogeo <- st_read("raw_data/eea_v_3035_1_mio_biogeo-regions_p_2016_v01_r00/BiogeoRegions2016.shp")
+
+data_biogeo <- st_crop(data_biogeo, c(xmin=3066000, ymin=2000000, xmax=4300000, ymax=3140000))
+
+# commune geo from https://public.opendatasoft.com/explore/dataset/georef-france-commune-arrondissement-municipal-millesime/export/?disjunctive.reg_name&disjunctive.dep_name&disjunctive.arrdep_name&disjunctive.ze2020_name&disjunctive.bv2012_name&disjunctive.epci_name&disjunctive.ept_name&disjunctive.com_name&disjunctive.com_arm_name&disjunctive.com_arm_is_mountain_area&sort=year&location=6,46.97276,3.93311&basemap=jawg.light
+spdf <- geojson_read("raw_data/georef-france-commune-arrondissement-municipal-millesime.geojson",  what = "sp")
+spdf$com_code <- stringr::str_pad(spdf$com_code, 5, pad = "0")
+spdf$com_name2 <- gsub("-"," ",spdf$com_arm_name_upper)
+spdf$com_name2 <- gsub("É","E",spdf$com_name2)
+spdf$com_name2 <- gsub("È","E",spdf$com_name2)
+spdf$com_name2 <- gsub("Ê","E",spdf$com_name2)
+spdf$com_name2 <- gsub("Â","A",spdf$com_name2)
+spdf$com_name2 <- gsub("Î","I",spdf$com_name2)
+spdf$com_name2 <- gsub("E ARRONDISSEMENT","",spdf$com_name2)
+
+spdf$com_code[which(spdf$com_arm_name_upper == "LYON 7E ARRONDISSEMENT")] <- 69387
+spdf$com_code[which(spdf$com_arm_name_upper == "MARSEILLE 7E ARRONDISSEMENT")] <- 13207
+spdf$com_code[which(spdf$com_arm_name_upper == "MARSEILLE 13E ARRONDISSEMENT")] <- 13213
+spdf$com_code[which(spdf$com_arm_name_upper == "MARSEILLE 14E ARRONDISSEMENT")] <- 13214
+spdf$com_code[which(spdf$com_arm_name_upper == "MARSEILLE 15E ARRONDISSEMENT")] <- 13215
+spdf$com_code[which(spdf$com_arm_name_upper == "MARSEILLE 16E ARRONDISSEMENT")] <- 13216
+
+spdf_sub <- spdf[which(spdf$com_name2 %in% unique(commune_liste_sub$nom_de_la_commune) |
+                         spdf$com_code %in% unique(commune_liste_sub$code_commune_insee)),]
+spdf_sub <- st_as_sf(spdf_sub)
+
+data_biogeo <- st_transform(data_biogeo, st_crs(spdf_sub))
+
+spdf_sub$biogeo <- unlist(st_intersects(spdf_sub,data_biogeo))
+
+data_spdf_sub <- st_drop_geometry(spdf_sub)
+
+#### nb exiting tramline
+
+data_existing_tram <- data.frame(city=c("Angers","Aubagne","Avignon","Bordeaux",
+                                        "Grenoble","Le Havre","Lille","Lyon",
+                                        "Montpellier","Nantes","Nice","Rouen",
+                                        "Strasbourg","Toulouse","Tours","Geneve",
+                                        "Caen","Marseille"),
+                                 exist_tram=c(1,1,1,4,
+                                              5,2,2,7,
+                                              4,3,3,2,
+                                              6,2,1,5,3,3))
+
+data_spdf_sub <- merge(data_spdf_sub,data_existing_tram, by.x="ze2020_name",by.y="city", all.x=TRUE)
+data_spdf_sub2 <- data_spdf_sub[which(is.na(data_spdf_sub$exist_tram)),]
+data_spdf_sub2 <- merge(data_spdf_sub2[,1:43],data_existing_tram, by.x="arrdep_name",by.y="city", all.x=TRUE)
+data_spdf_sub3 <- data_spdf_sub2[which(!is.na(data_spdf_sub2$exist_tram)),]
+
+data_spdf_sub_final <- rbind(data_spdf_sub[which(!is.na(data_spdf_sub$exist_tram)),],data_spdf_sub3)
+
+data_external <- merge(data_external,data_spdf_sub_final[,c("com_code","biogeo","exist_tram")],
+                       by.x="code_commune_insee", by.y="com_code", all.x=TRUE)
+
 
