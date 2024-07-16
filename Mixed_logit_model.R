@@ -1640,4 +1640,46 @@ data_spdf_sub_final <- rbind(data_spdf_sub[which(!is.na(data_spdf_sub$exist_tram
 data_external <- merge(data_external,data_spdf_sub_final[,c("com_code","biogeo","exist_tram")],
                        by.x="code_commune_insee", by.y="com_code", all.x=TRUE)
 
+data_external$ligne_5 <- NULL
+
+data_external <- data_external[!duplicated(data_external), ]
+
+saveRDS(data_external,"output/data_external.rds")
+
+# model with the external variable
+
+data_DCE_numeric_ext <- merge(data_DCE_numeric,data_external,
+                              by.x="post_code_home", by.y="com_code", all.x=TRUE)
+
+data_DCE_numeric_ext$biogeo <- as.character(data_DCE_numeric_ext$biogeo)
+
+saveRDS(data_DCE_numeric_ext,"output/data_DCE_numeric_ext.rds")
+
+data_DCE_mlogit_ext <- mlogit.data(data_DCE_numeric_ext,
+                               choice = "choice",
+                               shape = "long",
+                               alt.var = "Scenario",
+                               id.var = "survey_person",
+                               chid.var = "chid")
+
+
+
+mixl_Temps_ava <- gmnl(choice ~ Temps + Paysage + Acces + Biodiversite + Biome + asc | 0 | 0 | Gender + Age + Income_cap + class_nat + survey_id +
+                        job_travel + Perso_relation_nature + Perso_behaviour_nature + Perso_knowledge_biodiversity + biogeo + exist_tram + IEM...6.pollutions,
+                      data = data_DCE_mlogit_ext,
+                      model = "mixl",
+                      panel=TRUE,
+                      ranp = c(Temps = "t",
+                               Paysage = "n",
+                               Acces = "n",
+                               Biodiversite = "n",
+                               Biome1 = "n",
+                               Biome2 = "n",
+                               asc = "n"),
+                      mvar = list(Temps = c("Gender", "Age", "biogeo", "exist_tram", "IEM...6.pollutions"),
+                                  Paysage = c("Gender", "Age", "biogeo", "exist_tram", "IEM...6.pollutions"),
+                                  Acces = c("Gender", "Age", "biogeo", "exist_tram", "IEM...6.pollutions"),
+                                  Biodiversite = c("Gender", "Age","Perso_relation_nature", "biogeo", "exist_tram", "IEM...6.pollutions"),
+                                  asc = c("Perso_relation_nature","job_travel","survey_id", "biogeo", "exist_tram", "IEM...6.pollutions")),
+                      R = 60)
 

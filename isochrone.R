@@ -103,4 +103,78 @@ com_isochrone$class_nat[which(com_isochrone$nat<227)] <- "Naturality --"
 com_isochrone$class_nat[which(com_isochrone$nat>=227 & com_isochrone$nat<256)] <- "Naturality -"
 com_isochrone$class_nat[which(com_isochrone$nat>=256)] <- "Naturality +"
 
-saveRDS(com_isochrone,"output/com_isochrone.rds")
+#saveRDS(com_isochrone,"output/com_isochrone.rds")
+com_isochrone <- readRDS("output/com_isochrone.rds")
+
+
+com_isochrone_to_plot <- com_isochrone
+com_isochrone_to_plot$classe <- NA
+com_isochrone_to_plot$classe[which(com_isochrone_to_plot$com_code %in% com_isochrone_split$`[116,227)`$com_code)] <- "[116,227)" 
+com_isochrone_to_plot$classe[which(com_isochrone_to_plot$com_code %in% com_isochrone_split$`[227,256)`$com_code)] <- "[227,256)" 
+com_isochrone_to_plot$classe[which(com_isochrone_to_plot$com_code %in% com_isochrone_split$`[256,288)`$com_code)] <- "[256,288)" 
+com_isochrone_to_plot$classe[which(com_isochrone_to_plot$com_code %in% com_isochrone_split$`[288,423]`$com_code)] <- "[288,423]" 
+com_isochrone_to_plot$pc_inact1564 <- 100*com_isochrone$pc_inact1564
+com_isochrone_to_plot$inactif_tot <- com_isochrone$p_csp_retr+com_isochrone$pc_inact1564
+com_isochrone_to_plot$classe_3 <- com_isochrone_to_plot$classe
+com_isochrone_to_plot$classe_3[which(com_isochrone_to_plot$classe_3=="[116,227)")] <- "Naturalité --"
+com_isochrone_to_plot$classe_3[which(com_isochrone_to_plot$classe_3=="[227,256)")] <- "Naturalité -"
+com_isochrone_to_plot$classe_3[which(com_isochrone_to_plot$classe_3 %in% c("[256,288)","[288,423]"))] <- "Naturalité +"
+com_isochrone_to_plot$classe_3 <- factor(com_isochrone_to_plot$classe_3, levels=c("Naturalité --", "Naturalité -", "Naturalité +"))
+
+ggplot(com_isochrone_to_plot, aes(x=nat)) + 
+  geom_histogram(data = com_isochrone_to_plot[com_isochrone_to_plot$classe=="[116,227)",],bins=40, alpha=0.5, fill="#edf8fb", col="lightgrey") +
+  geom_histogram(data = com_isochrone_to_plot[com_isochrone_to_plot$classe=="[227,256)",],bins=40, alpha=0.5, fill="#b2e2e2", col="lightgrey") +
+  geom_histogram(data = com_isochrone_to_plot[com_isochrone_to_plot$classe=="[256,288)",],bins=40, alpha=0.5, fill="#66c2a4", col="lightgrey") +
+  geom_histogram(data = com_isochrone_to_plot[com_isochrone_to_plot$classe=="[288,423]",],bins=40, alpha=0.5, fill="#238b45", col="lightgrey") +
+  geom_vline(xintercept=116, linetype="dashed") +
+  geom_vline(xintercept=227, linetype="dashed") +
+  geom_vline(xintercept=256, linetype="dashed") +
+  geom_vline(xintercept=288, linetype="dashed") +
+  geom_vline(xintercept=423, linetype="dashed") +
+  scale_x_continuous(breaks = c(116,227,256,288,423), name="Naturalité") +
+  ylab("Nombre de communes") +
+  annotate("text", label=paste("Population = ",formatC(lapply(com_isochrone_split,function(x){return(round(sum(x$pop)))})$`[116,227)`, digits = 2)),x=(116+(227-116)/2),y=30) +
+  annotate("text", label=paste("Population = ",formatC(lapply(com_isochrone_split,function(x){return(round(sum(x$pop)))})$`[227,256)`, digits = 2)),x=(227+(256-227)/2),y=37) +
+  annotate("text", label=paste("Population = ",formatC(lapply(com_isochrone_split,function(x){return(round(sum(x$pop)))})$`[256,288)`, digits = 2)),x=(256+(288-256)/2),y=40) +
+  annotate("text", label=paste("Population = ",formatC(lapply(com_isochrone_split,function(x){return(round(sum(x$pop)))})$`[288,423]`, digits = 2)),x=(288+(423-288)/2),y=30) +
+  theme_modern()
+
+ggplot(com_isochrone_to_plot, aes(x=nat)) + 
+  geom_histogram(data = com_isochrone_to_plot[com_isochrone_to_plot$classe_3=="Naturalité --",],bins=40, alpha=0.5, fill="#edf8fb", col="lightgrey") +
+  geom_histogram(data = com_isochrone_to_plot[com_isochrone_to_plot$classe_3=="Naturalité -",],bins=40, alpha=0.5, fill="#b2e2e2", col="lightgrey") +
+  geom_histogram(data = com_isochrone_to_plot[com_isochrone_to_plot$classe_3=="Naturalité +",],bins=40, alpha=0.5, fill="#66c2a4", col="lightgrey") +
+  geom_vline(xintercept=116, linetype="dashed") +
+  geom_vline(xintercept=227, linetype="dashed") +
+  geom_vline(xintercept=256, linetype="dashed") +
+  geom_vline(xintercept=423, linetype="dashed") +
+  scale_x_continuous(breaks = c(116,227,256,423), name="Naturalness") +
+  ylab("Nomber of communes") +
+  annotate("text", label=paste("Population = ",formatC(lapply(com_isochrone_split,function(x){return(round(sum(x$pop)))})$`[116,227)`, digits = 2)),x=(116+(227-116)/2),y=30) +
+  annotate("text", label=paste("Population = ",formatC(lapply(com_isochrone_split,function(x){return(round(sum(x$pop)))})$`[227,256)`, digits = 2)),x=(227+(256-227)/2),y=37) +
+  annotate("text", label=paste("Population = ",formatC((lapply(com_isochrone_split,function(x){return(round(sum(x$pop)))})$`[256,288)` + lapply(com_isochrone_split,function(x){return(round(sum(x$pop)))})$`[288,423]`), digits = 2)),x=(256+(423-256)/2),y=40) +
+  theme_modern()
+
+ggsave(
+  "output/classe_nat.png",
+  width = 10,
+  height = 5,
+  dpi = 400
+)
+
+nat_com3 <- readRDS("output/nat_com3.rds")
+
+ggplot(com_isochrone_to_plot, aes(x=nat)) + 
+  geom_density(fill="#edf8fb", alpha=0.5) +
+  geom_density(data = nat_com3,fill="#66c2a4", alpha=0.5) +
+  annotate("text", label="Sample", x=150, y=0.006) +
+  annotate("text", label="National", x=400, y=0.006) +
+  scale_x_continuous(name="Naturalness") +
+  ylab("Density") +
+  theme_modern()
+
+ggsave(
+  "output/classe_nat_compare.png",
+  width = 8,
+  height = 5,
+  dpi = 400
+)
