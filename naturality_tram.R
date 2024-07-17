@@ -10,6 +10,8 @@ library(reshape2)
 library(plyr)
 library(dplyr)
 library(see)
+library(ggstatsplot)
+library(ggsignif)
 
 ### tram en projet
 
@@ -204,7 +206,7 @@ plot_trace_13m_nat1 <- rbind(data.frame(project_trace_13m_nat1,variable="Tram pr
 ggplot(plot_trace_13m_nat1, aes(x = variable, y = value, weight = cover, fill=variable)) + 
   geom_boxplot(width=0.6, col="#0219f3") + 
   scale_fill_manual(name="alpha", values=alpha(c("#0219f3","#8d98ff"),0.5)) + theme_modern() +
-  labs(y="Naturalness") + theme(axis.title.x = element_blank(),
+  labs(y="Integrity") + theme(axis.title.x = element_blank(),
                                 legend.position = "none")
 
 project_trace_13m_nat2 <- do.call(rbind.data.frame, nat2_tram_all_plot)
@@ -214,7 +216,7 @@ plot_trace_13m_nat2 <- rbind(data.frame(project_trace_13m_nat2,variable="Tram pr
 ggplot(plot_trace_13m_nat2, aes(x = variable, y = value, weight = cover, fill=variable)) + 
   geom_boxplot(width=0.6, col="#0219f3") + 
   scale_fill_manual(name="alpha", values=alpha(c("#0219f3","#8d98ff"),0.5)) + theme_modern() +
-  labs(y="Naturalness") + theme(axis.title.x = element_blank(),
+  labs(y="Spontaneity") + theme(axis.title.x = element_blank(),
                                 legend.position = "none")
 
 project_trace_13m_nat3 <- do.call(rbind.data.frame, nat3_tram_all_plot)
@@ -224,12 +226,37 @@ plot_trace_13m_nat3 <- rbind(data.frame(project_trace_13m_nat3,variable="Tram pr
 ggplot(plot_trace_13m_nat3, aes(x = variable, y = value, weight = cover, fill=variable)) + 
   geom_boxplot(width=0.6, col="#0219f3") + 
   scale_fill_manual(name="alpha", values=alpha(c("#0219f3","#8d98ff"),0.5)) + theme_modern() +
-  labs(y="Naturalness") + theme(axis.title.x = element_blank(),
+  labs(y="Continuity") + theme(axis.title.x = element_blank(),
                                 legend.position = "none")
 
+plot_trace_13m_nat1$value <- scales::rescale(plot_trace_13m_nat1$value,to=c(min(na.omit(plot_trace_13m$value)), max(na.omit(plot_trace_13m$value))))
+plot_trace_13m_nat2$value <- scales::rescale(plot_trace_13m_nat2$value,to=c(min(na.omit(plot_trace_13m$value)), max(na.omit(plot_trace_13m$value))))
+plot_trace_13m_nat3$value <- scales::rescale(plot_trace_13m_nat3$value,to=c(min(na.omit(plot_trace_13m$value)), max(na.omit(plot_trace_13m$value))))
+
+plot_trace_all_nat <- rbind(data.frame(plot_trace_13m,variable2="Naturalness"),
+                            data.frame(plot_trace_13m_nat1,variable2="Integrity"),
+                            data.frame(plot_trace_13m_nat2,variable2="Spontaneity"),
+                            data.frame(plot_trace_13m_nat3,variable2="Continuity"))
+plot_trace_all_nat$variable2 <- factor(plot_trace_all_nat$variable2, levels = c("Naturalness","Integrity","Spontaneity","Continuity"))
+
+ggplot(plot_trace_all_nat, aes(x = variable2, y = value)) + 
+  geom_point(position = position_jitterdodge(jitter.width=0.15,dodge.width = 0.6), 
+             alpha = 0.2, size = 3, stroke = 0, na.rm = TRUE, aes(col=variable)) +
+  geom_violin(width = 0.6, alpha = 0.1, na.rm = TRUE, aes(fill = variable, weight = cover)) +
+  geom_boxplot(width = 0.6, alpha = 0.1, na.rm = TRUE,outlier.shape = NA,aes(fill = variable,weight = cover)) + 
+  geom_signif(stat="identity",
+              data=data.frame(x=c(0.875, 1.875, 2.875, 3.875), xend=c(1.125, 2.125, 3.125, 4.125),
+                              y=c(470, 470,470,470), annotation=c("***", "NS"," *** ","  ***  ")),
+              aes(x=x,xend=xend, y=y, yend=y, annotation=annotation)) +
+  scale_fill_manual(values = c("Tram projects" = "#ffaf3c","Tram extant" = "#ff3c3c")) +
+  scale_color_manual(values = c("Tram projects" = "#ffaf3c","Tram extant" = "#ff3c3c")) +
+  theme_ggstatsplot() +
+  labs(y="Naturalness scale") + theme(axis.title.x = element_blank(),
+                               legend.position = "none")
+
 ggsave("output/tram_nat_extant_project.png",
-       width = 5,
-       height = 5,
+       width = 6,
+       height = 6,
        dpi = 400)
 
 summary(lm(value~variable,plot_trace_13m, weights = cover))
@@ -241,7 +268,7 @@ summary(lm(value~variable,plot_trace_13m_nat3, weights = cover))
 
 dist_effect_tram <- dist_effect_tram_nat1 <- dist_effect_tram_nat2 <- dist_effect_tram_nat3 <- data.frame(dist=NA,effect=NA, pval=NA)
 
-for(i in seq(from=1, to=50, by=2)){
+for(i in seq(from=1, to=50, by=1)){
   
   tram_trace_buff_compare <- st_buffer(tram_trace,i)
   nat_tram_all_compare <- exact_extract(nat,tram_trace_buff_compare)
@@ -281,14 +308,42 @@ for(i in seq(from=1, to=50, by=2)){
   results_nat2 <- summary(lm(value~variable,plot_trace_compare_nat2, weights = cover))
   results_nat3 <- summary(lm(value~variable,plot_trace_compare_nat3, weights = cover))
   
-  dist_effect_tram <- rbind(dist_effect_tram,data.frame(dist=i, effect=results$coef[2,1], pval=results$coef[2,4]))
-  dist_effect_tram_nat1 <- rbind(dist_effect_tram_nat1,data.frame(dist=i, effect=results_nat1$coef[2,1], pval=results_nat1$coef[2,4]))
-  dist_effect_tram_nat2 <- rbind(dist_effect_tram_nat2,data.frame(dist=i, effect=results_nat2$coef[2,1], pval=results_nat2$coef[2,4]))
-  dist_effect_tram_nat3 <- rbind(dist_effect_tram_nat3,data.frame(dist=i, effect=results_nat3$coef[2,1], pval=results_nat3$coef[2,4]))
+  dist_effect_tram <- rbind(dist_effect_tram,data.frame(dist=i, effect=results$coef[2,1]/results$coef[1,1], pval=results$coef[2,4]))
+  dist_effect_tram_nat1 <- rbind(dist_effect_tram_nat1,data.frame(dist=i, effect=results_nat1$coef[2,1]/results_nat1$coef[1,1], pval=results_nat1$coef[2,4]))
+  dist_effect_tram_nat2 <- rbind(dist_effect_tram_nat2,data.frame(dist=i, effect=results_nat2$coef[2,1]/results_nat2$coef[1,1], pval=results_nat2$coef[2,4]))
+  dist_effect_tram_nat3 <- rbind(dist_effect_tram_nat3,data.frame(dist=i, effect=results_nat3$coef[2,1]/results_nat3$coef[1,1], pval=results_nat3$coef[2,4]))
   
 }
 
 
+dist_effect_tram_plot <- cbind(dist_effect_tram,dist_effect_tram_nat1[,c("effect","pval")],
+                               dist_effect_tram_nat2[,c("effect","pval")],dist_effect_tram_nat3[,c("effect","pval")])
+
+names(dist_effect_tram_plot) <- c("Buffer","Naturalness","nat_pval","Integrity","int_pval",
+                                  "Spontaneity","spo_pval","Continuity","con_pval")
+
+dist_effect_tram_plot <- na.omit(dist_effect_tram_plot)
+dist_effect_tram_plot$Buffer <- dist_effect_tram_plot$Buffer*2
+dist_effect_tram_plot$nat_sig <- ifelse(dist_effect_tram_plot$nat_pval<0.05,1,0.2)
+dist_effect_tram_plot$int_sig <- ifelse(dist_effect_tram_plot$int_pval<0.05,1,0.2)
+dist_effect_tram_plot$spo_sig <- ifelse(dist_effect_tram_plot$spo_pval<0.05,1,0.2)
+dist_effect_tram_plot$con_sig <- ifelse(dist_effect_tram_plot$con_pval<0.05,0.5,0.2)
+
+ggplot(dist_effect_tram_plot, aes(x=Buffer)) +
+  geom_point(aes(y=Naturalness, alpha=nat_sig), shape=19) +
+  geom_point(aes(y=Integrity/2, alpha=int_sig), shape=0) +
+  geom_point(aes(y=Spontaneity, alpha=spo_sig), shape=1) +
+  geom_point(aes(y=Continuity, alpha=con_sig), shape=2) +
+  scale_alpha(range = c(0.2, 1)) +
+  scale_y_continuous(
+    name = "Difference in Naturalness \u25CF, Spontaneity \u25CB, Continuity \u25B3 (%)",
+    sec.axis = sec_axis( trans=~.*2, name="Difference in Integrity \u25A1 (%)")
+  ) +  theme_modern() + theme(legend.position = "none")
+
+ggsave("output/tram_nat_extant_project_buffer.png",
+       width = 7,
+       height = 6.5,
+       dpi = 400)
 
 ### example of tree effect on natrualness (Montpellier ligne 1, most frequented ligne in France)
 
@@ -386,6 +441,35 @@ ggplot(plot_ex_tram_arbre_nat3, aes(x = variable2, y = value, weight = cover)) +
 summary(lm(value~variable2,plot_ex_tram_arbre_nat3, weights = cover))
 
 
+plot_ex_tram_arbre_nat1$value <- scales::rescale(plot_ex_tram_arbre_nat1$value,to=c(min(na.omit(plot_ex_tram_arbre$value)), max(na.omit(plot_ex_tram_arbre$value))))
+plot_ex_tram_arbre_nat2$value <- scales::rescale(plot_ex_tram_arbre_nat2$value,to=c(min(na.omit(plot_ex_tram_arbre$value)), max(na.omit(plot_ex_tram_arbre$value))))
+plot_ex_tram_arbre_nat3$value <- scales::rescale(plot_ex_tram_arbre_nat3$value,to=c(min(na.omit(plot_ex_tram_arbre$value)), max(na.omit(plot_ex_tram_arbre$value))))
+
+plot_ex_tram_arbre_all <- rbind(data.frame(plot_ex_tram_arbre,variable3="Naturalness"),
+                            data.frame(plot_ex_tram_arbre_nat1,variable3="Integrity"),
+                            data.frame(plot_ex_tram_arbre_nat2,variable3="Spontaneity"),
+                            data.frame(plot_ex_tram_arbre_nat3,variable3="Continuity"))
+plot_ex_tram_arbre_all$variable3 <- factor(plot_ex_tram_arbre_all$variable3, levels = c("Naturalness","Integrity","Spontaneity","Continuity"))
+
+ggplot(plot_ex_tram_arbre_all, aes(x = variable3, y = value)) + 
+  geom_point(position = position_jitterdodge(jitter.width=0.15,dodge.width = 0.6), 
+             alpha = 0.2, size = 3, stroke = 0, na.rm = TRUE, aes(col=variable2)) +
+  geom_violin(width = 0.6, alpha = 0.1, na.rm = TRUE, aes(fill = variable2, weight = cover)) +
+  geom_boxplot(width = 0.6, alpha = 0.1, na.rm = TRUE,outlier.shape = NA,aes(fill = variable2,weight = cover)) + 
+  geom_signif(stat="identity",
+              data=data.frame(x=c(0.875, 1.875, 2.875, 3.875), xend=c(1.125, 2.125, 3.125, 4.125),
+                              y=c(410, 410,410,410), annotation=c("*", "NS","***","  NS  ")),
+              aes(x=x,xend=xend, y=y, yend=y, annotation=annotation)) +
+  scale_fill_manual(values = c("trees" = "#29c200","no_tree" = "#b1b1b1")) +
+  scale_color_manual(values = c("trees" = "#29c200","no_tree" = "#b1b1b1")) +
+  theme_ggstatsplot() +
+  labs(y="Naturalness scale") + theme(axis.title.x = element_blank(),
+                                      legend.position = "none")
+
+ggsave("output/tram_tree_project.png",
+       width = 6,
+       height = 6,
+       dpi = 400)
 
 
 
@@ -545,8 +629,8 @@ nat_affected_com_ex_tram_mean$com_name <- no_tram_trace_com$com_name
 
 nat_affected_com_in_tram_mean <- ldply(nat_affected_com_in_tram, .fun = function(x){return(weighted.mean(x$value,x$cover, na.rm=TRUE))})
 nat_affected_com_in_tram_mean$com_name <- no_tram_trace_com$com_name
-nat_affected_com_in_tram_mean$nat_post_tram <- nat_affected_com_in_tram_mean$V1 - dist_effect_tram$effect[9]
-nat_affected_com_in_tram_mean$nat_post_tram_tree <- nat_affected_com_in_tram_mean$nat_post_tram + summary(lm(value~variable2,plot_ex_tram_arbre, weights = cover))$coef[2,1]
+nat_affected_com_in_tram_mean$nat_post_tram <- nat_affected_com_in_tram_mean$V1 * (1-dist_effect_tram$effect[which(dist_effect_tram$dist==16)])
+nat_affected_com_in_tram_mean$nat_post_tram_tree <- nat_affected_com_in_tram_mean$V1 * (1-dist_effect_tram$effect[which(dist_effect_tram$dist==16)]+dist_effect_tree$effect[which(dist_effect_tree$dist==16)])
 names(nat_affected_com_in_tram_mean)[1] <- "nat_current"
 
 nat_affected_com_post_tram_mean <- merge(nat_affected_com_ex_tram_mean,nat_affected_com_in_tram_mean,by="com_name")
@@ -573,25 +657,49 @@ fig4_data$variable[which(fig4_data$variable=="nat_current")] <- "Tram project ri
 fig4_data$variable[which(fig4_data$variable=="nat_post_tram")] <- "Tram project right-of-way (expected)"
 fig4_data$variable[which(fig4_data$variable=="nat_post_tram_tree")] <- "Tram project right-of-way (trees)"
 
-ggplot(fig4_data, aes(x = Naturalness, y = variable, fill = ..x..)) +
-  geom_density_ridges_gradient(scale = 1.5, rel_min_height = 0.01) +
+ggplot(fig4_data) +
+  geom_density_ridges_gradient(aes(x = Naturalness, y = variable, fill = ..x..),scale = 1.5, rel_min_height = 0.01) +
   scale_fill_viridis() + 
   theme_minimal() +
   geom_segment(aes(x = mean(fig4_data$Naturalness[which(fig4_data$variable=="Center")]),
-               xend = mean(fig4_data$Naturalness[which(fig4_data$variable=="Center")]),
-               y=1,yend=2.3),linetype="dashed") +
+                   xend = mean(fig4_data$Naturalness[which(fig4_data$variable=="Center")]),
+                   y=1,yend=2.3),linetype="dashed") +
   geom_segment(aes(x = mean(fig4_data$Naturalness[which(fig4_data$variable=="Peripheric")]),
                    xend = mean(fig4_data$Naturalness[which(fig4_data$variable=="Peripheric")]),
                    y=2,yend=2.63),linetype="dashed") +
   geom_segment(aes(x = mean(fig4_data$Naturalness[which(fig4_data$variable=="Tram project right-of-way (current)")]),
                    xend = mean(fig4_data$Naturalness[which(fig4_data$variable=="Tram project right-of-way (current)")]),
-                   y=3,yend=3.7),linetype="dashed") +
+                   y=3,yend=3.65),linetype="dashed") +
   geom_segment(aes(x = mean(fig4_data$Naturalness[which(fig4_data$variable=="Tram project right-of-way (expected)")]),
                    xend = mean(fig4_data$Naturalness[which(fig4_data$variable=="Tram project right-of-way (expected)")]),
-                   y=4,yend=4.7),linetype="dashed") +
+                   y=4,yend=4.8),linetype="dashed") +
   geom_segment(aes(x = mean(fig4_data$Naturalness[which(fig4_data$variable=="Tram project right-of-way (trees)")]),
                    xend = mean(fig4_data$Naturalness[which(fig4_data$variable=="Tram project right-of-way (trees)")]),
                    y=5,yend=5.7),linetype="dashed") +
+  geom_segment(
+    x = mean(fig4_data$Naturalness[which(fig4_data$variable=="Tram project right-of-way (current)")]), y = 4.5,
+    xend = mean(fig4_data$Naturalness[which(fig4_data$variable=="Tram project right-of-way (expected)")]), yend = 4.5,
+    lineend = "round", # See available arrow types in example above
+    linejoin = "round",
+    size = 1, 
+    arrow = arrow(length = unit(0.1, "inches")),
+    colour = "#ff0000" # Also accepts "red", "blue' etc
+  ) +
+  geom_segment(
+    x = mean(fig4_data$Naturalness[which(fig4_data$variable=="Tram project right-of-way (current)")]), y = 5.5,
+    xend = mean(fig4_data$Naturalness[which(fig4_data$variable=="Tram project right-of-way (trees)")]), yend = 5.5,
+    lineend = "round", # See available arrow types in example above
+    linejoin = "round",
+    size = 1, 
+    arrow = arrow(length = unit(0.1, "inches")),
+    colour = "#ffa200" # Also accepts "red", "blue' etc
+  ) +
+  annotate("text", x=mean(fig4_data$Naturalness[which(fig4_data$variable=="Tram project right-of-way (current)")])-
+             (mean(fig4_data$Naturalness[which(fig4_data$variable=="Tram project right-of-way (current)")])-mean(fig4_data$Naturalness[which(fig4_data$variable=="Tram project right-of-way (trees)")]))/2,
+           y=5.3, label= "-7.4 %", col="#ffa200") +
+  annotate("text", x=mean(fig4_data$Naturalness[which(fig4_data$variable=="Tram project right-of-way (current)")])-
+             (mean(fig4_data$Naturalness[which(fig4_data$variable=="Tram project right-of-way (current)")])-mean(fig4_data$Naturalness[which(fig4_data$variable=="Tram project right-of-way (expected)")]))/2,
+           y=4.3, label= "-13.9 %", col="#ff0000") +
   theme(
     legend.position="none",
     axis.title.y = element_blank(),
@@ -606,8 +714,8 @@ ggsave("output/figure4.png",
 
 ### test influence distance buffer
 
-dist_effect <- dist_effect_nat1 <- dist_effect_nat2 <- dist_effect_nat3 <- data.frame(dist=NA,effect=NA, pval=NA)
-dist_effect2 <- dist_effect2_nat1 <- dist_effect2_nat2 <- dist_effect2_nat3 <- data.frame(dist=NA, effect1=NA, pval1=NA, effect2=NA, pval2=NA)
+dist_effect_tree <- dist_effect_tree_nat1 <- dist_effect_tree_nat2 <- dist_effect_tree_nat3 <- data.frame(dist=NA,effect=NA, pval=NA)
+dist_effect_tree2 <- dist_effect_tree2_nat1 <- dist_effect_tree2_nat2 <- dist_effect_tree2_nat3 <- data.frame(dist=NA, effect1=NA, pval1=NA, effect2=NA, pval2=NA)
 
 for(i in seq(from=1, to=50, by=1)){
   
@@ -664,8 +772,8 @@ for(i in seq(from=1, to=50, by=1)){
   result <- summary(lm(value~variable2,plot_ex_tram_arbre, weights = cover))
   result2 <- summary(lm(value~variable,plot_ex_tram_arbre, weights = cover))
   
-  dist_effect <- rbind(dist_effect,data.frame(dist=i, effect=result$coef[2,1], pval=result$coef[2,4]))
-  dist_effect2 <- rbind(dist_effect2,data.frame(dist=i, effect1=result2$coef[2,1], pval1=result2$coef[2,4], effect2=result2$coef[3,1], pval2=result2$coef[3,4]))
+  dist_effect_tree <- rbind(dist_effect_tree,data.frame(dist=i, effect=result$coef[2,1]/result$coef[1,1], pval=result$coef[2,4]))
+  dist_effect_tree2 <- rbind(dist_effect_tree2,data.frame(dist=i, effect1=result2$coef[2,1], pval1=result2$coef[2,4], effect2=result2$coef[3,1], pval2=result2$coef[3,4]))
   
   plot_ex_tram_arbre_nat1 <- rbind(data.frame(nat1_ex_tram_arbre0_plot,variable="0_tree"),
                               data.frame(nat1_ex_tram_arbre1_plot,variable="1_trees"),
@@ -675,8 +783,8 @@ for(i in seq(from=1, to=50, by=1)){
   result_nat1 <- summary(lm(value~variable2,plot_ex_tram_arbre_nat1, weights = cover))
   result2_nat1 <- summary(lm(value~variable,plot_ex_tram_arbre_nat1, weights = cover))
   
-  dist_effect_nat1 <- rbind(dist_effect_nat1,data.frame(dist=i, effect=result_nat1$coef[2,1], pval=result_nat1$coef[2,4]))
-  dist_effect2_nat1 <- rbind(dist_effect2_nat1,data.frame(dist=i, effect1=result2_nat1$coef[2,1], pval1=result2_nat1$coef[2,4], effect2=result2_nat1$coef[3,1], pval2=result2_nat1$coef[3,4]))
+  dist_effect_tree_nat1 <- rbind(dist_effect_tree_nat1,data.frame(dist=i, effect=result_nat1$coef[2,1]/result_nat1$coef[1,1], pval=result_nat1$coef[2,4]))
+  dist_effect_tree2_nat1 <- rbind(dist_effect_tree2_nat1,data.frame(dist=i, effect1=result2_nat1$coef[2,1], pval1=result2_nat1$coef[2,4], effect2=result2_nat1$coef[3,1], pval2=result2_nat1$coef[3,4]))
   
   plot_ex_tram_arbre_nat2 <- rbind(data.frame(nat2_ex_tram_arbre0_plot,variable="0_tree"),
                                    data.frame(nat2_ex_tram_arbre1_plot,variable="1_trees"),
@@ -686,8 +794,8 @@ for(i in seq(from=1, to=50, by=1)){
   result_nat2 <- summary(lm(value~variable2,plot_ex_tram_arbre_nat2, weights = cover))
   result2_nat2 <- summary(lm(value~variable,plot_ex_tram_arbre_nat2, weights = cover))
   
-  dist_effect_nat2 <- rbind(dist_effect_nat2,data.frame(dist=i, effect=result_nat2$coef[2,1], pval=result_nat2$coef[2,4]))
-  dist_effect2_nat2 <- rbind(dist_effect2_nat2,data.frame(dist=i, effect1=result2_nat2$coef[2,1], pval1=result2_nat2$coef[2,4], effect2=result2_nat2$coef[3,1], pval2=result2_nat2$coef[3,4]))
+  dist_effect_tree_nat2 <- rbind(dist_effect_tree_nat2,data.frame(dist=i, effect=result_nat2$coef[2,1]/result_nat2$coef[1,1], pval=result_nat2$coef[2,4]))
+  dist_effect_tree2_nat2 <- rbind(dist_effect_tree2_nat2,data.frame(dist=i, effect1=result2_nat2$coef[2,1], pval1=result2_nat2$coef[2,4], effect2=result2_nat2$coef[3,1], pval2=result2_nat2$coef[3,4]))
   
   plot_ex_tram_arbre_nat3 <- rbind(data.frame(nat3_ex_tram_arbre0_plot,variable="0_tree"),
                                    data.frame(nat3_ex_tram_arbre1_plot,variable="1_trees"),
@@ -697,10 +805,40 @@ for(i in seq(from=1, to=50, by=1)){
   result_nat3 <- summary(lm(value~variable2,plot_ex_tram_arbre_nat3, weights = cover))
   result2_nat3 <- summary(lm(value~variable,plot_ex_tram_arbre_nat3, weights = cover))
   
-  dist_effect_nat3 <- rbind(dist_effect_nat3,data.frame(dist=i, effect=result_nat3$coef[2,1], pval=result_nat3$coef[2,4]))
-  dist_effect2_nat3 <- rbind(dist_effect2_nat3,data.frame(dist=i, effect1=result2_nat3$coef[2,1], pval1=result2_nat3$coef[2,4], effect2=result2_nat3$coef[3,1], pval2=result2_nat3$coef[3,4]))
+  dist_effect_tree_nat3 <- rbind(dist_effect_tree_nat3,data.frame(dist=i, effect=result_nat3$coef[2,1]/result_nat3$coef[1,1], pval=result_nat3$coef[2,4]))
+  dist_effect_tree2_nat3 <- rbind(dist_effect_tree2_nat3,data.frame(dist=i, effect1=result2_nat3$coef[2,1], pval1=result2_nat3$coef[2,4], effect2=result2_nat3$coef[3,1], pval2=result2_nat3$coef[3,4]))
   
 }
+
+
+dist_effect_tree_plot <- cbind(dist_effect_tree,dist_effect_tree_nat1[,c("effect","pval")],
+                               dist_effect_tree_nat2[,c("effect","pval")],dist_effect_tree_nat3[,c("effect","pval")])
+
+names(dist_effect_tree_plot) <- c("Buffer","Naturalness","nat_pval","Integrity","int_pval",
+                                  "Spontaneity","spo_pval","Continuity","con_pval")
+
+dist_effect_tree_plot <- na.omit(dist_effect_tree_plot)
+dist_effect_tree_plot$Buffer <- dist_effect_tree_plot$Buffer*2
+dist_effect_tree_plot$nat_sig <- ifelse(dist_effect_tree_plot$nat_pval<0.05,1,0.2)
+dist_effect_tree_plot$int_sig <- ifelse(dist_effect_tree_plot$int_pval<0.05,1,0.2)
+dist_effect_tree_plot$spo_sig <- ifelse(dist_effect_tree_plot$spo_pval<0.05,1,0.2)
+dist_effect_tree_plot$con_sig <- ifelse(dist_effect_tree_plot$con_pval<0.05,0.5,0.2)
+
+ggplot(dist_effect_tree_plot, aes(x=Buffer)) +
+  geom_point(aes(y=Naturalness, alpha=nat_sig), shape=19) +
+  geom_point(aes(y=Integrity/4, alpha=int_sig), shape=0) +
+  geom_point(aes(y=Spontaneity, alpha=spo_sig), shape=1) +
+  geom_point(aes(y=Continuity, alpha=con_sig), shape=2) +
+  scale_alpha(range = c(0.2, 1)) +
+  scale_y_continuous(
+    name = "Difference in Naturalness \u25CF, Spontaneity \u25CB, Continuity \u25B3 (%)",
+    sec.axis = sec_axis( trans=~.*4, name="Difference in Integrity \u25A1 (%)")
+  ) +  theme_modern() + theme(legend.position = "none")
+
+ggsave("output/tram_tree_project_buffer.png",
+       width = 7,
+       height = 6.5,
+       dpi = 400)
 
 # nombre d'arbres
 
