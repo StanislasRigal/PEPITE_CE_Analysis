@@ -29,6 +29,11 @@ tram_trace <- rbind(tram_trace1,tram_trace2,tram_trace3,
                     tram_trace4,tram_trace5,tram_trace6)
 mapview(tram_trace)
 
+for(i in 1:nrow(tram_trace)){
+  mapshot(mapview(tram_trace[i,]),
+          file = paste0("output/mapview",i,stringr::str_sub(tram_trace[i,]$Name,1,5),".png"))
+}
+
 
 nat <- rast(raster("raw_data/Donnees_cartographiques/Layer4_FINAL.tif"))
 nat1 <- rast(raster("raw_data/Donnees_cartographiques/Layer1_FINAL.tif"))
@@ -70,7 +75,8 @@ for(i in 1:length(nat_masked)){
   nat_masked_df[[i]] <- nat_masked_df_tempo
 }
 
-
+library(ggpattern)
+library(magick)
 for(i in 1:length(nat_masked_df)){
   outfile1 <- paste("output/trace_tram_",i,".png",sep="")
   outfile2 <- paste("output/hist_tram_",i,".png",sep="")
@@ -87,6 +93,7 @@ for(i in 1:length(nat_masked_df)){
          height = 4,
          dpi = 400)
   
+  
   ggplot() +  
     geom_col(data=nat_tram_all_plot[[i]], aes(x=value, y= cover, fill=value), alpha=0.8, position = 'identity') + 
     scale_fill_viridis(limits = c(50, 500)) + labs(y= "Cover impacted", x="Naturalness") +
@@ -97,6 +104,36 @@ for(i in 1:length(nat_masked_df)){
          width = 6,
          height = 4,
          dpi = 400)
+}
+
+for(i in 1:length(nat_masked_df)){
+  outfile1b <- paste("output/trace",i,"_nat.png",sep="")
+  
+  break_value <- seq(from=min(nat_masked_df[[i]]$x),
+                     to=max(nat_masked_df[[i]]$x),length.out=round(nrow(nat_masked_df[[i]])/5))
+  
+  nat_masked_df[[i]]$x_cat <- cut(nat_masked_df[[i]]$x,
+                                  breaks=break_value)
+  
+  nat_masked_df_tempo <- na.omit(data.frame(nat_masked_df[[i]] %>% group_by(x_cat) %>% summarise(nat=mean(value,na.rm=TRUE))))
+  
+  nat_masked_df_tempo$x_mean <- seq(from=min(nat_masked_df[[i]]$x),
+                                    to=max(nat_masked_df[[i]]$x),length.out=nrow(nat_masked_df_tempo))
+  
+  nat_masked_df_tempo$x_mean <- nat_masked_df_tempo$x_mean - min(nat_masked_df_tempo$x_mean)
+  
+  ggplot(data=nat_masked_df_tempo, aes(x=x_mean, y=nat)) + 
+    geom_area_pattern(aes(fill=nat), pattern="gradient", 
+                      pattern_fill2 = viridis_pal()(500)[round(max(nat_masked_df_tempo$nat))], pattern_fill = viridis_pal()(500)[1], alpha=0.4)+
+    theme_modern() + ylab("Naturalness") + xlab("Distance (m)") +
+    scale_x_continuous(breaks = c(min(nat_masked_df_tempo$x_mean),max(nat_masked_df_tempo$x_mean)))+
+    theme(legend.position = "none")
+  
+  ggsave(outfile1b,
+         width = 8,
+         height = 4,
+         dpi = 400)
+  
 }
 
 ### tram existant
@@ -650,12 +687,14 @@ names(nat_affected_com_final_long)[2] <- "nat"
 
 fig4_data <- rbind(data.frame(nat_com3[which(nat_com3$com_name %in% unique(list_ville$com_centre)),],variable="com_center")[,c("nat","variable")],
                    nat_affected_com_final_long)
+saveRDS(fig4_data,"output/fig4_data.rds")
+
 names(fig4_data)[1] <- "Naturalness"
 fig4_data$variable[which(fig4_data$variable=="com_center")] <- "Center"
 fig4_data$variable[which(fig4_data$variable=="com_current")] <- "Peripheric"
-fig4_data$variable[which(fig4_data$variable=="nat_current")] <- "Tram project right-of-way (current)"
-fig4_data$variable[which(fig4_data$variable=="nat_post_tram")] <- "Tram project right-of-way (expected)"
-fig4_data$variable[which(fig4_data$variable=="nat_post_tram_tree")] <- "Tram project right-of-way (trees)"
+fig4_data$variable[which(fig4_data$variable=="nat_current")] <- "Tram project spatial extent (current)"
+fig4_data$variable[which(fig4_data$variable=="nat_post_tram")] <- "Tram project spatial extent (expected)"
+fig4_data$variable[which(fig4_data$variable=="nat_post_tram_tree")] <- "Tram project spatial extent (trees)"
 
 ggplot(fig4_data) +
   geom_density_ridges_gradient(aes(x = Naturalness, y = variable, fill = ..x..),scale = 1.5, rel_min_height = 0.01) +
@@ -667,18 +706,18 @@ ggplot(fig4_data) +
   geom_segment(aes(x = mean(fig4_data$Naturalness[which(fig4_data$variable=="Peripheric")]),
                    xend = mean(fig4_data$Naturalness[which(fig4_data$variable=="Peripheric")]),
                    y=2,yend=2.63),linetype="dashed") +
-  geom_segment(aes(x = mean(fig4_data$Naturalness[which(fig4_data$variable=="Tram project right-of-way (current)")]),
-                   xend = mean(fig4_data$Naturalness[which(fig4_data$variable=="Tram project right-of-way (current)")]),
+  geom_segment(aes(x = mean(fig4_data$Naturalness[which(fig4_data$variable=="Tram project spatial extent (current)")]),
+                   xend = mean(fig4_data$Naturalness[which(fig4_data$variable=="Tram project spatial extent (current)")]),
                    y=3,yend=3.65),linetype="dashed") +
-  geom_segment(aes(x = mean(fig4_data$Naturalness[which(fig4_data$variable=="Tram project right-of-way (expected)")]),
-                   xend = mean(fig4_data$Naturalness[which(fig4_data$variable=="Tram project right-of-way (expected)")]),
+  geom_segment(aes(x = mean(fig4_data$Naturalness[which(fig4_data$variable=="Tram project spatial extent (expected)")]),
+                   xend = mean(fig4_data$Naturalness[which(fig4_data$variable=="Tram project spatial extent (expected)")]),
                    y=4,yend=4.8),linetype="dashed") +
-  geom_segment(aes(x = mean(fig4_data$Naturalness[which(fig4_data$variable=="Tram project right-of-way (trees)")]),
-                   xend = mean(fig4_data$Naturalness[which(fig4_data$variable=="Tram project right-of-way (trees)")]),
+  geom_segment(aes(x = mean(fig4_data$Naturalness[which(fig4_data$variable=="Tram project spatial extent (trees)")]),
+                   xend = mean(fig4_data$Naturalness[which(fig4_data$variable=="Tram project spatial extent (trees)")]),
                    y=5,yend=5.7),linetype="dashed") +
   geom_segment(
-    x = mean(fig4_data$Naturalness[which(fig4_data$variable=="Tram project right-of-way (current)")]), y = 4.5,
-    xend = mean(fig4_data$Naturalness[which(fig4_data$variable=="Tram project right-of-way (expected)")]), yend = 4.5,
+    x = mean(fig4_data$Naturalness[which(fig4_data$variable=="Tram project spatial extent (current)")]), y = 4.5,
+    xend = mean(fig4_data$Naturalness[which(fig4_data$variable=="Tram project spatial extent (expected)")]), yend = 4.5,
     lineend = "round", # See available arrow types in example above
     linejoin = "round",
     size = 1, 
@@ -686,19 +725,19 @@ ggplot(fig4_data) +
     colour = "#ff0000" # Also accepts "red", "blue' etc
   ) +
   geom_segment(
-    x = mean(fig4_data$Naturalness[which(fig4_data$variable=="Tram project right-of-way (current)")]), y = 5.5,
-    xend = mean(fig4_data$Naturalness[which(fig4_data$variable=="Tram project right-of-way (trees)")]), yend = 5.5,
+    x = mean(fig4_data$Naturalness[which(fig4_data$variable=="Tram project spatial extent (current)")]), y = 5.5,
+    xend = mean(fig4_data$Naturalness[which(fig4_data$variable=="Tram project spatial extent (trees)")]), yend = 5.5,
     lineend = "round", # See available arrow types in example above
     linejoin = "round",
     size = 1, 
     arrow = arrow(length = unit(0.1, "inches")),
     colour = "#ffa200" # Also accepts "red", "blue' etc
   ) +
-  annotate("text", x=mean(fig4_data$Naturalness[which(fig4_data$variable=="Tram project right-of-way (current)")])-
-             (mean(fig4_data$Naturalness[which(fig4_data$variable=="Tram project right-of-way (current)")])-mean(fig4_data$Naturalness[which(fig4_data$variable=="Tram project right-of-way (trees)")]))/2,
+  annotate("text", x=mean(fig4_data$Naturalness[which(fig4_data$variable=="Tram project spatial extent (current)")])-
+             (mean(fig4_data$Naturalness[which(fig4_data$variable=="Tram project spatial extent (current)")])-mean(fig4_data$Naturalness[which(fig4_data$variable=="Tram project spatial extent (trees)")]))/2,
            y=5.3, label= "-7.4 %", col="#ffa200") +
-  annotate("text", x=mean(fig4_data$Naturalness[which(fig4_data$variable=="Tram project right-of-way (current)")])-
-             (mean(fig4_data$Naturalness[which(fig4_data$variable=="Tram project right-of-way (current)")])-mean(fig4_data$Naturalness[which(fig4_data$variable=="Tram project right-of-way (expected)")]))/2,
+  annotate("text", x=mean(fig4_data$Naturalness[which(fig4_data$variable=="Tram project spatial extent (current)")])-
+             (mean(fig4_data$Naturalness[which(fig4_data$variable=="Tram project spatial extent (current)")])-mean(fig4_data$Naturalness[which(fig4_data$variable=="Tram project spatial extent (expected)")]))/2,
            y=4.3, label= "-13.9 %", col="#ff0000") +
   theme(
     legend.position="none",
