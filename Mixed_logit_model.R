@@ -237,8 +237,11 @@ saveRDS(mixl_Temps5,"output/mixl_Temps5.rds")
 
 
 test <- data_DCE_numeric[,c("Gender", "Age", "Income","Education", "CSPgroup_plus","CSPgroup_moins","CSPgroup_inactif","CSPgroup_retraite",
-                             "class_nat", "Perso_knowledge_biodiversity","Perso_behaviour_nature", "Perso_relation_nature",
+                             "class_nat", "Perso_knowledge_biodiversity","Perso_behaviour_nature", "Perso_relation_nature","job_travel",
                             "journey_duration3","main_vehicule_indiv_motor","main_vehicule_indiv_no_motor", "main_vehicule_commun", "survey_id")]
+
+test <- data_DCE_numeric[,c("Gender", "Age", "Income","Perso_relation_nature","Perso_behaviour_nature",
+                            "Perso_knowledge_biodiversity","class_nat", "job_travel","survey_id")]
 
 #calculate correlation between each pairwise combination of variables
 cor_df <- round(cor(na.omit(test)), 2)
@@ -254,12 +257,12 @@ ggplot(data = melted_cormat, aes(x=Var1, y=Var2, fill=value)) +
                        limit = c(-1,1), name="Correlation") +
   scale_x_discrete(labels=c("Gender", "Age", "Income", "CSPgroup_inactif"="Inactive SPC", "CSPgroup_plus"="Higher SPC","CSPgroup_retraite"="Retired",
                             "CSPgroup_moins"="Lower SPC", "class_nat"="Habitat naturalness", "survey_id"="Informative framing", "journey_duration3"="Travel time",
-                            "Perso_knowledge_biodiversity"="Declared biodiversity knowledge","Perso_behaviour_nature"="Declared environmental behaviour",
+                            "Perso_knowledge_biodiversity"="Declared biodiversity knowledge","Perso_behaviour_nature"="Declared environmental behaviour","job_travel"="Commuting",
                             "main_vehicule_indiv_motor"="Individual motorised transport","main_vehicule_indiv_no_motor"="Individual not motorised transport",
                             "main_vehicule_commun"="Public transport","Education", "Perso_relation_nature"="INS")) +
   scale_y_discrete(labels=c("Gender", "Age", "Income", "CSPgroup_inactif"="Inactive SPC", "CSPgroup_plus"="Higher SPC","CSPgroup_retraite"="Retired",
                             "CSPgroup_moins"="Lower SPC", "class_nat"="Habitat naturalness", "survey_id"="Informative framing", "journey_duration3"="Travel time",
-                            "Perso_knowledge_biodiversity"="Declared biodiversity knowledge","Perso_behaviour_nature"="Declared environmental behaviour",
+                            "Perso_knowledge_biodiversity"="Declared biodiversity knowledge","Perso_behaviour_nature"="Declared environmental behaviour","job_travel"="Commuting",
                             "main_vehicule_indiv_motor"="Individual motorised transport","main_vehicule_indiv_no_motor"="Individual not motorised transport",
                             "main_vehicule_commun"="Public transport","Education", "Perso_relation_nature"="INS")) +
   theme(axis.title.x = element_blank(),
@@ -268,8 +271,8 @@ ggplot(data = melted_cormat, aes(x=Var1, y=Var2, fill=value)) +
         axis.text.x = element_text(angle = 45, vjust = 1, hjust=1), legend.position = "none")
 
 ggsave("output/correlation_all_variable.png",
-       width = 11,
-       height = 11,
+       width = 12,
+       height = 12,
        dpi = 400)
 
 
@@ -920,9 +923,9 @@ ggplot(AIC_BIC_mixl2, aes(x=model)) +
   geom_point(aes(y=AIC), col="grey") +
   geom_point(aes(y=BIC-200)) + 
   scale_y_continuous(
-    name = "AIC",
-    sec.axis = sec_axis( trans=~.-200, name="BIC")
-  ) +
+    name = "BIC",
+    sec.axis = sec_axis( trans=~.-200, name="AIC")
+  ) + xlab("Models") +
   theme_modern()
 
 ggsave("output/model_selection.png",
@@ -986,7 +989,7 @@ ggplot(df[which(!(df$Attribute %in% c("Biome peri-urban","Biome rural"))),], aes
                    .2, color = "gray50") +
   geom_point(size = 3.5, aes(color = Attribute, alpha=signif)) + 
   geom_point(data=df[which(!(df$Attribute %in% c("Biome peri-urban","Biome rural")) & df$Variable=="Main estimate"),],size = 3.5, aes(color = Attribute,x=box_estimate_main,alpha=signif)) +
-  theme_modern() + theme(legend.position = "none") + scale_alpha_discrete(range = c(0.4, 1)) +
+  theme_modern() + theme(legend.position = "none") + scale_color_viridis_d() + scale_alpha_discrete(range = c(0.4, 1)) +
   ylab("") +
   xlab("Estimate") + facet_grid(. ~ Attribute, scales='free')
 
@@ -1683,3 +1686,83 @@ mixl_Temps_ava <- gmnl(choice ~ Temps + Paysage + Acces + Biodiversite + Biome +
                                   asc = c("Perso_relation_nature","job_travel","survey_id", "biogeo", "exist_tram", "IEM...6.pollutions")),
                       R = 60)
 
+
+
+
+### supplementary questions
+
+data_DCE <- readRDS("output/data_DCE.rds")
+df <- data_DCE[grep("QCE1_",data_DCE$chid),]
+df <- df[which(df$choice==1),]
+
+df_alternative <- df[,grep(c("Alternative_"),names(df))]
+df_alternative$Alternative_other <- NULL
+df_alternative$survey_person <- df$survey_person
+
+df_alternative_long <- melt(df_alternative, id.vars = "survey_person")
+df_alternative_long$value[which(df_alternative_long$value=="Oui")] <- "Yes"
+df_alternative_long$value[which(df_alternative_long$value=="Non sélectionné")] <- "No"
+df_alternative_long$variable <- as.character(df_alternative_long$variable)
+df_alternative_long$variable <- factor(df_alternative_long$variable,
+                                        c("Alternative_tram_important","Alternative_bicycle","Alternative_remote_work","Alternative_bus",
+                                          "Alternative_change_city","Alternative_pedestrian","Alternative_carpool","Alternative_closer_work"))
+df_alternative_long <- droplevels(na.omit(df_alternative_long))
+
+ggplot(df_alternative_long, aes(x=variable, fill=value)) + 
+  geom_bar(position="fill",stat = "count") +
+  scale_fill_viridis_d() + ylab("Frequency") +
+  scale_x_discrete(labels=c("Alternative_tram_important"="Tram development is already an important step",
+                            "Alternative_pedestrian"="Extanded pedestrian areas",
+                            "Alternative_bicycle"="Protected and continuous cycle lanes",
+                            "Alternative_bus"="Buses with their own lane",
+                            "Alternative_carpool"="Car-pooling",
+                            "Alternative_remote_work"="Increase remote work share",
+                            "Alternative_closer_work"="Change job to be closer to home",
+                            "Alternative_change_city"="Redesign cities to decrease need for car deplacements")) +
+  theme_modern() + theme(axis.text.x = element_text(angle = 60, hjust=1),
+                         legend.title = element_blank(),
+                         axis.title.x = element_blank())
+
+ggsave("output/alternative_graph.png",
+       width = 15,
+       height = 12,
+       dpi = 400)
+
+
+df_agree <- df[,grep(c("Agree_"),names(df))]
+df_agree$agree_other <- NULL
+df_agree$survey_person <- df$survey_person
+
+df_agree_long <- melt(df_agree, id.vars = "survey_person")
+df_agree_long$value[which(df_agree_long$value=="Je ne sais pas")] <- "Doesn't know"
+df_agree_long$value[which(df_agree_long$value=="Pas du tout d’accord")] <- "Completely disagree"
+df_agree_long$value[which(df_agree_long$value=="Plutôt pas d’accord")] <- "Disagree"
+df_agree_long$value[which(df_agree_long$value=="Plutôt d’accord")] <- "Agree"
+df_agree_long$value[which(df_agree_long$value=="Tout à fait d’accord")] <- "Completely agree"
+df_agree_long$value <- factor(df_agree_long$value,c("Completely disagree","Disagree","Doesn't know","Agree","Completely agree"))
+
+df_agree_long_eco <- droplevels(na.omit(df_agree_long[which(df_agree_long$variable %in% c("Agree_protect_nature_major","Agree_individual_effect",
+                                                                       "Agree_public_transport_not_a_solution","Agree_infra_no_impact",
+                                                                       "Agree_individual_not_enough")),]))
+
+df_agree_long_eco$variable <- as.character(df_agree_long_eco$variable)
+df_agree_long_eco$variable <- factor(df_agree_long_eco$variable,
+                                       c("Agree_individual_effect","Agree_protect_nature_major","Agree_individual_not_enough",
+                                         "Agree_public_transport_not_a_solution","Agree_infra_no_impact"))
+
+ggplot(df_agree_long_eco, aes(x=variable, fill=value)) + 
+  geom_bar(position="fill",stat = "count") +
+  scale_fill_viridis_d() + ylab("Frequency") +
+  scale_x_discrete(labels=c("Agree_individual_effect"="Individual actions help to protect nature",
+                            "Agree_protect_nature_major"="Nature preservation is a major challenge in our society",
+                            "Agree_individual_not_enough"="Individual actions will not be sufficient to protect nature",
+                            "Agree_public_transport_not_a_solution"="Developing public transport is not a solution to mitigate climate change",
+                            "Agree_infra_no_impact"="Transport infrastructures do not affect nature")) +
+  theme_modern() + theme(axis.text.x = element_text(angle = 45, hjust=1),
+                         legend.title = element_blank(),
+                         axis.title.x = element_blank())
+
+ggsave("output/agree_graph.png",
+       width = 15,
+       height = 12,
+       dpi = 400)

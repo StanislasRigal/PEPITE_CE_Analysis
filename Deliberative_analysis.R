@@ -530,5 +530,40 @@ ggsave("output/ranking2.png",
        height = 6,
        dpi = 400)
 
+#
 
+choix_fiche <- read.csv2("raw_data/choix_fiche.csv")
+choix_fiche$`Scenario 1` <- choix_fiche$somme.standard*choix_fiche$scenario1/sum(choix_fiche$somme.standard,na.rm = TRUE)
+choix_fiche$`Scenario 2` <- choix_fiche$somme.standard*choix_fiche$scenario2/sum(choix_fiche$somme.standard,na.rm = TRUE)
+choix_fiche$`Scenario 3` <- choix_fiche$somme.standard*choix_fiche$scenario3/sum(choix_fiche$somme.standard,na.rm = TRUE)
+choix_fiche$`Scenario 4` <- choix_fiche$somme.standard*choix_fiche$scenario4/sum(choix_fiche$somme.standard,na.rm = TRUE)
+choix_fiche$`Scenario 5` <- choix_fiche$somme.standard*choix_fiche$scenario5/sum(choix_fiche$somme.standard,na.rm = TRUE)
 
+choix_fiche$`Scenario 1 (weighted)` <- choix_fiche$somme.pondérée*choix_fiche$scenario1/sum(choix_fiche$somme.pondérée,na.rm = TRUE)
+choix_fiche$`Scenario 2 (weighted)` <- choix_fiche$somme.pondérée*choix_fiche$scenario2/sum(choix_fiche$somme.pondérée,na.rm = TRUE)
+choix_fiche$`Scenario 3 (weighted)` <- choix_fiche$somme.pondérée*choix_fiche$scenario3/sum(choix_fiche$somme.pondérée,na.rm = TRUE)
+choix_fiche$`Scenario 4 (weighted)` <- choix_fiche$somme.pondérée*choix_fiche$scenario4/sum(choix_fiche$somme.pondérée,na.rm = TRUE)
+choix_fiche$`Scenario 5 (weighted)` <- choix_fiche$somme.pondérée*choix_fiche$scenario5/sum(choix_fiche$somme.pondérée,na.rm = TRUE)
+
+apply(choix_fiche[-nrow(choix_fiche),c("Scenario 1","Scenario 2","Scenario 3","Scenario 4","Scenario 5")],2,sum)
+apply(choix_fiche[-nrow(choix_fiche),c("Scenario 1 (weighted)","Scenario 2 (weighted)","Scenario 3 (weighted)","Scenario 4 (weighted)","Scenario 5 (weighted)")],2,sum)
+
+ggplot(melt(choix_fiche[-nrow(choix_fiche),c("Scenario 1","Scenario 2","Scenario 3","Scenario 4","Scenario 5")])) +
+  geom_bar(aes(x=variable,y=value,fill=variable),stat = "identity") + coord_cartesian(ylim = c(2, 3.5)) +
+  ylab("Score") +
+  scale_fill_brewer() + theme_modern() + theme(legend.position = "none",
+                                               axis.text.x = element_text(angle = 45, hjust = 1),
+                                               axis.title.x = element_blank())
+
+ggplot(melt(choix_fiche[-nrow(choix_fiche),c("Scenario 1 (weighted)","Scenario 2 (weighted)","Scenario 3 (weighted)","Scenario 4 (weighted)","Scenario 5 (weighted)")])) +
+  geom_bar(aes(x=variable,y=value,fill=variable),stat = "identity") + coord_cartesian(ylim = c(2, 3.5)) +
+  ylab("Score") +
+  scale_fill_brewer() + theme_modern() + theme(legend.position = "none",
+                                              axis.text.x = element_text(angle = 45, hjust = 1),
+                                              axis.title.x = element_blank())
+
+ggsave("output/scenario_choice.png",
+       width = 8,
+       height = 6,
+       dpi = 400)
+ 
